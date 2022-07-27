@@ -9,11 +9,24 @@ const controller = {
   get: async () => {
 
     //const col = await Collection.add({ "name":"peter" ,"age":20 })
-   return new APIResponse(200, "Hello");
+   return new APIResponse(200, "Hello Collection ....");
     // throw new APIError({
     //   status: httpStatus.NOT_FOUND,
     //   message: "user not found",
     // });
+  },
+
+  create: async ({ body }) => {
+    const col = await Collection.add(body);
+    if(cal) {
+      return new APIResponse(201, "Create OK");
+    }
+    else{
+        throw new APIError({
+            status: httpStatus.INTERNAL_SERVER_ERROR,
+            message: "Cannot crate Collection",
+          });
+    }
   },
 
   uploadMultiple: async(req) => {

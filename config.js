@@ -20,19 +20,19 @@ const config = {
   },
 };
 
-if (process.env.NODE_ENV === "production") {
-  config.database.options = {
-    ...config.database.options,
-    authSource: "admin",
-    auth: {
-      username: config.database.username,
-      password: config.database.password,
-    },
-  };
-} else if (process.env.NODE_ENV === "test") {
-  config.database.name += "-test";
-  config.server.port = 3456;
-}
+// if (process.env.NODE_ENV === "production") {
+//   config.database.options = {
+//     ...config.database.options,
+//     authSource: "admin",
+//     auth: {
+//       username: config.database.username,
+//       password: config.database.password,
+//     },
+//   };
+// } else if (process.env.NODE_ENV === "test") {
+//   config.database.name += "-test";
+//   config.server.port = 3456;
+// }
 
 config.database.uri = `mongodb://${config.database.host}:${config.database.port}/${config.database.name}`;
 

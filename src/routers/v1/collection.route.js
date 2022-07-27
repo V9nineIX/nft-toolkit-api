@@ -47,6 +47,12 @@ const router = express.Router();
 router.route("/").get(handle(controller.get));
 
 
+
+
+ router.route("/create").post(handle(controller.create));
+
+
+
 /**
  * @swagger
  * /v1/collection:
@@ -68,6 +74,8 @@ router.route("/").get(handle(controller.get));
  *               example: 1.0.0
  */
  router.route("/uploadImage").post(upload.array('profile-files', 12), handle(controller.uploadMultiple));
+
+
 
 
 export default router;

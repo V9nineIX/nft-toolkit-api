@@ -23,6 +23,11 @@ services:
       MONGODB_USERNAME: ${MONGODB_USERNAME}
       MONGODB_PASSWORD: ${MONGODB_PASSWORD}
       NODE_ENV: production
+    volumes:
+      - ./:/app
+      - ignore:/app/node_modules/
 
 volumes:
   db_data:
+  ignore:
+  

@@ -47,8 +47,35 @@ const router = express.Router();
 router.route("/").get(handle(controller.get));
 
 
-
-
+/**
+ * @swagger
+ * /v1/collection:
+ *   post:
+ *     tags: [Collection]
+ *     summary: create
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         description: collection info
+ *         schema:
+ *           type: object
+ *           properties:
+ *             name:
+ *               type: string
+ *               description: Name
+ *               example: Jack
+ *     responses:
+ *       201:
+ *         description: Return created user
+ *         schema:
+ *           type: object
+ *           properties:
+ *             data:
+ *               $ref: '#/definitions/User'
+ *             version:
+ *               type: string
+ *               example: 1.0.0
+ */
  router.route("/create").post(handle(controller.create));
 
 

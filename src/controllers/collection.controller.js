@@ -10,7 +10,7 @@ const controller = {
   get: async () => {
 
     //const col = await Collection.add({ "name":"peter" ,"age":20 })
-   return new APIResponse(200, "Hello Collection ....");
+   return new APIResponse(200, "Hello Collection API  99999 ....");
     // throw new APIError({
     //   status: httpStatus.NOT_FOUND,
     //   message: "user not found",
@@ -18,12 +18,19 @@ const controller = {
   },
 
   create: async ({ body }) => {
-    const col = await Collection.add(body);
-    //TODO :  create folder
-    if(cal) {
-      return new APIResponse(201, "Create OK");
+
+    try {
+        const colResult = await Collection.add(body);
+        //TODO :  create folder
+        const projectName = req.body.name;
+        const createDir = './folder/'+projectName;
+        fsx.ensureDir(createDir);
+    
+    if(colResult) {
+        return new APIResponse(201, "Create OK");
     }
-    else{
+    }catch(ex){
+
         throw new APIError({
             status: httpStatus.INTERNAL_SERVER_ERROR,
             message: "Cannot crate Collection",
@@ -33,8 +40,8 @@ const controller = {
 
   uploadMultiple: async(req) => {
    // console.log("body" , body)
-   console.log("req", req.body.layer)
-   console.log(JSON.stringify(req.files))
+   //console.log("req", req.body.layer)
+   //console.log(JSON.stringify(req.files))
 
    try {
 
@@ -55,7 +62,7 @@ const controller = {
  
     }
  
-     return new APIResponse(200, "Upload OK");
+    return new APIResponse(200, "Upload OK");
 
    }catch(ex){
      console.log("ex" ,ex)

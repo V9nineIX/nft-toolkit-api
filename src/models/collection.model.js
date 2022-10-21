@@ -5,6 +5,9 @@ const collectionSchema = new mongoose.Schema({
     name: {
         type: String
     },
+    ownerId: {
+        type: String
+    },
     symbol: {
         type: String
     },

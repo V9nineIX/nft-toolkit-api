@@ -23,11 +23,14 @@ const controller = {
         const colResult = await Collection.add(body);
         //TODO :  create folder
         const projectName = body.name;
-        const createDir = './folder/'+projectName;
+        const ownerId = body.ownerId
+        const projectDir = ownerId+'-'+projectName 
+        const createDir = './folder/'+projectDir;
         fsx.ensureDir(createDir);
     
     if(colResult) {
-        return new APIResponse(201, "Create OK");
+        return new APIResponse(201, { 
+            projectDir  });
     }
     }catch(ex){
 
@@ -46,7 +49,8 @@ const controller = {
    try {
 
     const layerName = req.body.layer;
-    const createDir = './folder/'+layerName;
+    const projectDir = req.body.projectDir;
+    const createDir = './folder/'+projectDir+"/"+layerName;
  
     fsx.ensureDir(createDir);
  

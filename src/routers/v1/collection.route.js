@@ -76,13 +76,13 @@ router.route("/").get(handle(controller.get));
  *               type: string
  *               example: 1.0.0
  */
- router.route("/create").post(handle(controller.create));
+ router.route("/").post(handle(controller.create));
 
 
 
 /**
  * @swagger
- * /v1/collection:
+ * UploadImage:
  *   post:
  *     tags: [Collection]
  *     summary: upload
@@ -100,7 +100,8 @@ router.route("/").get(handle(controller.get));
  *               type: string
  *               example: 1.0.0
  */
- router.route("/uploadImage").post(upload.array('profile-files', 12), handle(controller.uploadMultiple));
+
+router.route("/uploadImage").post(upload.array('profile-files', 12), handle(controller.uploadMultiple));
 
 
 

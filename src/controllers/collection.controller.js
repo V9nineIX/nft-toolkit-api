@@ -10,7 +10,7 @@ const controller = {
   get: async () => {
 
     //const col = await Collection.add({ "name":"peter" ,"age":20 })
-   return new APIResponse(200, "Hello Collection API  99999 ....");
+   return new APIResponse(200, "Hello Collection API ....");
     // throw new APIError({
     //   status: httpStatus.NOT_FOUND,
     //   message: "user not found",
@@ -22,7 +22,7 @@ const controller = {
     try {
         const colResult = await Collection.add(body);
         //TODO :  create folder
-        const projectName = req.body.name;
+        const projectName = body.name;
         const createDir = './folder/'+projectName;
         fsx.ensureDir(createDir);
     
@@ -33,7 +33,7 @@ const controller = {
 
         throw new APIError({
             status: httpStatus.INTERNAL_SERVER_ERROR,
-            message: "Cannot crate Collection",
+            message: "Cannot create Collection",
           });
     }
   },

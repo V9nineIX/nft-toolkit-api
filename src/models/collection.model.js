@@ -3,19 +3,19 @@ import mongoose from "mongoose";
 
 
 const ImageSchema = new mongoose.Schema({
-    name:{
+    name: {
         type: String
     },
-    path:{
+    path: {
         type: String
     }
 })
 
-const LayerSchema =  new mongoose.Schema({
+const LayerSchema = new mongoose.Schema({
     name: {
         type: String
     },
-    image:[ImageSchema]
+    image: [ImageSchema]
 })
 
 
@@ -29,39 +29,39 @@ const collectionSchema = new mongoose.Schema({
     symbol: {
         type: String
     },
-    description:{
+    description: {
         type: String
     },
-    defulatPrice:{
+    defaultPrice: {
         type: String
     },
-    royaltyFee:{
+    royaltyFee: {
         type: String
     },
-    layer:{
+    layer: {
         type: [LayerSchema]
 
     }
 
 },
-{ timestamps: true }
+    { timestamps: true }
 )
 
 collectionSchema.statics = {
 
- async add(body) {
+    async add(body) {
         const doc = await this.create(body); /// mogia
         return doc;
- },
- async list(){
+    },
+    async list() {
         const doc = await this.find()
         return doc
- }
+    },
 
- async findByOwnerId(ownerId) {
-    const doc = await this.find({ ownerId: ownerId });
-    return doc;
-  },
+    async findByOwnerId(ownerId) {
+        const doc = await this.find({ ownerId: ownerId });
+        return doc;
+    },
 
 
 }

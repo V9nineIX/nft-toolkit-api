@@ -30,7 +30,9 @@ const controller = {
     
     if(colResult) {
         return new APIResponse(201, { 
-            projectDir  });
+            projectDir ,
+            projectName 
+        });
     }
     }catch(ex){
 

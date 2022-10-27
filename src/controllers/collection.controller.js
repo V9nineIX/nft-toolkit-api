@@ -78,7 +78,22 @@ const controller = {
    }
 
 
-  } //  end upload function
+  }, //  end upload function
+
+
+
+  findByOwnerId: async ({ params }) => {
+    const { ownerId } = params;
+    try {
+      const collection = await Collection.findByOwnerId(ownerId);
+      return new APIResponse(201,  collection );
+    } catch (ex) {
+      throw new APIError({
+        status: httpStatus.INTERNAL_SERVER_ERROR,
+        message: "Cannot find collection by ownerId",
+      });
+    }
+  },
   
 }; //  end controller
 

@@ -8,6 +8,12 @@ const ImageSchema = new mongoose.Schema({
     },
     path: {
         type: String
+    },
+    rarity: {
+        type: String
+    },
+    count : {
+        type: Number
     }
 })
 
@@ -37,6 +43,9 @@ const collectionSchema = new mongoose.Schema({
     },
     royaltyFee: {
         type: String
+    },
+    totalSupply: {
+        type: Number
     },
     layer: {
         type: [LayerSchema]

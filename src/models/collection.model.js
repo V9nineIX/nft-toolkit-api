@@ -17,7 +17,7 @@ const ImageSchema = new mongoose.Schema({
     },
     count: {
         type: Number
-    },
+    }
 })
 
 const LayerSchema = new mongoose.Schema({
@@ -41,17 +41,21 @@ const collectionSchema = new mongoose.Schema({
     description: {
         type: String
     },
+    coverImage: {
+        type: String
+    },
     defaultPrice: {
         type: Number
     },
     royaltyFee: {
         type: Number
     },
+    totalSupply: {
+        type: Number
+    },
     layers: {
         type: [LayerSchema]
-
     }
-
 },
     { timestamps: true }
 )

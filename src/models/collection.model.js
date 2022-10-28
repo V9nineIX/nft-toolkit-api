@@ -3,16 +3,19 @@ import mongoose from "mongoose";
 
 
 const ImageSchema = new mongoose.Schema({
-    name: {
-        type: String
-    },
     path: {
         type: String
     },
-    rarity: {
+    name: {
         type: String
     },
-    count : {
+    title: {
+        type: String
+    },
+    rarity: {
+        type: Number
+    },
+    count: {
         type: Number
     }
 })
@@ -21,7 +24,7 @@ const LayerSchema = new mongoose.Schema({
     name: {
         type: String
     },
-    image: [ImageSchema]
+    images: [ImageSchema]
 })
 
 
@@ -38,20 +41,21 @@ const collectionSchema = new mongoose.Schema({
     description: {
         type: String
     },
-    defaultPrice: {
+    coverImage: {
         type: String
     },
+    defaultPrice: {
+        type: Number
+    },
     royaltyFee: {
-        type: String
+        type: Number
     },
     totalSupply: {
         type: Number
     },
-    layer: {
+    layers: {
         type: [LayerSchema]
-
     }
-
 },
     { timestamps: true }
 )

@@ -3,12 +3,14 @@ import Collection from "../models/collection.model";
 import APIResponse from "../utils/api-response";
 import APIError from "../utils/api-error";
 import fsx from 'fs-extra';
+import { startCreating } from '../libs/genarate'
 
 
 const controller = {
   
   get: async () => {
-
+    
+    await startCreating()
     //const col = await Collection.add({ "name":"peter" ,"age":20 })
    return new APIResponse(200, "Hello Collection API ....");
     // throw new APIError({

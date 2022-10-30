@@ -56,8 +56,7 @@ collectionSchema.statics = {
  async list(){
         const doc = await this.find()
         return doc
- }
-
+ },
  async findByOwnerId(ownerId) {
     const doc = await this.find({ ownerId: ownerId });
     return doc;

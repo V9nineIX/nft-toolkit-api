@@ -10,7 +10,9 @@ const controller = {
   
   get: async () => {
     
-    await startCreating()
+    const res  = await startCreating()
+    console.log("res",res)
+
     //const col = await Collection.add({ "name":"peter" ,"age":20 })
    return new APIResponse(200, "Hello Collection API ....");
     // throw new APIError({

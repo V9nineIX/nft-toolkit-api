@@ -4,25 +4,31 @@ import mongoose from "mongoose";
 
 const ImageSchema = new mongoose.Schema({
     path: {
-        type: String
+        type: String,
+        default: "",
     },
     name: {
-        type: String
+        type: String,
+        default: "",
     },
     title: {
-        type: String
+        type: String,
+        default: "",
     },
     rarity: {
-        type: Number
+        type: Number,
+        default: 0,
     },
     count: {
-        type: Number
+        type: Number,
+        default: 0,
     }
 })
 
 const LayerSchema = new mongoose.Schema({
     name: {
-        type: String
+        type: String,
+        default: "",
     },
     images: [ImageSchema]
 })
@@ -30,28 +36,40 @@ const LayerSchema = new mongoose.Schema({
 
 const collectionSchema = new mongoose.Schema({
     name: {
-        type: String
+        type: String,
+        default: "",
     },
     ownerId: {
-        type: String
+        type: String,
+        default: "",
     },
     symbol: {
-        type: String
+        type: String,
+        default: "",
     },
     description: {
-        type: String
+        type: String,
+        default: "",
     },
     coverImage: {
-        type: String
+        type: String,
+        default: "",
     },
     defaultPrice: {
-        type: Number
+        type: Number,
+        default: 0,
     },
     royaltyFee: {
-        type: Number
+        type: Number,
+        default: 0,
     },
     totalSupply: {
-        type: Number
+        type: Number,
+        default: 1000,
+    },
+    projectDir: {
+        type: String,
+        default: "",
     },
     layers: {
         type: [LayerSchema]

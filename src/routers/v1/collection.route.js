@@ -112,13 +112,13 @@ router.route("/uploadImage").post(upload.array('profile-files', 12), handle(cont
 // ========= find by ownerId ========= //
 /**
  * @swagger
- * /v1/collection/{ownerId}:
+ * /v1/collection/owner/{id}:
  *   get:
  *     tags: [Collection]
  *     summary: get by ownerId
  *     parameters:
  *       - in: path
- *         name: ownerId
+ *         name: id
  *         description: ownerID
  *         schema:
  *           type: string
@@ -135,9 +135,37 @@ router.route("/uploadImage").post(upload.array('profile-files', 12), handle(cont
  *               type: string
  *               example: 1.0.0
  */
-router.route("/:ownerId").get(handle(controller.findByOwnerId));
+router.route("/owner/:id").get(handle(controller.findByOwnerId));
 
 
+
+// ========= find by ownerId ========= //
+/**
+ * @swagger
+ * /v1/collection/{id}:
+ *   get:
+ *     tags: [Collection]
+ *     summary: get by id
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: collectionID
+ *         schema:
+ *           type: string
+ *           example: 5df206f819f1802f7e158f73
+ *     responses:
+ *       200:
+ *         description: Return get collection by id
+ *         schema:
+ *           type: object
+ *           properties:
+ *             data:
+ *               $ref: '#/definitions/User'
+ *             version:
+ *               type: string
+ *               example: 1.0.0
+ */
+ router.route("/:id").get(handle(controller.findByCollectionId));
 
 
 export default router;

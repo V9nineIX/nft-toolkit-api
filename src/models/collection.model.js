@@ -94,6 +94,11 @@ collectionSchema.statics = {
         return doc;
     },
 
+    async findByCollectionId(id) {
+        const doc = await this.find({ _id: id });
+        return doc;
+    },
+
 
 }
 

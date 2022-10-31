@@ -88,14 +88,27 @@ const controller = {
 
 
   findByOwnerId: async ({ params }) => {
-    const { ownerId } = params;
+    const { id } = params;
     try {
-      const collection = await Collection.findByOwnerId(ownerId);
+      const collection = await Collection.findByOwnerId(id);
       return new APIResponse(201, collection);
     } catch (ex) {
       throw new APIError({
         status: httpStatus.INTERNAL_SERVER_ERROR,
         message: "Cannot find collection by ownerId",
+      });
+    }
+  },
+
+  findByCollectionId: async ({ params }) => {
+    const { id } = params;
+    try {
+      const res = await Collection.findByCollectionId(id);
+      return new APIResponse(201, res);
+    } catch (ex) {
+      throw new APIError({
+        status: httpStatus.INTERNAL_SERVER_ERROR,
+        message: "Cannot find collection by id",
       });
     }
   },

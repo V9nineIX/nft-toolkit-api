@@ -88,3 +88,6 @@ typings/
 .dynamodb/
 
 *yarn.lock
+
+.build/
+build/

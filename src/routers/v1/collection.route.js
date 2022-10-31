@@ -136,4 +136,36 @@ router.route("/:ownerId").get(handle(controller.findByOwnerId));
 
 
 
+/**
+ * @swagger
+ * /v1/collection/genarateImage:
+ *   put:
+ *     tags: [Collection]
+ *     summary: genarateImage
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         description: collection info
+ *         schema:
+ *           type: object
+ *           properties:
+ *             name:
+ *               type: string
+ *               description: Name
+ *               example: Jack
+ *     responses:
+ *       201:
+ *         description: Return created user
+ *         schema:
+ *           type: object
+ *           properties:
+ *             data:
+ *               $ref: '#/definitions/User'
+ *             version:
+ *               type: string
+ *               example: 1.0.0
+ */
+ router.route("genarateImage/:id").put(handle(controller.genarateImage));
+
+
 export default router;

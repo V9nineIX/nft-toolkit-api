@@ -140,7 +140,7 @@ const controller = {
              console.log("move file finish")
          }
      });
- 
+
     }
  
     return new APIResponse(200, "Upload OK");
@@ -171,6 +171,25 @@ const controller = {
       });
     }
   },
+
+  genarateImage: async({ body ,params }) => {
+
+    try{
+    const { id } = params
+    const { data } = body
+    const  res    =  collection.updateById(id ,data)  
+    console.log("res" ,res) 
+
+        
+    }catch(ex){
+        throw new APIError({
+            status: httpStatus.INTERNAL_SERVER_ERROR,
+            message: "Cannot genarate image",
+          });
+
+    }
+
+  }
   
 }; //  end controller
 

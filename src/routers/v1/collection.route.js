@@ -6,14 +6,14 @@ import fsx from 'fs-extra';
 
 
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, './folder')
-    },
-    filename: function (req, file, cb) {
-      cb(null, file.originalname)
-    }
+  destination: function (req, file, cb) {
+    cb(null, './folder')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname)
+  }
 })
-const  upload = multer({ storage: storage })
+const upload = multer({ storage: storage })
 
 
 const router = express.Router();
@@ -63,7 +63,11 @@ router.route("/").get(handle(controller.get));
  *             name:
  *               type: string
  *               description: Name
- *               example: Jack
+ *               example: CollectionA
+ *             ownerId:
+ *               type: string
+ *               description: Owner ID
+ *               example: 0952648493
  *     responses:
  *       201:
  *         description: Return created user
@@ -76,7 +80,7 @@ router.route("/").get(handle(controller.get));
  *               type: string
  *               example: 1.0.0
  */
- router.route("/").post(handle(controller.create));
+router.route("/").post(handle(controller.create));
 
 
 
@@ -108,17 +112,17 @@ router.route("/uploadImage").post(upload.array('profile-files', 12), handle(cont
 // ========= find by ownerId ========= //
 /**
  * @swagger
- * /v1/collection/{ownerId}:
+ * /v1/collection/owner/{id}:
  *   get:
  *     tags: [Collection]
  *     summary: get by ownerId
  *     parameters:
  *       - in: path
- *         name: ownerId
+ *         name: id
  *         description: ownerID
  *         schema:
  *           type: string
- *           example: 5df206f819f1802f7e158f73
+ *           example: 0952648493
  *     responses:
  *       200:
  *         description: Return get collection by ownerId
@@ -131,31 +135,27 @@ router.route("/uploadImage").post(upload.array('profile-files', 12), handle(cont
  *               type: string
  *               example: 1.0.0
  */
-router.route("/:ownerId").get(handle(controller.findByOwnerId));
+router.route("/owner/:id").get(handle(controller.findByOwnerId));
 
 
 
-
+// ========= find by ownerId ========= //
 /**
  * @swagger
- * /v1/collection/genarateImage:
- *   put:
+ * /v1/collection/{id}:
+ *   get:
  *     tags: [Collection]
- *     summary: genarateImage
+ *     summary: get by id
  *     parameters:
- *       - in: body
- *         name: body
- *         description: collection info
+ *       - in: path
+ *         name: id
+ *         description: collectionID
  *         schema:
- *           type: object
- *           properties:
- *             name:
- *               type: string
- *               description: Name
- *               example: Jack
+ *           type: string
+ *           example: 5df206f819f1802f7e158f73
  *     responses:
- *       201:
- *         description: Return created user
+ *       200:
+ *         description: Return get collection by id
  *         schema:
  *           type: object
  *           properties:
@@ -165,7 +165,34 @@ router.route("/:ownerId").get(handle(controller.findByOwnerId));
  *               type: string
  *               example: 1.0.0
  */
- router.route("genarateImage/:id").put(handle(controller.genarateImage));
+ router.route("/:id").get(handle(controller.findByCollectionId));
+
+
+/**
+ * @swagger
+ * /v1/collection/genarateImage/{id}:
+ *   put:
+ *     tags: [Collection]
+ *     summary: genarateImage
+*     parameters:
+ *       - in: path
+ *         name: id
+ *         description: Collection Id
+ *         schema:
+ *           type: string
+ *           example: 635f93c13058f3148ec59d6b
+ *       - in: body
+ *         name: body
+ *         description: Collection's information
+ *         schema:
+ *           type: object
+ *     responses:
+ *       201:
+ *         description: Return created user
+ *         schema:
+ *           type: object
+ */
+ router.route("/genarateImage/:id").put(handle(controller.genarateImage));
 
 
 export default router;

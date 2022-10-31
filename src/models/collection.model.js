@@ -3,68 +3,106 @@ import mongoose from "mongoose";
 
 
 const ImageSchema = new mongoose.Schema({
-    name:{
-        type: String
+    path: {
+        type: String,
+        default: "",
     },
-    path:{
-        type: String
+    name: {
+        type: String,
+        default: "",
+    },
+    title: {
+        type: String,
+        default: "",
+    },
+    rarity: {
+        type: Number,
+        default: 0,
+    },
+    count: {
+        type: Number,
+        default: 0,
     }
 })
 
-const LayerSchema =  new mongoose.Schema({
+const LayerSchema = new mongoose.Schema({
     name: {
-        type: String
+        type: String,
+        default: "",
     },
-    image:[ImageSchema]
+    images: [ImageSchema]
 })
 
 
 const collectionSchema = new mongoose.Schema({
     name: {
-        type: String
+        type: String,
+        default: "",
     },
     ownerId: {
-        type: String
+        type: String,
+        default: "",
     },
     symbol: {
-        type: String
+        type: String,
+        default: "",
     },
-    description:{
-        type: String
+    description: {
+        type: String,
+        default: "",
     },
-    defulatPrice:{
-        type: String
+    coverImage: {
+        type: String,
+        default: "",
     },
-    royaltyFee:{
-        type: String
+    defaultPrice: {
+        type: Number,
+        default: 0,
     },
-    layer:{
+    royaltyFee: {
+        type: Number,
+        default: 0,
+    },
+    totalSupply: {
+        type: Number,
+        default: 1000,
+    },
+    projectDir: {
+        type: String,
+        default: "",
+    },
+    layers: {
         type: [LayerSchema]
-
     }
-
 },
-{ timestamps: true }
+    { timestamps: true }
 )
 
 collectionSchema.statics = {
 
- async add(body) {
+    async add(body) {
         const doc = await this.create(body); /// mogia
         return doc;
- },
- async list(){
+    },
+    async list() {
         const doc = await this.find()
         return doc
- },
- async findByOwnerId(ownerId) {
-    const doc = await this.find({ ownerId: ownerId });
-    return doc;
-  },
- async updateById(id, body) {
-    const doc = await this.findByIdAndUpdate(id, body, { new: true });
-    return doc;
-  },
+    },
+
+    async findByOwnerId(ownerId) {
+        const doc = await this.find({ ownerId: ownerId });
+        return doc;
+    },
+
+    async findByCollectionId(id) {
+        const doc = await this.find({ _id: id });
+        return doc;
+    },
+
+    async updateById(id, body) {
+        const doc = await this.findByIdAndUpdate(id, body, { new: true });
+        return doc;
+     },
 
 
 }

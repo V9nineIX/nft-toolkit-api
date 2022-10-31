@@ -7,7 +7,7 @@ import { startCreating } from '../libs/genarate'
 
 
 const controller = {
-  
+
   get: async () => {
     
 
@@ -83,7 +83,7 @@ const controller = {
     console.log("res",res)
 
     //const col = await Collection.add({ "name":"peter" ,"age":20 })
-   return new APIResponse(200, "Hello Collection API ....");
+    return new APIResponse(200, "Hello Collection API ....");
     // throw new APIError({
     //   status: httpStatus.NOT_FOUND,
     //   message: "user not found",
@@ -93,66 +93,67 @@ const controller = {
   create: async ({ body }) => {
 
     try {
-        const colResult = await Collection.add(body);
-        //TODO :  create folder
-        const projectName = body.name;
-        const ownerId = body.ownerId
-        const projectDir = ownerId+'-'+projectName 
-        const createDir = './folder/'+projectDir;
+      //TODO :  create folder
+      const projectName = body.name;
+      const ownerId = body.ownerId
+      const projectDir = ownerId + '-' + projectName
+      const createDir = './folder/' + projectDir;
 
+      let res = { ...body, projectDir: projectDir }
+      const colResult = await Collection.add(res);
 
-        fsx.ensureDir(createDir);
-    
-    if(colResult) {
-        return new APIResponse(201, { 
-            projectDir ,
-            projectName 
+      fsx.ensureDir(createDir);
+
+      if (colResult) {
+        return new APIResponse(201, {
+          projectDir,
+          projectName
         });
-    }
-    }catch(ex){
+      }
+    } catch (ex) {
 
-        throw new APIError({
-            status: httpStatus.INTERNAL_SERVER_ERROR,
-            message: "Cannot create Collection",
-          });
+      throw new APIError({
+        status: httpStatus.INTERNAL_SERVER_ERROR,
+        message: "Cannot create Collection",
+      });
     }
   },
 
-  uploadMultiple: async(req) => {
-   // console.log("body" , body)
-   //console.log("req", req.body.layer)
-   //console.log(JSON.stringify(req.files))
+  uploadMultiple: async (req) => {
+    // console.log("body" , body)
+    //console.log("req", req.body.layer)
+    //console.log(JSON.stringify(req.files))
 
-   try {
+    try {
 
-    const layerName = req.body.layer;
-    const projectDir = req.body.projectDir;
-    const createDir = './folder/'+projectDir+"/"+layerName;
- 
-    fsx.ensureDir(createDir);
- 
-    for(var i=0;i<req.files.length;i++){
-     const fileName = req.files[i].filename;
-     fsx.move('./folder/' + fileName, createDir + '/' + fileName, function (err) {
-         if (err) {
-              console.error(err);
-         }else{
-             console.log("move file finish")
-         }
-     });
+      const layerName = req.body.layer;
+      const projectDir = req.body.projectDir;
+      const createDir = './folder/' + projectDir + "/" + layerName;
 
-    }
- 
-    return new APIResponse(200, "Upload OK");
+      fsx.ensureDir(createDir);
 
-   }catch(ex){
-     console.log("ex" ,ex)
-   
-     throw new APIError({
+      for (var i = 0; i < req.files.length; i++) {
+        const fileName = req.files[i].filename;
+        fsx.move('./folder/' + fileName, createDir + '/' + fileName, function (err) {
+          if (err) {
+            console.error(err);
+          } else {
+            console.log("move file finish")
+          }
+        });
+
+      }
+
+      return new APIResponse(200, "Upload OK");
+
+    } catch (ex) {
+      console.log("ex", ex)
+
+      throw new APIError({
         status: httpStatus.INTERNAL_SERVER_ERROR,
         message: "upload faild",
       });
-   }
+    }
 
 
   }, //  end upload function
@@ -160,28 +161,43 @@ const controller = {
 
 
   findByOwnerId: async ({ params }) => {
-    const { ownerId } = params;
+    const { id } = params;
     try {
-      const collection = await Collection.findByOwnerId(ownerId);
-      return new APIResponse(201,  collection );
+      const collection = await Collection.findByOwnerId(id);
+      return new APIResponse(201, collection);
     } catch (ex) {
       throw new APIError({
         status: httpStatus.INTERNAL_SERVER_ERROR,
         message: "Cannot find collection by ownerId",
       });
     }
+  },  
+
+  findByCollectionId: async ({ params }) => {
+    const { id } = params;
+    try {
+      const res = await Collection.findByCollectionId(id);
+      return new APIResponse(201, res);
+    } catch (ex) {
+      throw new APIError({
+        status: httpStatus.INTERNAL_SERVER_ERROR,
+        message: "Cannot find collection by id",
+      });
+    }
   },
+
 
   genarateImage: async({ body ,params }) => {
 
-    try{
-    const { id } = params
-    const { data } = body
-    const  res    =  collection.updateById(id ,data)  
-    console.log("res" ,res) 
+    try{ 
 
-        
+
+    const { id } = params
+    const  res  = await Collection.updateById(id ,body)  
+
+    return new APIResponse(201, res);
     }catch(ex){
+        console.log(ex)
         throw new APIError({
             status: httpStatus.INTERNAL_SERVER_ERROR,
             message: "Cannot genarate image",
@@ -189,8 +205,8 @@ const controller = {
 
     }
 
-  }
-  
+  },
+
 }; //  end controller
 
 export default controller;

@@ -92,7 +92,7 @@ const cleanName = (_str) => {
   return nameWithoutWeight;
 };
 
-const getElements = (path) => {
+const getElements = (path ,layer) => {
   return fs
     .readdirSync(path)
     .filter((item) => !/(^|\/)\.[^\/\.]/g.test(item))
@@ -100,12 +100,28 @@ const getElements = (path) => {
       if (i.includes("-")) {
         throw new Error(`layer name can not contain dashes, please fix: ${i}`);
       }
+     
+      let weight = getRarityWeight(i)
+      const imageName =  cleanName(i)
+
+      if(!_.isEmpty(layer)) {
+        if(!_.isEmpty(layer.image)){
+       
+           const imageConfig = layer.image.find(img => img.name == imageName)
+           if(!_.isEmpty(imageConfig)){
+              weight = imageConfig.rarity 
+           }
+          
+        }
+      }
+      //console.log(cleanName(i))
+
       return {
         id: index,
-        name: cleanName(i),
+        name: imageName,
         filename: i,
         path: `${path}${i}`,
-        weight: getRarityWeight(i),
+        weight:  weight ,
       };
     });
 };
@@ -113,7 +129,7 @@ const getElements = (path) => {
 const layersSetup = (layersOrder) => {
   const layers = layersOrder.map((layerObj, index) => ({
     id: index,
-    elements: getElements(`${layersDir}/${layerObj.name}/`),
+    elements: getElements(`${layersDir}/${layerObj.name}/` ,layerObj),
     name:
       layerObj.options?.["displayName"] != undefined
         ? layerObj.options?.["displayName"]
@@ -391,7 +407,7 @@ function shuffle(array) {
   return array;
 }
 
-const startCreating = async () => {
+const startCreating = async ({layerConfigurations}) => {
 
     return new Promise( async (resolve ,reject) => {
 
@@ -399,23 +415,6 @@ const startCreating = async () => {
         let editionCount = 1;
         let failedCount = 0;
         let abstractedIndexes = [];
-
-
-        const layerConfigurations = [
-            {
-              growEditionSizeTo: 10,
-              layersOrder: [
-                { name: "Background" },
-                { name: "Eyeball" },
-                { name: "Eye color" },
-                { name: "Iris" },
-                { name: "Shine" },
-                { name: "Bottom lid" },
-                { name: "Top lid" },
-              ],
-            }
-          ];
-
 
         for (
         let i =  1;

@@ -6,14 +6,14 @@ import fsx from 'fs-extra';
 
 
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, './folder')
-    },
-    filename: function (req, file, cb) {
-      cb(null, file.originalname)
-    }
+  destination: function (req, file, cb) {
+    cb(null, './folder')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname)
+  }
 })
-const  upload = multer({ storage: storage })
+const upload = multer({ storage: storage })
 
 
 const router = express.Router();
@@ -63,7 +63,11 @@ router.route("/").get(handle(controller.get));
  *             name:
  *               type: string
  *               description: Name
- *               example: Jack
+ *               example: CollectionA
+ *             ownerId:
+ *               type: string
+ *               description: Owner ID
+ *               example: 0952648493
  *     responses:
  *       201:
  *         description: Return created user
@@ -76,7 +80,7 @@ router.route("/").get(handle(controller.get));
  *               type: string
  *               example: 1.0.0
  */
- router.route("/").post(handle(controller.create));
+router.route("/").post(handle(controller.create));
 
 
 
@@ -118,7 +122,7 @@ router.route("/uploadImage").post(upload.array('profile-files', 12), handle(cont
  *         description: ownerID
  *         schema:
  *           type: string
- *           example: 5df206f819f1802f7e158f73
+ *           example: 0952648493
  *     responses:
  *       200:
  *         description: Return get collection by ownerId

@@ -9,78 +9,81 @@ import { startCreating } from '../libs/genarate'
 const controller = {
 
   get: async () => {
-    
+
 
 
     const layerConfigurations = [
-        {
-          growEditionSizeTo: 10,
-          layersOrder: [
-            { name: "Background" ,
-                image:[{ 
-                    name :"black" ,
-                    rarity:100
-                }]
-            },
-            { name: "Eyeball",
-                image:[
-                    { 
-                        name :"Red",
-                        title:"Red",
-                        rarity:100
-                    },
-                    { 
-                        name :"White" ,
-                        title: "White",
-                        rarity:1
-                    }
-               ],
-            },
-            { name: "Eyecolor",
-                image:[
-                    { 
-                        name :"Cyan",
-                        title:"Cyan",
-                        rarity:1
-                    },
-                    { 
-                        name :"Green" ,
-                        title:"Green",
-                        rarity:50
-                    },
-                    { 
-                        name :"Pink" ,
-                        title:"Pink",
-                        rarity:1
-                    },
-                    { 
-                        name :"Purple",
-                        title:"Purple",
-                        rarity:1
-                    },
-                    { 
-                        name :"Red",
-                        title:"Red",
-                        rarity:50
-                    },
-                    { 
-                        name :"Yellow" ,
-                        title: "Yellow",
-                        rarity:1
-                    }
-               ],
-            },
-            { name: "Iris" , image:[]},
-            { name: "Shine", image:[] },
-            { name: "Bottom lid" ,image:[]  },
-            { name: "Top lid" ,image:[] },
-          ],
-        }
-      ];
+      {
+        growEditionSizeTo: 10,
+        layersOrder: [
+          {
+            name: "Background",
+            image: [{
+              name: "black",
+              rarity: 100
+            }]
+          },
+          {
+            name: "Eyeball",
+            image: [
+              {
+                name: "Red",
+                title: "Red",
+                rarity: 100
+              },
+              {
+                name: "White",
+                title: "White",
+                rarity: 1
+              }
+            ],
+          },
+          {
+            name: "Eyecolor",
+            image: [
+              {
+                name: "Cyan",
+                title: "Cyan",
+                rarity: 1
+              },
+              {
+                name: "Green",
+                title: "Green",
+                rarity: 50
+              },
+              {
+                name: "Pink",
+                title: "Pink",
+                rarity: 1
+              },
+              {
+                name: "Purple",
+                title: "Purple",
+                rarity: 1
+              },
+              {
+                name: "Red",
+                title: "Red",
+                rarity: 50
+              },
+              {
+                name: "Yellow",
+                title: "Yellow",
+                rarity: 1
+              }
+            ],
+          },
+          { name: "Iris", image: [] },
+          { name: "Shine", image: [] },
+          { name: "Bottom lid", image: [] },
+          { name: "Top lid", image: [] },
+        ],
+      }
+    ];
 
 
-    const res  = await startCreating({ layerConfigurations })
-    console.log("res",res)
+    const res = await startCreating({ layerConfigurations })
+    console.log("res", res)
 
     //const col = await Collection.add({ "name":"peter" ,"age":20 })
     return new APIResponse(200, "Hello Collection API ....");
@@ -127,12 +130,20 @@ const controller = {
     try {
       const layerName = req.body.layer;
       const projectDir = req.body.projectDir;
+      const collectionId = req.body.collectionId;
       const createDir = './folder/' + projectDir + "/" + layerName;
 
       fsx.ensureDir(createDir);
-
+      let pathLayer = []
       for (var i = 0; i < req.files.length; i++) {
         const fileName = req.files[i].filename;
+        pathLayer.push(
+          {
+            path: `${createDir}/${fileName}`,
+            name: fileName.replace('.png', ''),
+            title: fileName.replace('.png', ''),
+          }
+        )
         fsx.move('./folder/' + fileName, createDir + '/' + fileName, function (err) {
           if (err) {
             console.error(err);
@@ -142,6 +153,12 @@ const controller = {
         });
 
       }
+      const resCollection = await Collection.findById(collectionId)
+      resCollection.layers.push({
+        name: layerName,
+        images: pathLayer,
+      })
+      resCollection.save()
 
       return new APIResponse(200, "Upload OK");
 
@@ -170,7 +187,7 @@ const controller = {
         message: "Cannot find collection by ownerId",
       });
     }
-  },  
+  },
 
   findByCollectionId: async ({ params }) => {
     const { id } = params;
@@ -186,21 +203,21 @@ const controller = {
   },
 
 
-  genarateImage: async({ body ,params }) => {
+  genarateImage: async ({ body, params }) => {
 
-    try{ 
+    try {
 
 
-    const { id } = params
-    const  res  = await Collection.updateById(id ,body)  
+      const { id } = params
+      const res = await Collection.updateById(id, body)
 
-    return new APIResponse(201, res);
-    }catch(ex){
-        console.log(ex)
-        throw new APIError({
-            status: httpStatus.INTERNAL_SERVER_ERROR,
-            message: "Cannot genarate image",
-          });
+      return new APIResponse(201, res);
+    } catch (ex) {
+      console.log(ex)
+      throw new APIError({
+        status: httpStatus.INTERNAL_SERVER_ERROR,
+        message: "Cannot genarate image",
+      });
 
     }
 

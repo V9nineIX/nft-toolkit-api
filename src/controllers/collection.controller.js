@@ -139,7 +139,7 @@ const controller = {
         const fileName = req.files[i].filename;
         pathLayer.push(
           {
-            path: `${createDir}/${fileName}`,
+            path: `${createDir.replace('.', '')}/${fileName}`,
             name: fileName.replace('.png', ''),
             title: fileName.replace('.png', ''),
           }

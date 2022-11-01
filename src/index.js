@@ -6,24 +6,24 @@ import route from "./routers";
 import bodyParser from "body-parser";
 const path = require('path')
 import cors from "cors"
-import { ApolloServer  , gql } from "apollo-server-express";
+import { ApolloServer, gql } from "apollo-server-express";
 // import { graphqlHTTP } from 'express-graphql'
 // import { buildSchema } from 'graphql'
 
 
 const grapQLServer = new ApolloServer({
-    playground: true,
-    typeDefs: gql`
+  playground: true,
+  typeDefs: gql`
       type Query {
         hello: String
       }
     `,
-    resolvers: {
-      Query: {
-        hello: () => 'Hello world!',
-      },
-    }
-  })
+  resolvers: {
+    Query: {
+      hello: () => 'Hello world!',
+    },
+  }
+})
 
 
 // Construct a schema, using GraphQL schema language
@@ -39,7 +39,7 @@ const grapQLServer = new ApolloServer({
 //       return 'Hello world!';
 //     },
 // };
-  
+
 
 
 
@@ -62,16 +62,13 @@ grapQLServer.applyMiddleware({ app });
 app.use(cors())
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use('/uploads', express.static('uploads'));
+app.use('/folder', express.static('folder'));
 
 
 log(app);
 route(app);
 
-
-
-app.use('/uploads', express.static('uploads'));
-//app.use(express.static('folder'))
-app.use('/folder', express.static(path.join(__dirname, 'folder')))
 
 
 

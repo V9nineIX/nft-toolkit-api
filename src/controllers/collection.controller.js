@@ -203,12 +203,15 @@ const controller = {
   },
 
 
-  genarateImage: async ({ body, params }) => {
+  generateImage: async ({ body }) => {
 
     try {
 
 
-      const { id } = params
+      const { id ,data } = body
+
+
+
       const res = await Collection.updateById(id, body)
 
       return new APIResponse(201, res);

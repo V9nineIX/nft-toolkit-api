@@ -192,7 +192,7 @@ router.route("/:id").get(handle(controller.findByCollectionId));
  *         schema:
  *           type: object
  */
- router.route("/genarateImage/:id").put(handle(controller.genarateImage));
+router.route("/genarateImage/:id").put(handle(controller.genarateImage));
 
 
 export default router;

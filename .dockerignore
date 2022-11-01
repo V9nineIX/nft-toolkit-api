@@ -29,3 +29,6 @@ bower_components
 
 server/*.spec.js
 kubernetes
+folder
+*/folder
+uploads

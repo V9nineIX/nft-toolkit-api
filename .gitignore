@@ -91,3 +91,6 @@ typings/
 
 .build/
 build/
+
+.folder/
+folder/

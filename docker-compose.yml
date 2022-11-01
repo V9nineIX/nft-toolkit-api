@@ -24,7 +24,7 @@ services:
       MONGODB_PASSWORD: ${MONGODB_PASSWORD}
       NODE_ENV: production
     volumes:
-      - ./:/app
+      - ./folder:/app/folder/
 
 volumes:
   db_data:

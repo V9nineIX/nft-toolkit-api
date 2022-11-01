@@ -132,6 +132,7 @@ const controller = {
       const projectDir = req.body.projectDir;
       const collectionId = req.body.collectionId;
       const createDir = './folder/' + projectDir + "/" + layerName;
+      const folderPath = '/folder/' + projectDir;
 
       fsx.ensureDir(createDir);
       let pathLayer = []
@@ -139,7 +140,7 @@ const controller = {
         const fileName = req.files[i].filename;
         pathLayer.push(
           {
-            path: `${createDir}/${fileName}`,
+            path: `${folderPath}/${fileName}`,
             name: fileName.replace('.png', ''),
             title: fileName.replace('.png', ''),
           }

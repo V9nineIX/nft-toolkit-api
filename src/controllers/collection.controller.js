@@ -52,7 +52,6 @@ const controller = {
     //console.log(JSON.stringify(req.files))
 
     try {
-
       const layerName = req.body.layer;
       const projectDir = req.body.projectDir;
       const createDir = './folder/' + projectDir + "/" + layerName;

@@ -105,7 +105,7 @@ router.route("/").post(handle(controller.create));
  *               example: 1.0.0
  */
 
-router.route("/uploadImage").post(upload.array('profile-files', 12), handle(controller.uploadMultiple));
+router.route("/uploadImage").post(upload.array('files', 12), handle(controller.uploadMultiple));
 
 
 
@@ -165,7 +165,7 @@ router.route("/owner/:id").get(handle(controller.findByOwnerId));
  *               type: string
  *               example: 1.0.0
  */
- router.route("/:id").get(handle(controller.findByCollectionId));
+router.route("/:id").get(handle(controller.findByCollectionId));
 
 
 export default router;

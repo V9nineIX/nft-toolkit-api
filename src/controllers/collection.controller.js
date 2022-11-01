@@ -132,7 +132,7 @@ const controller = {
       const projectDir = req.body.projectDir;
       const collectionId = req.body.collectionId;
       const createDir = './folder/' + projectDir + "/" + layerName;
-      const folderPath = '/folder/' + projectDir;
+      const folderPath = '/folder/' + projectDir + "/" + layerName;
 
       fsx.ensureDir(createDir);
       let pathLayer = []

@@ -225,9 +225,19 @@ const controller = {
       ]
 
       console.log('layerConfigurations', layerConfigurations);
-      const projectDir = body?.projectDir
+      const projectDir = `./folder/`+ body?.projectDir
 
-      const result = await startCreating({ layerConfigurations , projectDir})
+      const buildFolder =  `${projectDir}/build/image`
+      const jsonFolder =  `${projectDir}/build/json`
+      await fsx.ensureDir(buildFolder);
+      await fsx.ensureDir(jsonFolder);
+
+      const result = await startCreating({ 
+        layerConfigurations ,
+        projectDir,
+        buildFolder,
+        jsonFolder
+      })
       console.log("result", result)
 
       return new APIResponse(201, res);

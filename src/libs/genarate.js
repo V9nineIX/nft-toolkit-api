@@ -151,14 +151,14 @@ const layersSetup = (layersOrder ,projecDir=`${layersDir}`) => {
   return layers;
 };
 
-const saveImage = (_editionCount ,projectDir=`${buildDir}/images` ) => {
+const saveImage = (_editionCount ,buildFolder=`${buildDir}/images` ) => {
 try {
 //   fs.writeFileSync(
 //     `${buildDir}/images/${_editionCount}.png`,
 //     canvas.toBuffer("image/png")
 //   );
   fs.writeFileSync(
-    `${projectDir}/${_editionCount}.png`,
+    `${buildFolder}/${_editionCount}.png`,
     canvas.toBuffer("image/png")
   );
 }catch(ex){
@@ -177,7 +177,7 @@ const drawBackground = () => {
   ctx.fillRect(0, 0, format.width, format.height);
 };
 
-const addMetadata = (_dna, _edition ,projectDir=`${buildDir}/json`) => {
+const addMetadata = (_dna, _edition ,jsonFolder=`${buildDir}/json`) => {
   let dateTime = Date.now();
   let tempMetadata = {
     name: `${namePrefix} #${_edition}`,
@@ -224,7 +224,7 @@ const addMetadata = (_dna, _edition ,projectDir=`${buildDir}/json`) => {
 //     JSON.stringify(tempMetadata, null, 2)
 //   );
   fs.writeFileSync(
-    `projectDir/${_edition}.text`,
+    `${jsonFolder}/${_edition}.text`,
     JSON.stringify(tempMetadata, null, 2)
   );
 
@@ -416,7 +416,12 @@ function shuffle(array) {
   return array;
 }
 
-const startCreating = async ({layerConfigurations , projectDir}) => {
+const startCreating = async ({
+    layerConfigurations ,
+     projectDir,
+     buildFolder,
+     jsonFolder
+    }) => {
 
     return new Promise( async (resolve ,reject) => {
 
@@ -491,8 +496,8 @@ const startCreating = async ({layerConfigurations , projectDir}) => {
                 debugLogs
                 ? console.log("Editions left to create: ", abstractedIndexes)
                 : null;
-                saveImage(abstractedIndexes[0],projectDir);
-                addMetadata(newDna, abstractedIndexes[0] ,projectDir);
+                saveImage(abstractedIndexes[0],  buildFolder);
+                addMetadata(newDna, abstractedIndexes[0] ,jsonFolder);
 
                 // saveMetaDataSingleFile(abstractedIndexes[0]);
                 console.log(

@@ -4,6 +4,7 @@ import APIResponse from "../utils/api-response";
 import APIError from "../utils/api-error";
 import fsx from 'fs-extra';
 import { startCreating } from '../libs/genarate'
+import { last } from "lodash";
 
 
 const controller = {
@@ -139,7 +140,7 @@ const controller = {
         const fileName = req.files[i].filename;
         pathLayer.push(
           {
-            path: `${createDir}/${fileName}`,
+            path: `${createDir.replace('.', '')}/${fileName}`,
             name: fileName.replace('.png', ''),
             title: fileName.replace('.png', ''),
           }
@@ -160,7 +161,7 @@ const controller = {
       })
       resCollection.save()
 
-      return new APIResponse(200, "Upload OK");
+      return new APIResponse(200, { layers: [last(resCollection.layers)] });
 
     } catch (ex) {
       console.log("ex", ex)

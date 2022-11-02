@@ -83,8 +83,8 @@ const controller = {
     ];
 
 
-    const res = await startCreating({ layerConfigurations })
-    console.log("res", res)
+    // const res = await startCreating({ layerConfigurations })
+    // console.log("res", res)
 
     //const col = await Collection.add({ "name":"peter" ,"age":20 })
     return new APIResponse(200, "Hello Collection API ....");
@@ -224,7 +224,6 @@ const controller = {
         }
       ]
 
-      console.log('layerConfigurations', layerConfigurations);
       const projectDir = `./folder/`+ body?.projectDir
 
       const buildFolder =  `${projectDir}/build/image`

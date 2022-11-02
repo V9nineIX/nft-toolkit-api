@@ -204,7 +204,7 @@ const controller = {
   },
 
 
-  genarateImage: async ({ body, params }) => {
+  generateImage: async ({ body ,params }) => {
 
     try {
 
@@ -223,6 +223,25 @@ const controller = {
     }
 
   },
+
+  updateCollectionById: async({param})=>{
+
+    try {
+
+        const { id } = params
+        const res = await Collection.updateById(id, body)
+  
+        return new APIResponse(201, res);
+      } catch (ex) {
+        console.log(ex)
+        throw new APIError({
+          status: httpStatus.INTERNAL_SERVER_ERROR,
+          message: "Cannot genarate image",
+        });
+    }
+  
+
+  }
 
 }; //  end controller
 

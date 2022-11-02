@@ -65,7 +65,7 @@ const collectionSchema = new mongoose.Schema({
     },
     totalSupply: {
         type: Number,
-        default: 1000,
+        default: 10,
     },
     projectDir: {
         type: String,

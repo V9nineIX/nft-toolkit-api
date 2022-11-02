@@ -225,6 +225,10 @@ const controller = {
       ]
 
       console.log('layerConfigurations', layerConfigurations);
+      const projectDir = body?.projectDir
+
+      const result = await startCreating({ layerConfigurations , projectDir})
+      console.log("result", result)
 
       return new APIResponse(201, res);
     } catch (ex) {

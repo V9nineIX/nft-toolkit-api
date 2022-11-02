@@ -83,8 +83,8 @@ const controller = {
     ];
 
 
-    const res = await startCreating({ layerConfigurations })
-    console.log("res", res)
+    // const res = await startCreating({ layerConfigurations })
+    // console.log("res", res)
 
     //const col = await Collection.add({ "name":"peter" ,"age":20 })
     return new APIResponse(200, "Hello Collection API ....");
@@ -224,7 +224,20 @@ const controller = {
         }
       ]
 
-      console.log('layerConfigurations', layerConfigurations);
+      const projectDir = `./folder/`+ body?.projectDir
+
+      const buildFolder =  `${projectDir}/build/image`
+      const jsonFolder =  `${projectDir}/build/json`
+      await fsx.ensureDir(buildFolder);
+      await fsx.ensureDir(jsonFolder);
+
+      const result = await startCreating({ 
+        layerConfigurations ,
+        projectDir,
+        buildFolder,
+        jsonFolder
+      })
+      console.log("result", result)
 
       return new APIResponse(201, res);
     } catch (ex) {
@@ -249,7 +262,7 @@ const controller = {
       console.log(ex)
       throw new APIError({
         status: httpStatus.INTERNAL_SERVER_ERROR,
-        message: "Cannot genarate image",
+        message: "Cannot update collection",
       });
     }
 

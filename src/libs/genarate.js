@@ -126,10 +126,11 @@ const getElements = (path ,layer) => {
     });
 };
 
-const layersSetup = (layersOrder) => {
+const layersSetup = (layersOrder ,projecDir=`${layersDir}`) => {
   const layers = layersOrder.map((layerObj, index) => ({
     id: index,
-    elements: getElements(`${layersDir}/${layerObj.name}/` ,layerObj),
+    elements: getElements(`${projecDir}/${layerObj.name}/` ,layerObj),
+    // elements: getElements(`${layersDir}/${layerObj.name}/` ,layerObj),
     name:
       layerObj.options?.["displayName"] != undefined
         ? layerObj.options?.["displayName"]
@@ -150,10 +151,14 @@ const layersSetup = (layersOrder) => {
   return layers;
 };
 
-const saveImage = (_editionCount) => {
+const saveImage = (_editionCount ,buildFolder=`${buildDir}/images` ) => {
 try {
+//   fs.writeFileSync(
+//     `${buildDir}/images/${_editionCount}.png`,
+//     canvas.toBuffer("image/png")
+//   );
   fs.writeFileSync(
-    `${buildDir}/images/${_editionCount}.png`,
+    `${buildFolder}/${_editionCount}.png`,
     canvas.toBuffer("image/png")
   );
 }catch(ex){
@@ -172,7 +177,7 @@ const drawBackground = () => {
   ctx.fillRect(0, 0, format.width, format.height);
 };
 
-const addMetadata = (_dna, _edition) => {
+const addMetadata = (_dna, _edition ,jsonFolder=`${buildDir}/json`) => {
   let dateTime = Date.now();
   let tempMetadata = {
     name: `${namePrefix} #${_edition}`,
@@ -214,8 +219,12 @@ const addMetadata = (_dna, _edition) => {
   metadataList.push(tempMetadata);
 
   try {
+//   fs.writeFileSync(
+//     `${buildDir}/json/${_edition}.text`,
+//     JSON.stringify(tempMetadata, null, 2)
+//   );
   fs.writeFileSync(
-    `${buildDir}/json/${_edition}.text`,
+    `${jsonFolder}/${_edition}.text`,
     JSON.stringify(tempMetadata, null, 2)
   );
 
@@ -407,7 +416,12 @@ function shuffle(array) {
   return array;
 }
 
-const startCreating = async ({layerConfigurations}) => {
+const startCreating = async ({
+    layerConfigurations ,
+     projectDir,
+     buildFolder,
+     jsonFolder
+    }) => {
 
     return new Promise( async (resolve ,reject) => {
 
@@ -431,7 +445,8 @@ const startCreating = async ({layerConfigurations}) => {
         : null;
         while (layerConfigIndex < layerConfigurations.length) {
         const layers = layersSetup(
-            layerConfigurations[layerConfigIndex].layersOrder
+            layerConfigurations[layerConfigIndex].layersOrder,
+            projectDir
         );
         while (
             editionCount <= layerConfigurations[layerConfigIndex].growEditionSizeTo
@@ -481,8 +496,8 @@ const startCreating = async ({layerConfigurations}) => {
                 debugLogs
                 ? console.log("Editions left to create: ", abstractedIndexes)
                 : null;
-                saveImage(abstractedIndexes[0]);
-                addMetadata(newDna, abstractedIndexes[0]);
+                saveImage(abstractedIndexes[0],  buildFolder);
+                addMetadata(newDna, abstractedIndexes[0] ,jsonFolder);
 
                 // saveMetaDataSingleFile(abstractedIndexes[0]);
                 console.log(
@@ -506,7 +521,7 @@ const startCreating = async ({layerConfigurations}) => {
                     `You need more layers or elements to grow your edition to ${layerConfigurations[layerConfigIndex].growEditionSizeTo} artworks!`
                   );
                   //process.exit();
-                  resolve("Finsish")
+                  reject("Error")
                 }
             }
        
@@ -516,7 +531,7 @@ const startCreating = async ({layerConfigurations}) => {
         layerConfigIndex++;
         }
     // writeMetaData(JSON.stringify(metadataList, null, 2));
-       console.log("end loop")
+      // console.log("end loop")
        resolve("Finsish")
     }) //  end promise
 };

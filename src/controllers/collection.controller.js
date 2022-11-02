@@ -204,7 +204,7 @@ const controller = {
   },
 
 
-  generateImage: async ({ body ,params }) => {
+  generateImage: async ({ body, params }) => {
 
     try {
 
@@ -213,7 +213,7 @@ const controller = {
       const res = await Collection.updateById(id, body?.collection)
 
       let layersOrder = []
-      for(const item of res?.layers) {
+      for (const item of res?.layers) {
         layersOrder.push(item)
       }
 
@@ -251,22 +251,21 @@ const controller = {
 
   },
 
-  updateCollectionById: async({param})=>{
+  updateCollectionById: async ({ body, params }) => {
 
     try {
+      const { id } = params
+      const res = await Collection.updateById(id, body)
 
-        const { id } = params
-        const res = await Collection.updateById(id, body)
-  
-        return new APIResponse(201, res);
-      } catch (ex) {
-        console.log(ex)
-        throw new APIError({
-          status: httpStatus.INTERNAL_SERVER_ERROR,
-          message: "Cannot genarate image",
-        });
+      return new APIResponse(201, res);
+    } catch (ex) {
+      console.log(ex)
+      throw new APIError({
+        status: httpStatus.INTERNAL_SERVER_ERROR,
+        message: "Cannot genarate image",
+      });
     }
-  
+
 
   }
 

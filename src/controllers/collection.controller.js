@@ -210,7 +210,21 @@ const controller = {
 
 
       const { id } = params
-      const res = await Collection.updateById(id, body)
+      const res = await Collection.updateById(id, body?.collection)
+
+      let layersOrder = []
+      for(const item of res?.layers) {
+        layersOrder.push(item)
+      }
+
+      const layerConfigurations = [
+        {
+          growEditionSizeTo: res?.totalSupply,
+          layersOrder: layersOrder
+        }
+      ]
+
+      console.log('layerConfigurations', layerConfigurations);
 
       return new APIResponse(201, res);
     } catch (ex) {

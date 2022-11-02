@@ -170,7 +170,7 @@ router.route("/:id").get(handle(controller.findByCollectionId));
 
 /**
  * @swagger
- * /v1/collection/genarateImage/{id}:
+ * /v1/collection/generateImage/{id}:
  *   put:
  *     tags: [Collection]
  *     summary: genarateImage
@@ -188,11 +188,38 @@ router.route("/:id").get(handle(controller.findByCollectionId));
  *           type: object
  *     responses:
  *       201:
- *         description: Return created user
+ *         description: Return status create collection
  *         schema:
  *           type: object
  */
 router.route("/generateImage/:id").put(handle(controller.generateImage));
+
+
+/**
+ * @swagger
+ * /v1/collection/{id}:
+ *   put:
+ *     tags: [Collection]
+ *     summary: update collection by id
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: Collection Id
+ *         schema:
+ *           type: string
+ *           example: 635f93c13058f3148ec59d6b
+ *       - in: body
+ *         name: body
+ *         description: Collection's information
+ *         schema:
+ *           type: object
+ *     responses:
+ *       201:
+ *         description: Return update collection
+ *         schema:
+ *           type: object
+ */
+router.route("/:id").put(handle(controller.updateCollectionById));
 
 
 export default router;

@@ -522,6 +522,7 @@ const startCreating = async ({
                   );
                   //process.exit();
                   reject("Error")
+                  return
                 }
             }
        

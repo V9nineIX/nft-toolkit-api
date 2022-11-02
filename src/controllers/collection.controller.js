@@ -262,7 +262,7 @@ const controller = {
       console.log(ex)
       throw new APIError({
         status: httpStatus.INTERNAL_SERVER_ERROR,
-        message: "Cannot genarate image",
+        message: "Cannot update collection",
       });
     }
 

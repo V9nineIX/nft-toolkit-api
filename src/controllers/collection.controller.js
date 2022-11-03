@@ -221,15 +221,15 @@ const controller = {
         }
       ]
 
-      const projectDir = `./folder/`+ body?.projectDir
+      const projectDir = `./folder/` + body?.projectDir
 
-      const buildFolder =  `${projectDir}/build/image`
-      const jsonFolder =  `${projectDir}/build/json`
+      const buildFolder = `${projectDir}/build/image`
+      const jsonFolder = `${projectDir}/build/json`
       await fsx.ensureDir(buildFolder);
       await fsx.ensureDir(jsonFolder);
 
-      const result = await startCreating({ 
-        layerConfigurations ,
+      const result = await startCreating({
+        layerConfigurations,
         projectDir,
         buildFolder,
         jsonFolder
@@ -264,7 +264,29 @@ const controller = {
     }
 
 
-  }
+  },
+
+  removeLayerById: async ({ body, params }) => {
+
+    try {
+      const { id } = params
+      const { projectDir, nameLayer } = body
+      const res = await Collection.removeLayerById(id)
+      if (res) {
+        const nameDir = './folder/' + projectDir + "/" + nameLayer;
+        fsx.removeSync(nameDir)
+      }
+      return new APIResponse(201, { message: "Remove layer success" });
+    } catch (ex) {
+      console.log(ex)
+      throw new APIError({
+        status: httpStatus.INTERNAL_SERVER_ERROR,
+        message: "Cannot remove layer",
+      });
+    }
+
+
+  },
 
 }; //  end controller
 

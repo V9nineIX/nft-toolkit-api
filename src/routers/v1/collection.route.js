@@ -222,4 +222,32 @@ router.route("/generateImage/:id").put(handle(controller.generateImage));
 router.route("/:id").put(handle(controller.updateCollectionById));
 
 
+/**
+ * @swagger
+ * /v1/collection/removeLayer/{id}:
+ *   delete:
+ *     tags: [Collection]
+ *     summary: Delete an layer collection
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: Layer Bg collection's ID
+ *         schema:
+ *           type: string
+ *           example: 6363799d569ae632e4149815
+ *     responses:
+ *       200:
+ *         description: Return deleted layer collection
+ *         schema:
+ *           type: object
+ *           properties:
+ *             data:
+ *               $ref: '#/definitions/User'
+ *             version:
+ *               type: string
+ *               example: 1.0.0
+ */
+router.route("/removeLayer/:id").post(handle(controller.removeLayerById));
+
+
 export default router;

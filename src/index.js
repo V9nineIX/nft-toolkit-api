@@ -7,8 +7,14 @@ import bodyParser from "body-parser";
 const path = require('path')
 import cors from "cors"
 import { ApolloServer, gql } from "apollo-server-express";
+import { isEmpty } from "lodash";
 // import { graphqlHTTP } from 'express-graphql'
 // import { buildSchema } from 'graphql'
+const http = require('http');
+const socketIo = require("socket.io");
+
+
+
 
 
 const grapQLServer = new ApolloServer({
@@ -51,6 +57,7 @@ const app = express();
 
 
 
+
 // app.use('/graphql', graphqlHTTP({
 //     schema: schema,
 //     rootValue: root,
@@ -65,6 +72,32 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/uploads', express.static('uploads'));
 app.use('/folder', express.static('folder'));
 
+const httpServer = http.createServer(app);
+const io = socketIo(httpServer , { cors: { origin: "*" } }); 
+
+app.use((req, res, next) => {
+    req.io = io;
+    return next();
+  });
+
+
+io.on('connection', (socket) => {
+    const { ownerId = null} =socket.handshake.query
+    console.log('user connected' ,socket.handshake.query.ownerId);
+
+    socket.on('disconnect', function () {
+      console.log('user disconnected');
+    });
+})
+
+
+io.use((socket, next) => {
+    if ( !isEmpty(socket.handshake.query.ownerId)) {
+      next();
+    } else {
+      next(new Error("invalid"));
+    }
+});
 
 log(app);
 route(app);
@@ -72,7 +105,7 @@ route(app);
 
 
 
-app.listen(server.port, server.host, () =>
+httpServer.listen(server.port, server.host, () =>
   console.log(`Server has started on ${server.host}:${server.port} ${grapQLServer.graphqlPath}`)
 );
 

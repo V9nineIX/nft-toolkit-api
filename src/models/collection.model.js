@@ -102,7 +102,18 @@ collectionSchema.statics = {
     async updateById(id, body) {
         const doc = await this.findByIdAndUpdate(id, body, { new: true });
         return doc;
-     },
+    },
+
+    async removeLayerById(id) {
+        /* Remove Collection */
+        // await this.deleteOne({ _id: "63624b9bfd8eb3f178d57f0f" }).then(result => {
+        //     console.log('result', result)
+        // });
+        const doc = await this.update(
+            { $pull: { layers: { '_id': id } } }
+        );
+        return doc;
+    },
 
 
 }

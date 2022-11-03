@@ -212,15 +212,10 @@ const controller = {
       const { id } = params
       const res = await Collection.updateById(id, body?.collection)
 
-      let layersOrder = []
-      for (const item of res?.layers) {
-        layersOrder.push(item)
-      }
-
       const layerConfigurations = [
         {
           growEditionSizeTo: res?.totalSupply,
-          layersOrder: layersOrder
+          layersOrder: res?.layers
         }
       ]
 

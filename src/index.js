@@ -12,9 +12,10 @@ import { isEmpty } from "lodash";
 // import { buildSchema } from 'graphql'
 const http = require('http');
 const socketIo = require("socket.io");
-
-
-
+const { ExpressAdapter } = require('@bull-board/express');
+const { createBullBoard } = require('@bull-board/api')
+const { BullAdapter } = require('@bull-board/api/bullAdapter')
+import { orderQueue } from "./queues/order-queue"
 
 
 const grapQLServer = new ApolloServer({
@@ -54,7 +55,13 @@ mongoose.connect(database.uri, database.options);
 
 const app = express();
 
+const serverAdapter = new ExpressAdapter();
+serverAdapter.setBasePath('/bull');
 
+createBullBoard({
+    queues: [new BullAdapter(orderQueue)],
+    serverAdapter,
+  });
 
 
 
@@ -71,6 +78,8 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/uploads', express.static('uploads'));
 app.use('/folder', express.static('folder'));
+
+app.use("/bull" , serverAdapter.getRouter())
 
 const httpServer = http.createServer(app);
 const io = socketIo(httpServer , { cors: { origin: "*" } }); 

@@ -16,6 +16,7 @@ const { ExpressAdapter } = require('@bull-board/express');
 const { createBullBoard } = require('@bull-board/api')
 const { BullAdapter } = require('@bull-board/api/bullAdapter')
 import { orderQueue } from "./queues/order-queue"
+import queueListeners from "./queues/queueListeners";
 
 
 const grapQLServer = new ApolloServer({
@@ -81,6 +82,8 @@ app.use('/folder', express.static('folder'));
 
 app.use("/bull" , serverAdapter.getRouter())
 
+
+
 const httpServer = http.createServer(app);
 const io = socketIo(httpServer , { cors: { origin: "*" } }); 
 
@@ -107,6 +110,16 @@ io.use((socket, next) => {
       next(new Error("invalid"));
     }
 });
+
+
+queueListeners()
+
+// queuelistener()
+//  
+// orderQueue.on('completed', (job, result) => {
+//     console.log("Job Completed: ", "Result: ", result); 
+//     //TODO emit  to clinent
+// })
 
 log(app);
 route(app);

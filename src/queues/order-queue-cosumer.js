@@ -1,12 +1,11 @@
 import { startCreating } from '../libs/genarate'
 
 const orderProcess = async (job ,done) => {
-    console.log("job" , job.data)
 
 
     const layerConfigurations = [
         {
-          growEditionSizeTo: 50,
+          growEditionSizeTo: 10,
           layersOrder: [
             {
               name: "Background",
@@ -76,10 +75,9 @@ const orderProcess = async (job ,done) => {
 
       const res = await startCreating({ layerConfigurations })
       console.log(res)
+      done(null , { "result": res})
 
-      done()
 
-   
 
 
 }

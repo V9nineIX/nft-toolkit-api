@@ -9,7 +9,7 @@ orderQueue.process(orderProcess)
 
 const createNewOrder = (order) => {
     orderQueue.add(order,{
-        attempt:2
+        attempt:2,
     })
 }
 

@@ -16,7 +16,7 @@ const controller = {
 
     const layerConfigurations = [
       {
-        growEditionSizeTo: 30,
+        growEditionSizeTo: 10,
         layersOrder: [
           {
             name: "Background",

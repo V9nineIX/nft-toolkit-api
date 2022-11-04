@@ -6,13 +6,19 @@
   "scripts": {
     "start": "nodemon --exec babel-node src/index.js",
     "test": "NODE_ENV=test mocha tests/**/*.test.js --require @babel/register --exit",
-    "prod": "NODE_ENV=production babel-node src/index.js"
+    "prod": "NODE_ENV=production babel-node src/index.js",
+    "worker": "babel-node src/worker.js",
+    "worker:dev": "nodemon --exec babel-node src/worker.js"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@bull-board/api": "^4.6.2",
+    "@bull-board/express": "^4.6.2",
     "apollo-server-express": "2.6.7",
     "body-parser": "^1.20.0",
+    "bull": "^4.10.1",
+    "bull-arena": "^3.30.0",
     "canvas": "^2.10.1",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
@@ -29,7 +35,8 @@
     "sha1": "^1.1.1",
     "socket.io": "^4.5.3",
     "swagger-jsdoc": "^6.2.1",
-    "swagger-ui-express": "^4.4.0"
+    "swagger-ui-express": "^4.4.0",
+    "throng": "^5.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.18.6",

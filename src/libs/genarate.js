@@ -224,7 +224,7 @@ const addMetadata = (_dna, _edition ,jsonFolder=`${buildDir}/json`) => {
 //     JSON.stringify(tempMetadata, null, 2)
 //   );
   fs.writeFileSync(
-    `${jsonFolder}/${_edition}.text`,
+    `${jsonFolder}/${_edition}.txt`,
     JSON.stringify(tempMetadata, null, 2)
   );
 
@@ -420,7 +420,8 @@ const startCreating = async ({
     layerConfigurations ,
      projectDir,
      buildFolder,
-     jsonFolder
+     jsonFolder,
+     job=null
     }) => {
 
     return new Promise( async (resolve ,reject) => {
@@ -429,10 +430,12 @@ const startCreating = async ({
         let editionCount = 1;
         let failedCount = 0;
         let abstractedIndexes = [];
+        let  progress = 0;
+        const totolSupply = layerConfigurations[layerConfigurations.length - 1].growEditionSizeTo
 
         for (
         let i =  1;
-        i <= layerConfigurations[layerConfigurations.length - 1].growEditionSizeTo;
+        i <=  totolSupply;
         i++
         ) {
         abstractedIndexes.push(i);
@@ -449,7 +452,7 @@ const startCreating = async ({
             projectDir
         );
         while (
-            editionCount <= layerConfigurations[layerConfigIndex].growEditionSizeTo
+            editionCount <=  totolSupply
         ) {
             let newDna = createDna(layers);
             if (isDnaUnique(dnaList, newDna)) {
@@ -509,9 +512,17 @@ const startCreating = async ({
 
 
             dnaList.add(filterDNAOptions(newDna));
+             progress = ((editionCount /  totolSupply) * 100).toFixed()
+             console.log( "progress ...",progress+"%");
+             //TODO update progress
+             if(job){
+                job.progress(progress)
+             }
+
             editionCount++;
             abstractedIndexes.shift();
 
+   
             } //end if
             else {
                 console.log("DNA exists!");

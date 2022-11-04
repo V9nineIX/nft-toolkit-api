@@ -19,4 +19,4 @@ RUN npm install -g nodemon
 RUN npm install canvas --build-from-source
 COPY . /app/
 RUN npm install
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "prod"]

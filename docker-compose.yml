@@ -8,12 +8,8 @@ services:
     restart: always
     ports:
       - 27018:27017
-  redis:
-    image: redis
-    container_name: redis
-    expose:
-     - "6379:6379"
-
+    networks:
+    - app-networks
   server:
     build:
       context: .
@@ -28,9 +24,44 @@ services:
       MONGODB_USERNAME: ${MONGODB_USERNAME}
       MONGODB_PASSWORD: ${MONGODB_PASSWORD}
       NODE_ENV: production
+      REDIS_PORT: ${REDIS_PORT}
     volumes:
       - ./folder:/app/folder/
+    links:
+      - redis
+    networks:
+      - app-networks
+  worker:
+        build: .
+        container_name: image-queue-worker
+        command: "npm run worker"
+        environment:
+          SERVER_IP: ${SERVER_IP}
+          SERVER_PORT: ${SERVER_PORT}
+          MONGODB_IP: mongo
+          MONGODB_PORT: 27017
+          MONGODB_USERNAME: ${MONGODB_USERNAME}
+          MONGODB_PASSWORD: ${MONGODB_PASSWORD}
+          NODE_ENV: production
+          REDIS_PORT: ${REDIS_PORT}
+        links:
+          - redis
+        networks:
+          - app-networks
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+     - 6399:6379
+    volumes:
+     - redis_data:/data
+    networks:
+    - app-networks
 
 volumes:
   db_data:
+  redis_data:
+networks:
+  app-networks:
+    driver: bridge
 

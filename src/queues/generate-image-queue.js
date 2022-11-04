@@ -1,8 +1,14 @@
 const Queue  = require('bull')
+import config from "../../config";
+const { redis } = config
 
-const generateImageQueue = new Queue("orders" , {
-    redis:  process.env.SERVER_IP+":6379"
-})
+console.log(redis.host+":"+redis.port)
+
+
+const REDIS_URL = 'redis://'+redis.host+":"+redis.port
+console.log(REDIS_URL )
+
+const generateImageQueue = new Queue("generateImage" ,REDIS_URL )
 
 const addGenerateImageQueue = (job) => {
     generateImageQueue.add(job,{

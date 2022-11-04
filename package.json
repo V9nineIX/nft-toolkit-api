@@ -6,7 +6,8 @@
   "scripts": {
     "start": "nodemon --exec babel-node src/index.js",
     "test": "NODE_ENV=test mocha tests/**/*.test.js --require @babel/register --exit",
-    "prod": "NODE_ENV=production babel-node src/index.js"
+    "prod": "NODE_ENV=production babel-node src/index.js",
+    "worker": "nodemon --exec babel-node src/worker.js"
   },
   "author": "",
   "license": "MIT",
@@ -33,7 +34,8 @@
     "sha1": "^1.1.1",
     "socket.io": "^4.5.3",
     "swagger-jsdoc": "^6.2.1",
-    "swagger-ui-express": "^4.4.0"
+    "swagger-ui-express": "^4.4.0",
+    "throng": "^5.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.18.6",

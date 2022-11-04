@@ -15,7 +15,7 @@ const socketIo = require("socket.io");
 const { ExpressAdapter } = require('@bull-board/express');
 const { createBullBoard } = require('@bull-board/api')
 const { BullAdapter } = require('@bull-board/api/bullAdapter')
-import { orderQueue } from "./queues/order-queue"
+import { generateImageQueue } from "./queues/generate-image-queue";
 import queueListeners from "./queues/queueListeners";
 
 
@@ -60,7 +60,7 @@ const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/bull');
 
 createBullBoard({
-    queues: [new BullAdapter(orderQueue)],
+    queues: [new BullAdapter(generateImageQueue)],
     serverAdapter,
   });
 

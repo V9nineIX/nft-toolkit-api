@@ -5,7 +5,7 @@ import APIError from "../utils/api-error";
 import fsx from 'fs-extra';
 import { startCreating } from '../libs/genarate'
 import { last } from "lodash";
-import {  createNewOrder } from '../queues/order-queue'
+import { addGenerateImageQueue } from "../queues/generate-image-queue";
 
 
 const controller = {
@@ -84,7 +84,8 @@ const controller = {
     ];
 
 
-     await createNewOrder({ orderNo: "333" , name:"ps5"})
+    //  await createNewOrder({ orderNo: "333" , name:"ps5"})
+     await addGenerateImageQueue({layerConfigurations})
 
 
     // const res = await startCreating({ layerConfigurations })

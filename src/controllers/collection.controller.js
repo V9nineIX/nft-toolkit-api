@@ -223,21 +223,32 @@ const controller = {
           layersOrder: res?.layers
         }
       ]
-
+      const ownerId = res?.ownerId
       const projectDir = `./folder/` + body?.projectDir
 
-      const buildFolder = `${projectDir}/build/image`
-      const jsonFolder = `${projectDir}/build/json`
-      await fsx.ensureDir(buildFolder);
-      await fsx.ensureDir(jsonFolder);
+    //   const buildFolder = `${projectDir}/build/image`
+    //   const jsonFolder = `${projectDir}/build/json`
+    //   await fsx.ensureDir(buildFolder);
+    //   await fsx.ensureDir(jsonFolder);
 
-      const result = await startCreating({
-        layerConfigurations,
+
+      const param = {
+        layerConfigurations ,
         projectDir,
-        buildFolder,
-        jsonFolder
-      })
-      console.log("result", result)
+        id,
+        ownerId
+      }
+
+     //ADD Queue
+      await addGenerateImageQueue(param)
+
+    //   const result = await startCreating({
+    //     layerConfigurations,
+    //     projectDir,
+    //     buildFolder,
+    //     jsonFolder
+    //   })
+    //   console.log("result", result)
 
       return new APIResponse(201, res);
     } catch (ex) {

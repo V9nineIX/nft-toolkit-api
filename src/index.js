@@ -60,9 +60,9 @@ const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/bull');
 
 createBullBoard({
-    queues: [new BullAdapter(generateImageQueue)],
-    serverAdapter,
-  });
+  queues: [new BullAdapter(generateImageQueue)],
+  serverAdapter,
+});
 
 
 
@@ -80,39 +80,49 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/uploads', express.static('uploads'));
 app.use('/folder', express.static('folder'));
 
-app.use("/bull" , serverAdapter.getRouter())
+app.use("/bull", serverAdapter.getRouter())
 
 
 
 const httpServer = http.createServer(app);
-const io = socketIo(httpServer , { cors: { origin: "*" } }); 
+const io = socketIo(httpServer, { cors: { origin: "*" } });
 
 app.use((req, res, next) => {
-    req.io = io;
-    return next();
-  });
+  req.io = io;
+  return next();
+});
 
 
 io.on('connection', (socket) => {
-    const { ownerId = null} =socket.handshake.query
-    console.log('user connected' ,socket.handshake.query.ownerId);
+  // const { ownerId = null } = socket.handshake.query
+  // console.log('user connected', socket.handshake.query.ownerId);
 
-    socket.on('disconnect', function () {
-      console.log('user disconnected');
-    });
+  // socket.on('disconnect', function () {
+  //   console.log('user disconnected');
+  // });
+
+
+  console.log('====================================');
+  console.log('connection server');
+  console.log('====================================');
+
+
 })
 
 
 io.use((socket, next) => {
-    if ( !isEmpty(socket.handshake.query.ownerId)) {
-      next();
-    } else {
-      next(new Error("invalid"));
-    }
+  // if (!isEmpty(socket.handshake.query.ownerId)) {
+  //   next();
+  // } else {
+  //   next(new Error("invalid"));
+  // }
+
+  next();
+
 });
 
 
-queueListeners()
+queueListeners(io)
 
 // queuelistener()
 //  

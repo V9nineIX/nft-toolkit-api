@@ -242,7 +242,7 @@ const controller = {
       }
 
      //ADD Queue
-    //   await addGenerateImageQueue(param)
+      await addGenerateImageQueue(param)
 
     //   const result = await startCreating({
     //     layerConfigurations,

@@ -1,5 +1,28 @@
-import { startCreating } from '../libs/genarate'
+import { startCreating , generateCollection} from '../libs/genarate'
 import fsx from 'fs-extra';
+
+
+const setupBuildFolder = async  (projectDir) => {
+ return new Promise( async (resolve, reject) => {
+
+    let buildFolder = null
+    let jsonFolder = null
+
+    if (projectDir) {
+        buildFolder = `${projectDir}/build/image`
+        jsonFolder = `${projectDir}/build/json`
+        await fsx.ensureDir(buildFolder);
+        await fsx.ensureDir(jsonFolder);
+      }
+    resolve({
+        buildFolder,
+        jsonFolder
+    })
+ })
+
+  
+
+}
 
 const generateImageProcess = async (job, done) => {
 
@@ -8,7 +31,10 @@ const generateImageProcess = async (job, done) => {
   const { layerConfigurations = null,
     projectDir = null,
     id = null,
-    ownerId = null
+    ownerId = null,
+    layersElement = null,
+    totalSupply = 0,
+    jobType =  null
   } = job.data
 
   let returnData = {
@@ -20,18 +46,22 @@ const generateImageProcess = async (job, done) => {
   try {
 
 
-    let buildFolder = null
-    let jsonFolder = null
+    const { buildFolder ,  jsonFolder }  = await setupBuildFolder(projectDir)
+    let res
 
-    if (projectDir) {
-      buildFolder = `${projectDir}/build/image`
-      jsonFolder = `${projectDir}/build/json`
-      await fsx.ensureDir(buildFolder);
-      await fsx.ensureDir(jsonFolder);
-    }
+    if(jobType == "GENERATE_COLLECTION"){
 
+    res = await generateCollection({
+            layersElement,
+            totalSupply,
+            projectDir,
+            buildFolder,
+            jsonFolder,
+            job
+        })
 
-    const res = await startCreating({
+    }else{  // narmal generate
+       res = await startCreating({
       layerConfigurations,
       projectDir,
       buildFolder,
@@ -39,6 +69,7 @@ const generateImageProcess = async (job, done) => {
       job
     })
 
+    }
 
 
     done(null,  returnData)

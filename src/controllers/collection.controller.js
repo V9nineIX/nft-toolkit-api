@@ -6,7 +6,7 @@ import fsx from 'fs-extra';
 import { startCreating } from '../libs/genarate'
 import { last } from "lodash";
 import { addGenerateImageQueue } from "../queues/generate-image-queue";
-
+import { GENERATE_COLLECTION ,GENERATE_IMAGE } from "../constants";
 
 const controller = {
 
@@ -238,7 +238,8 @@ const controller = {
         layerConfigurations ,
         projectDir,
         id,
-        ownerId
+        ownerId,
+        jobType: GENERATE_IMAGE
       }
 
      //ADD Queue
@@ -300,9 +301,41 @@ const controller = {
         message: "Cannot remove layer",
       });
     }
-
-
   },
+
+  generateCollection: async ({ body, params }) => {
+    try {
+
+
+        const { id } = params
+       const {layersElement ,ownerId=null, projectDir:dir, totalSupply} = body
+        const projectDir = `./folder/` + dir
+  
+        const param = {
+          layersElement,
+          totalSupply,
+          projectDir,
+          id,
+          ownerId,
+          jobType: GENERATE_COLLECTION
+        }
+        
+  
+     //  ADD Queue
+       await addGenerateImageQueue(param)
+  
+  
+        return new APIResponse(201, "OK");
+      } catch (ex) {
+        console.log(ex)
+        throw new APIError({
+          status: httpStatus.INTERNAL_SERVER_ERROR,
+          message: "Cannot genarate image",
+        });
+  
+      }
+
+  }
 
 
 }; //  end controller

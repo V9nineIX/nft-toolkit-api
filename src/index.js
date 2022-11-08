@@ -75,7 +75,8 @@ createBullBoard({
 
 grapQLServer.applyMiddleware({ app });
 app.use(cors())
-app.use(express.json());
+app.use(express.json({limit: "10mb", extended: true}))
+app.use(express.urlencoded({limit: "10mb", extended: true, parameterLimit: 50000}))
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/uploads', express.static('uploads'));
 app.use('/folder', express.static('folder'));

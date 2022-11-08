@@ -41,12 +41,12 @@ const generateImageProcess = async (job, done) => {
 
 
 
-    done(null, { "result": returnData })
+    done(null,  returnData)
 
   } catch (ex) {
     console.log(ex)
     returnData.status = "fail"
-    done(new Error("can not genImage"), { "result": returnData })
+    done(new Error("can not genImage"),  returnData )
   }
 
 

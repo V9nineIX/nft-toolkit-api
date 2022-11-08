@@ -215,7 +215,9 @@ const controller = {
 
 
       const { id } = params
-      const res = await Collection.updateById(id, body?.collection)
+      let paramCollection =  { ...body.collection}
+          paramCollection.status = "process"
+      const res = await Collection.updateById(id,  paramCollection)
 
       const layerConfigurations = [
         {
@@ -240,7 +242,7 @@ const controller = {
       }
 
      //ADD Queue
-      await addGenerateImageQueue(param)
+    //   await addGenerateImageQueue(param)
 
     //   const result = await startCreating({
     //     layerConfigurations,

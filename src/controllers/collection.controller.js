@@ -268,7 +268,9 @@ const controller = {
 
     try {
       const { id } = params
-      const res = await Collection.updateById(id, body)
+      let paramCollection =  { ...body}
+      paramCollection.status = "active"
+      const res = await Collection.updateById(id, paramCollection)
 
       return new APIResponse(201, res);
     } catch (ex) {

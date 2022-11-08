@@ -6,7 +6,7 @@ const queueListeners = (io = null) => {
 
 
     generateImageQueue.on('global:progress', async (job, progress) => {
-        // console.log("job progress------", progress);
+        // console.log("Job progress------", progress);
 
 
         const jobDetail = await generateImageQueue.getJob(job)
@@ -20,19 +20,15 @@ const queueListeners = (io = null) => {
             ownerId: ownerId,
             projectDir: projectDir
         }
-         
-        //TODO update status
-
 
         io.emit("generateProgress", data);
     })
 
 
-    generateImageQueue.on('global:completed',async (job, result) => {
-         console.log("Job Completed: ", "Result: ", result);
+    generateImageQueue.on('global:completed', async (job, result) => {
+        // console.log("Job Completed: ", "Result: ", result);
 
-
-       // TODO emit  to client
+        // TODO emit  to client
         const res = JSON.parse(result)
         const data = {
             status: res.status,
@@ -41,15 +37,29 @@ const queueListeners = (io = null) => {
             projectDir: res.projectDir
         }
 
-    
+
         //UPDATE collection status
-        const colletionRes = await Collection.updateStatus({"id":res.id, "status":"completed"})
-    
-        
+        const colletionRes = await Collection.updateStatus({ "id": res.id, "status": "completed" })
+
 
         io.emit("generateCompleted", data);
+    })
 
+    generateImageQueue.on('global:failed', async (job, errorMsg) => {
+        // console.log("Job failed: ", "errorMsg: ", errorMsg);
 
+        const jobDetail = await generateImageQueue.getJob(job)
+        const { id, ownerId, projectDir } = jobDetail.data
+
+        const data = {
+            messageError: 'Can not generate because total supply more than layer',
+            status: 'Failed',
+            collectionId: id,
+            ownerId: ownerId,
+            projectDir: projectDir,
+        }
+
+        io.emit("generateFailed", data);
     })
 
 

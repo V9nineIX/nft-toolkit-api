@@ -43,6 +43,10 @@ const collectionSchema = new mongoose.Schema({
         type: String,
         default: "",
     },
+    status: {
+        type: String,
+        default: "",
+    },
     symbol: {
         type: String,
         default: "",
@@ -73,7 +77,7 @@ const collectionSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        defualt:"active",
+        default:"active",
     },
     layers: {
         type: [LayerSchema]

@@ -59,6 +59,10 @@ const queueListeners = (io = null) => {
             projectDir: projectDir,
         }
 
+        //UPDATE collection status
+        const colletionRes = await Collection.updateStatus({ "id": id, "status": "failed" })
+
+
         io.emit("generateFailed", data);
     })
 

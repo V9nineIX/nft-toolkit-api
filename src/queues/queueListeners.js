@@ -39,7 +39,7 @@ const queueListeners = (io = null) => {
 
 
         //UPDATE collection status
-        const colletionRes = await Collection.updateStatus({ "id": res.id, "status": "completed" })
+        const collectionRes = await Collection.updateStatus({ "id": res.id, "status": "completed" })
 
 
         io.emit("generateCompleted", data);
@@ -58,6 +58,10 @@ const queueListeners = (io = null) => {
             ownerId: ownerId,
             projectDir: projectDir,
         }
+
+        //UPDATE collection status
+        const collectionRes = await Collection.updateStatus({ "id": id, "status": "failed" })
+
 
         io.emit("generateFailed", data);
     })

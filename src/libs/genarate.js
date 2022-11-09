@@ -224,7 +224,8 @@ const addMetadata = (_dna, _edition, jsonFolder = `${buildDir}/json`) => {
     //   );
     fs.writeFileSync(
       `${jsonFolder}/${_edition}.txt`,
-      JSON.stringify(tempMetadata, null, 2)
+      JSON.stringify(tempMetadata, null, 2),
+      'utf8'
     );
 
   } catch (ex) {
@@ -246,7 +247,12 @@ const addAttributes = (_element) => {
 const loadLayerImg = async (_layer) => {
   try {
     return new Promise(async (resolve) => {
-      const image = await loadImage(`${_layer.selectedElement.path}`);
+
+      let imagePath =  _layer.selectedElement.path
+      if( imagePath.charAt(0) != ".")
+      imagePath =  "."+imagePath 
+
+      const image = await loadImage(`${imagePath}`);
       resolve({ layer: _layer, loadedImage: image });
     });
   } catch (error) {
@@ -551,5 +557,115 @@ const startCreating = async ({
 
 
 
+const generateCollection = async ({
+    layersElement ,
+     totalSupply,
+     projectDir,
+     buildFolder,
+     jsonFolder,
+     job=null
+    }) => {
 
-module.exports = { startCreating, buildSetup, getElements };
+    return new Promise( async (resolve ,reject) => {
+     let editionCount = 1
+     let progress  = 0
+     let abstractedIndexes = [];
+
+
+     for (
+        let i =  1;
+        i <=  totalSupply;
+        i++
+        ) {
+        abstractedIndexes.push(i);
+        }
+
+     console.log(" totalSupply", totalSupply)
+        
+        while (editionCount <= totalSupply)
+         {
+       
+            // console.log(" layersElement", layersElement)
+              //TODO
+               let loadedElements = [];
+               const { dna , layers } = layersElement[editionCount-1]
+
+                for( const layer   of layers){
+                     loadedElements.push(loadLayerImg(layer));
+                }
+
+
+    
+             await Promise.all(loadedElements).then((renderObjectArray) => {
+                debugLogs ? console.log("Clearing canvas") : null;
+                ctx.clearRect(0, 0, format.width, format.height);
+                // if (gif.export) {
+                // hashlipsGiffer = new HashlipsGiffer(
+                //     canvas,
+                //     ctx,
+                //     `${buildDir}/gifs/${abstractedIndexes[0]}.gif`,
+                //     gif.repeat,
+                //     gif.quality,
+                //     gif.delay
+                // );
+                // hashlipsGiffer.start();
+                // }
+                // if (background.generate) {
+                // drawBackground();
+                // }
+             renderObjectArray.forEach((renderObject, index) => {
+            
+                drawElement(
+                    renderObject,
+                    index,
+                    layers.length
+                );
+                // if (gif.export) {
+                //     hashlipsGiffer.add();
+                // }
+                // });
+                // if (gif.export) {
+                // hashlipsGiffer.stop();
+                // }
+              })
+              
+                saveImage(abstractedIndexes[0],  buildFolder);
+                addMetadata(dna, abstractedIndexes[0] ,jsonFolder);
+
+                    console.log(
+                    `Created edition: ${abstractedIndexes[0]}, with DNA: `
+                 );
+               
+             });
+
+
+           
+             progress = ((editionCount / totalSupply) * 100).toFixed()
+             console.log( "progress ...",progress+"%");
+             //TODO update progress
+             if(job){
+                job.progress(progress)
+             }
+
+              editionCount++;
+              abstractedIndexes.shift();
+      
+
+           } //end while gowEdition
+
+        
+    // writeMetaData(JSON.stringify(metadataList, null, 2));
+      // console.log("end loop")
+       resolve("Finsish")
+    }) //  end promise
+ };
+
+
+
+
+module.exports = { 
+    startCreating,
+    buildSetup,
+    getElements,
+    generateCollection 
+};

@@ -197,6 +197,33 @@ router.route("/generateImage/:id").put(handle(controller.generateImage));
 
 /**
  * @swagger
+ * /v1/collection/generateCollection/{id}:
+ *   put:
+ *     tags: [Collection]
+ *     summary: genarate colection
+*     parameters:
+ *       - in: path
+ *         name: id
+ *         description: Collection Id
+ *         schema:
+ *           type: string
+ *           example: 635f93c13058f3148ec59d6b
+ *       - in: body
+ *         name: body
+ *         description: Collection's information
+ *         schema:
+ *           type: object
+ *     responses:
+ *       201:
+ *         description: Return status create collection
+ *         schema:
+ *           type: object
+ */
+router.route("/generateCollection/:id").put(handle(controller.generateCollection));
+
+
+/**
+ * @swagger
  * /v1/collection/{id}:
  *   put:
  *     tags: [Collection]

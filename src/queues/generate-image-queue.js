@@ -6,7 +6,7 @@ const generateImageQueue = new Queue("generateImage" ,redis.url)
 
 const addGenerateImageQueue = (job) => {
     generateImageQueue.add(job,{
-        attempt:2,
+        attempt:1,
     })
 }
 

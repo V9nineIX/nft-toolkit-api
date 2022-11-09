@@ -223,8 +223,9 @@ const addMetadata = (_dna, _edition, jsonFolder = `${buildDir}/json`) => {
     //     JSON.stringify(tempMetadata, null, 2)
     //   );
     fs.writeFileSync(
-      `${jsonFolder}/${_edition}.txt`,
-      JSON.stringify(tempMetadata, null, 2)
+      `${jsonFolder}/${_edition}.json`,
+      JSON.stringify(tempMetadata, null, 2),
+      'utf8'
     );
 
   } catch (ex) {
@@ -587,8 +588,9 @@ const generateCollection = async ({
             // console.log(" layersElement", layersElement)
               //TODO
                let loadedElements = [];
+               const { dna , layers } = layersElement[editionCount-1]
 
-                for( const layer   of  layersElement[editionCount-1]){
+                for( const layer   of layers){
                      loadedElements.push(loadLayerImg(layer));
                 }
 
@@ -616,7 +618,7 @@ const generateCollection = async ({
                 drawElement(
                     renderObject,
                     index,
-                    layersElement[editionCount-1].length
+                    layers.length
                 );
                 // if (gif.export) {
                 //     hashlipsGiffer.add();
@@ -628,7 +630,7 @@ const generateCollection = async ({
               })
               
                 saveImage(abstractedIndexes[0],  buildFolder);
-                //addMetadata(newDna, abstractedIndexes[0] ,jsonFolder);
+                addMetadata(dna, abstractedIndexes[0] ,jsonFolder);
 
                     console.log(
                     `Created edition: ${abstractedIndexes[0]}, with DNA: `

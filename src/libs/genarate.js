@@ -223,7 +223,7 @@ const addMetadata = (_dna, _edition, jsonFolder = `${buildDir}/json`) => {
     //     JSON.stringify(tempMetadata, null, 2)
     //   );
     fs.writeFileSync(
-      `${jsonFolder}/${_edition}.json`,
+      `${jsonFolder}/${_edition}.txt`,
       JSON.stringify(tempMetadata, null, 2),
       'utf8'
     );

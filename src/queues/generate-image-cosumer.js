@@ -1,5 +1,6 @@
 import { startCreating , generateCollection} from '../libs/genarate'
 import fsx from 'fs-extra';
+import { includes } from 'lodash';
 
 
 const setupBuildFolder = async  (projectDir) => {
@@ -43,6 +44,7 @@ const generateImageProcess = async (job, done) => {
     "status": "Completed"
   }
 
+
   try {
 
 
@@ -71,13 +73,17 @@ const generateImageProcess = async (job, done) => {
 
     }
 
-
-    done(null,  returnData)
+    if (includes(res, "Error")) {
+      returnData.status = "Failed"
+      done(new Error("Can not generate because total supply more than layer"), returnData)
+    } else {
+      done(null, returnData)
+    }
 
   } catch (ex) {
     console.log(ex)
-    returnData.status = "fail"
-    done(new Error("can not genImage"),  returnData )
+    returnData.status = "Failed"
+    done(new Error("can not genImage"), returnData)
   }
 
 

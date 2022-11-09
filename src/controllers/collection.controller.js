@@ -85,7 +85,7 @@ const controller = {
 
 
     //  await createNewOrder({ orderNo: "333" , name:"ps5"})
-     await addGenerateImageQueue({layerConfigurations})
+    await addGenerateImageQueue({ layerConfigurations })
 
 
     // const res = await startCreating({ layerConfigurations })
@@ -215,9 +215,9 @@ const controller = {
 
 
       const { id } = params
-      let paramCollection =  { ...body.collection}
-          paramCollection.status = "process"
-      const res = await Collection.updateById(id,  paramCollection)
+      let paramCollection = { ...body.collection }
+      paramCollection.status = "process"
+      const res = await Collection.updateById(id, paramCollection)
 
       const layerConfigurations = [
         {
@@ -228,30 +228,30 @@ const controller = {
       const ownerId = res?.ownerId
       const projectDir = `./folder/` + body?.projectDir
 
-    //   const buildFolder = `${projectDir}/build/image`
-    //   const jsonFolder = `${projectDir}/build/json`
-    //   await fsx.ensureDir(buildFolder);
-    //   await fsx.ensureDir(jsonFolder);
+      //   const buildFolder = `${projectDir}/build/image`
+      //   const jsonFolder = `${projectDir}/build/json`
+      //   await fsx.ensureDir(buildFolder);
+      //   await fsx.ensureDir(jsonFolder);
 
 
       const param = {
-        layerConfigurations ,
+        layerConfigurations,
         projectDir,
         id,
         ownerId,
         jobType: GENERATE_IMAGE
       }
 
-     //ADD Queue
+      //ADD Queue
       await addGenerateImageQueue(param)
 
-    //   const result = await startCreating({
-    //     layerConfigurations,
-    //     projectDir,
-    //     buildFolder,
-    //     jsonFolder
-    //   })
-    //   console.log("result", result)
+      //   const result = await startCreating({
+      //     layerConfigurations,
+      //     projectDir,
+      //     buildFolder,
+      //     jsonFolder
+      //   })
+      //   console.log("result", result)
 
       return new APIResponse(201, res);
     } catch (ex) {
@@ -269,7 +269,7 @@ const controller = {
 
     try {
       const { id } = params
-      let paramCollection =  { ...body}
+      let paramCollection = { ...body }
       paramCollection.status = "active"
       const res = await Collection.updateById(id, paramCollection)
 

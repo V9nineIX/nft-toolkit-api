@@ -77,7 +77,7 @@ const collectionSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        default:"active",
+        default: "active",
     },
     layers: {
         type: [LayerSchema]
@@ -122,8 +122,8 @@ collectionSchema.statics = {
         );
         return doc;
     },
-    async updateStatus({id , status}) {
-        const  doc = await this.findOneAndUpdate({ '_id': id }, { "status":status }, {
+    async updateStatus({ id, status }) {
+        const doc = await this.findOneAndUpdate({ '_id': id }, { "status": status }, {
             new: true,
             upsert: true // Make this update into an upsert
         });

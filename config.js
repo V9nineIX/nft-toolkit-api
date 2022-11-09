@@ -18,6 +18,11 @@ const config = {
       useNewUrlParser: true,
     },
   },
+  redis:{
+    host: process.env.SERVER_IP || "localhost",
+    port: process.env.REDIS_PORT || "6379",
+    url : process.env.REDIS_URL || "redis://127.0.0.1:6379"
+  }
 };
 
 // if (process.env.NODE_ENV === "production") {

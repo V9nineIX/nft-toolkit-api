@@ -1,4 +1,4 @@
-version: "3"
+version: "3.8"
 
 services:
   mongo:
@@ -9,6 +9,13 @@ services:
     ports:
       - 27018:27017
 
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+     - 6399:6379
+    volumes:
+     - redis_data:/data
   server:
     build:
       context: .
@@ -18,13 +25,35 @@ services:
     environment:
       SERVER_IP: ${SERVER_IP}
       SERVER_PORT: ${SERVER_PORT}
-      MONGODB_IP: mongo
-      MONGODB_PORT: 27017
+      MONGODB_IP: ${MONGODB_IP}
+      MONGODB_PORT: ${MONGODB_PORT}
       MONGODB_USERNAME: ${MONGODB_USERNAME}
       MONGODB_PASSWORD: ${MONGODB_PASSWORD}
       NODE_ENV: production
+      REDIS_PORT: ${REDIS_PORT}
     volumes:
       - ./folder:/app/folder/
+    depends_on: 
+      - mongo
+      - redis
+
+  worker:
+    build: .
+    container_name: image-queue-worker
+    command: "npm run worker"
+    environment:
+      SERVER_IP: ${SERVER_IP}
+      SERVER_PORT: ${SERVER_PORT}
+      MONGODB_IP: ${MONGODB_IP}
+      MONGODB_PORT: ${MONGODB_PORT}
+      MONGODB_USERNAME: ${MONGODB_USERNAME}
+      MONGODB_PASSWORD: ${MONGODB_PASSWORD}
+      NODE_ENV: production
+      REDIS_PORT: ${REDIS_PORT}
+    depends_on: 
+      - mongo
+      - redis
 
 volumes:
   db_data:
+  redis_data:

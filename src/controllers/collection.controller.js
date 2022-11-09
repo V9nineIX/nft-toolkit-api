@@ -5,7 +5,8 @@ import APIError from "../utils/api-error";
 import fsx from 'fs-extra';
 import { startCreating } from '../libs/genarate'
 import { last } from "lodash";
-
+import { addGenerateImageQueue } from "../queues/generate-image-queue";
+import { GENERATE_COLLECTION ,GENERATE_IMAGE } from "../constants";
 
 const controller = {
 
@@ -81,6 +82,10 @@ const controller = {
         ],
       }
     ];
+
+
+    //  await createNewOrder({ orderNo: "333" , name:"ps5"})
+    await addGenerateImageQueue({ layerConfigurations })
 
 
     // const res = await startCreating({ layerConfigurations })
@@ -210,7 +215,9 @@ const controller = {
 
 
       const { id } = params
-      const res = await Collection.updateById(id, body?.collection)
+      let paramCollection = { ...body.collection }
+      paramCollection.status = "process"
+      const res = await Collection.updateById(id, paramCollection)
 
       const layerConfigurations = [
         {
@@ -218,21 +225,33 @@ const controller = {
           layersOrder: res?.layers
         }
       ]
-
+      const ownerId = res?.ownerId
       const projectDir = `./folder/` + body?.projectDir
 
-      const buildFolder = `${projectDir}/build/image`
-      const jsonFolder = `${projectDir}/build/json`
-      await fsx.ensureDir(buildFolder);
-      await fsx.ensureDir(jsonFolder);
+      //   const buildFolder = `${projectDir}/build/image`
+      //   const jsonFolder = `${projectDir}/build/json`
+      //   await fsx.ensureDir(buildFolder);
+      //   await fsx.ensureDir(jsonFolder);
 
-      const result = await startCreating({
+
+      const param = {
         layerConfigurations,
         projectDir,
-        buildFolder,
-        jsonFolder
-      })
-      console.log("result", result)
+        id,
+        ownerId,
+        jobType: GENERATE_IMAGE
+      }
+
+      //ADD Queue
+      await addGenerateImageQueue(param)
+
+      //   const result = await startCreating({
+      //     layerConfigurations,
+      //     projectDir,
+      //     buildFolder,
+      //     jsonFolder
+      //   })
+      //   console.log("result", result)
 
       return new APIResponse(201, res);
     } catch (ex) {
@@ -250,7 +269,9 @@ const controller = {
 
     try {
       const { id } = params
-      const res = await Collection.updateById(id, body)
+      let paramCollection = { ...body }
+      paramCollection.status = "active"
+      const res = await Collection.updateById(id, paramCollection)
 
       return new APIResponse(201, res);
     } catch (ex) {
@@ -260,8 +281,6 @@ const controller = {
         message: "Cannot update collection",
       });
     }
-
-
   },
 
   removeLayerById: async ({ body, params }) => {
@@ -282,9 +301,42 @@ const controller = {
         message: "Cannot remove layer",
       });
     }
-
-
   },
+
+  generateCollection: async ({ body, params }) => {
+    try {
+
+
+        const { id } = params
+       const {layersElement ,ownerId=null, projectDir:dir, totalSupply} = body
+        const projectDir = `./folder/` + dir
+  
+        const param = {
+          layersElement,
+          totalSupply,
+          projectDir,
+          id,
+          ownerId,
+          jobType: GENERATE_COLLECTION
+        }
+        
+  
+     //  ADD Queue
+       await addGenerateImageQueue(param)
+  
+  
+        return new APIResponse(201, "OK");
+      } catch (ex) {
+        console.log(ex)
+        throw new APIError({
+          status: httpStatus.INTERNAL_SERVER_ERROR,
+          message: "Cannot genarate image",
+        });
+  
+      }
+
+  }
+
 
 }; //  end controller
 

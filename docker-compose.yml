@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3"
 
 services:
   mongo:
@@ -33,9 +33,6 @@ services:
       REDIS_PORT: ${REDIS_PORT}
     volumes:
       - ./folder:/app/folder/
-    depends_on: 
-      - mongo
-      - redis
 
   worker:
     build: .
@@ -50,9 +47,6 @@ services:
       MONGODB_PASSWORD: ${MONGODB_PASSWORD}
       NODE_ENV: production
       REDIS_PORT: ${REDIS_PORT}
-    depends_on: 
-      - mongo
-      - redis
 
 volumes:
   db_data:

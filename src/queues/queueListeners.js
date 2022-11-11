@@ -50,31 +50,16 @@ const queueListeners = (io = null) => {
         // console.log("Job failed: ", "errorMsg: ", errorMsg);
 
         const jobDetail = await generateImageQueue.getJob(job)
-        const { id, ownerId, projectDir } = jobDetail.data
-
-        const data = {
-            message: 'Can not generate because total supply more than layer',
-            status: 'Failed',
-            collectionId: id,
-            ownerId: ownerId,
-            projectDir: projectDir,
-        }
-
-        //UPDATE collection status
-        const collectionRes = await Collection.updateStatus({ "id": id, "status": "failed" })
-
-
-        io.emit("generateFailed", data);
+        handleFaild(jobDetail,io)
     })
 
 
     generateImageQueue.on('global:stalled', async (job) => {
+         //CPU stalled
 
         const jobDetail = await generateImageQueue.getJob(job)
-        const { id, ownerId, projectDir } = jobDetail.data
       /// TODO  on stalled
-
-       handleFaild(jobDetail)
+       handleFaild(jobDetail,io)
 
     })
 
@@ -87,7 +72,7 @@ const  handleFaild = async (job ,io , message=null) => {
     const { id, ownerId, projectDir } = job.data
 
     const data = {
-        messageError: 'Can not generate because total supply more than layer',
+        message: 'Can not generate please try agian',
         status: 'Failed',
         collectionId: id,
         ownerId: ownerId,

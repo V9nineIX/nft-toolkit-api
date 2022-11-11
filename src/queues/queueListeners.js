@@ -31,6 +31,7 @@ const queueListeners = (io = null) => {
         // TODO emit  to client
         const res = JSON.parse(result)
         const data = {
+            message: 'Generate image completed',
             status: res.status,
             collectionId: res.id,
             ownerId: res.ownerId,
@@ -49,28 +50,39 @@ const queueListeners = (io = null) => {
         // console.log("Job failed: ", "errorMsg: ", errorMsg);
 
         const jobDetail = await generateImageQueue.getJob(job)
-        const { id, ownerId, projectDir } = jobDetail.data
-
-        const data = {
-            messageError: 'Can not generate because total supply more than layer',
-            status: 'Failed',
-            collectionId: id,
-            ownerId: ownerId,
-            projectDir: projectDir,
-        }
-
-        //UPDATE collection status
-        const collectionRes = await Collection.updateStatus({ "id": id, "status": "failed" })
+        handleFaild(jobDetail,io)
+    })
 
 
-        io.emit("generateFailed", data);
+    generateImageQueue.on('global:stalled', async (job) => {
+         //CPU stalled
+
+        const jobDetail = await generateImageQueue.getJob(job)
+      /// TODO  on stalled
+       handleFaild(jobDetail,io)
+
     })
 
 
 
+}
 
 
+const  handleFaild = async (job ,io , message=null) => {
+    const { id, ownerId, projectDir } = job.data
 
+    const data = {
+        message: 'Can not generate please try agian',
+        status: 'Failed',
+        collectionId: id,
+        ownerId: ownerId,
+        projectDir: projectDir,
+    }
+
+    const collectionRes = await Collection.updateStatus({ "id": id, "status": "failed" })
+    
+
+    io.emit("generateFailed", data);
 }
 
 export default queueListeners

@@ -73,7 +73,8 @@ const generateImageProcess = async (job, done) => {
 
     }
 
-    if (includes(res, "Error")) {
+    //if (includes(res, "Error")) {
+    if( res == "Error"){
       returnData.status = "Failed"
       done(new Error("Can not generate because total supply more than layer"), returnData)
     } else {

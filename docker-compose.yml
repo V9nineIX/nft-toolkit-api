@@ -22,6 +22,7 @@ services:
     ports:
       - ${SERVER_PORT}:${SERVER_PORT}
     restart: always
+    container_name: nft-service
     environment:
       SERVER_IP: ${SERVER_IP}
       SERVER_PORT: ${SERVER_PORT}
@@ -47,6 +48,8 @@ services:
       MONGODB_PASSWORD: ${MONGODB_PASSWORD}
       NODE_ENV: production
       REDIS_PORT: ${REDIS_PORT}
+    volumes:
+      - ./folder:/app/folder/
 
 volumes:
   db_data:

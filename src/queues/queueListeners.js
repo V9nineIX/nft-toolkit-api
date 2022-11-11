@@ -73,10 +73,30 @@ const queueListeners = (io = null) => {
         const { id, ownerId, projectDir } = jobDetail.data
       /// TODO  on stalled
 
+       handleFaild(jobDetail)
+
     })
 
 
 
+}
+
+
+const  handleFaild = async (job ,io , message=null) => {
+    const { id, ownerId, projectDir } = job.data
+
+    const data = {
+        messageError: 'Can not generate because total supply more than layer',
+        status: 'Failed',
+        collectionId: id,
+        ownerId: ownerId,
+        projectDir: projectDir,
+    }
+
+    const collectionRes = await Collection.updateStatus({ "id": id, "status": "failed" })
+    
+
+    io.emit("generateFailed", data);
 }
 
 export default queueListeners

@@ -567,20 +567,12 @@ const generateCollection = async ({
     }) => {
 
     return new Promise( async (resolve ,reject) => {
+
+    try {
+
      let editionCount = 1
      let progress  = 0
-     let abstractedIndexes = [];
 
-
-     for (
-        let i =  1;
-        i <=  totalSupply;
-        i++
-        ) {
-        abstractedIndexes.push(i);
-        }
-
-     console.log(" totalSupply", totalSupply)
         
         while (editionCount <= totalSupply)
          {
@@ -629,11 +621,11 @@ const generateCollection = async ({
                 // }
               })
               
-                saveImage(abstractedIndexes[0],  buildFolder);
-                addMetadata(dna, abstractedIndexes[0] ,jsonFolder);
+                saveImage(editionCount,  buildFolder);
+                addMetadata(dna, editionCount ,jsonFolder);
 
-                    console.log(
-                    `Created edition: ${abstractedIndexes[0]}, with DNA: `
+                 console.log(
+                    `Created edition: ${editionCount}, with DNA: `
                  );
                
              });
@@ -648,15 +640,18 @@ const generateCollection = async ({
              }
 
               editionCount++;
-              abstractedIndexes.shift();
       
 
-           } //end while gowEdition
+        } //end while gowEdition
 
         
     // writeMetaData(JSON.stringify(metadataList, null, 2));
       // console.log("end loop")
        resolve("Finsish")
+    }catch(ex){
+       console.log(ex)
+       resolve("Error")
+     }
     }) //  end promise
  };
 

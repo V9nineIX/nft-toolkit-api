@@ -308,7 +308,7 @@ const controller = {
 
 
         const { id } = params
-       const {layersElement ,ownerId=null, projectDir:dir, totalSupply} = body
+        const {layersElement ,ownerId=null, projectDir:dir, totalSupply} = body
         const projectDir = `./folder/` + dir
   
         const param = {
@@ -319,6 +319,8 @@ const controller = {
           ownerId,
           jobType: GENERATE_COLLECTION
         }
+
+        //TODO update database
         
   
      //  ADD Queue

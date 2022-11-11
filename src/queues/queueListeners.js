@@ -31,6 +31,7 @@ const queueListeners = (io = null) => {
         // TODO emit  to client
         const res = JSON.parse(result)
         const data = {
+            message: 'Generate image completed',
             status: res.status,
             collectionId: res.id,
             ownerId: res.ownerId,
@@ -52,7 +53,7 @@ const queueListeners = (io = null) => {
         const { id, ownerId, projectDir } = jobDetail.data
 
         const data = {
-            messageError: 'Can not generate because total supply more than layer',
+            message: 'Can not generate because total supply more than layer',
             status: 'Failed',
             collectionId: id,
             ownerId: ownerId,

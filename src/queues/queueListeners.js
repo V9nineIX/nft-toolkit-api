@@ -67,7 +67,13 @@ const queueListeners = (io = null) => {
     })
 
 
+    generateImageQueue.on('global:stalled', async (job) => {
 
+        const jobDetail = await generateImageQueue.getJob(job)
+        const { id, ownerId, projectDir } = jobDetail.data
+      /// TODO  on stalled
+
+    })
 
 
 

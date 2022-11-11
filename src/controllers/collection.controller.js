@@ -308,8 +308,13 @@ const controller = {
 
 
         const { id } = params
-        const {layersElement ,ownerId=null, projectDir:dir, totalSupply} = body
+        const {layersElement ,ownerId=null, projectDir:dir, totalSupply ,collection} = body
         const projectDir = `./folder/` + dir
+
+
+        let paramCollection = { ...collection }
+        paramCollection.status = "process"
+        const res = await Collection.updateById(id, paramCollection)
   
         const param = {
           layersElement,
@@ -324,7 +329,7 @@ const controller = {
         
   
      //  ADD Queue
-       await addGenerateImageQueue(param)
+        await addGenerateImageQueue(param)
   
   
         return new APIResponse(201, "OK");

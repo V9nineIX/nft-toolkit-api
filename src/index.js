@@ -17,6 +17,7 @@ const { createBullBoard } = require('@bull-board/api')
 const { BullAdapter } = require('@bull-board/api/bullAdapter')
 import { generateImageQueue } from "./queues/generate-image-queue";
 import queueListeners from "./queues/queueListeners";
+import {  API_POST_SIZE_LIMIT } from "./constants"
 
 
 const grapQLServer = new ApolloServer({
@@ -75,8 +76,8 @@ createBullBoard({
 
 grapQLServer.applyMiddleware({ app });
 app.use(cors())
-app.use(express.json({limit: "10mb", extended: true}))
-app.use(express.urlencoded({limit: "10mb", extended: true, parameterLimit: 50000}))
+app.use(express.json({limit:  API_POST_SIZE_LIMIT, extended: true}))
+app.use(express.urlencoded({limit:  API_POST_SIZE_LIMIT, extended: true, parameterLimit: 50000}))
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/uploads', express.static('uploads'));
 app.use('/folder', express.static('folder'));

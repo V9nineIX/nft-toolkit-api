@@ -4,9 +4,10 @@
   "description": "Minimal boilerplate for node.js API server",
   "main": "src/index.js",
   "scripts": {
-    "start": "nodemon --exec babel-node src/index.js",
+    "dev": "nodemon --exec  env-cmd -f .env.development  babel-node src/index.js",
+    "start": "nodemon --exec  env-cmd -f .env.staging  babel-node src/index.js",
     "test": "NODE_ENV=test mocha tests/**/*.test.js --require @babel/register --exit",
-    "prod": "NODE_ENV=production babel-node src/index.js",
+    "prod": "NODE_ENV=production  env-cmd -f .env.production  babel-node src/index.js",
     "worker": "babel-node src/worker.js",
     "worker:dev": "nodemon --exec babel-node src/worker.js"
   },
@@ -22,6 +23,7 @@
     "canvas": "^2.10.1",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
+    "env-cmd": "^10.1.0",
     "express": "^4.18.1",
     "fs-extra": "^10.1.0",
     "gif-encoder-2": "^1.0.5",

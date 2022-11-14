@@ -3,6 +3,7 @@ import controller from "../../controllers/collection.controller";
 import { handle } from "../../utils/api-handler";
 import multer from "multer";
 import fsx from 'fs-extra';
+import { MAX_FILE_UPLOAD } from "../../constants"
 
 
 const storage = multer.diskStorage({
@@ -105,7 +106,7 @@ router.route("/").post(handle(controller.create));
  *               example: 1.0.0
  */
 
-router.route("/uploadImage").post(upload.array('files', 12), handle(controller.uploadMultiple));
+router.route("/uploadImage").post(upload.array('files', MAX_FILE_UPLOAD), handle(controller.uploadMultiple));
 
 
 

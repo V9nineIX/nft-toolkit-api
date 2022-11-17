@@ -176,7 +176,7 @@ const drawBackground = () => {
   ctx.fillRect(0, 0, format.width, format.height);
 };
 
-const addMetadata = (_dna, _edition, jsonFolder = `${buildDir}/json`) => {
+const addMetadata = (_dna, _edition, jsonFolder = `${buildDir}/json` , ipfsPath=null) => {
   let dateTime = Date.now();
   let tempMetadata = {
     name: `${namePrefix} #${_edition}`,
@@ -622,7 +622,7 @@ const generateCollection = async ({
               })
               
                 saveImage(editionCount,  buildFolder);
-                addMetadata(dna, editionCount ,jsonFolder);
+                // addMetadata(dna, editionCount ,jsonFolder);
 
                  console.log(
                     `Created edition: ${editionCount}, with DNA: `

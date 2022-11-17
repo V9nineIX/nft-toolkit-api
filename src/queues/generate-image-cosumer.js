@@ -3,6 +3,7 @@ import fsx from 'fs-extra';
 import { includes } from 'lodash';
 
 
+
 const setupBuildFolder = async  (projectDir) => {
  return new Promise( async (resolve, reject) => {
 
@@ -78,6 +79,10 @@ const generateImageProcess = async (job, done) => {
       returnData.status = "Failed"
       done(new Error("Can not generate because total supply more than layer"), returnData)
     } else {
+      //TODO upload to IPFS
+
+  
+
       done(null, returnData)
     }
 

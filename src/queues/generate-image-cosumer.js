@@ -1,6 +1,7 @@
 import { startCreating , generateCollection} from '../libs/genarate'
 import fsx from 'fs-extra';
 import { includes } from 'lodash';
+import { uploadToPinata ,uploadJson  } from '../ipfs/pinata'
 
 
 
@@ -36,6 +37,7 @@ const generateImageProcess = async (job, done) => {
     ownerId = null,
     layersElement = null,
     totalSupply = 0,
+    projectName = null,
     jobType =  null
   } = job.data
 
@@ -61,7 +63,7 @@ const generateImageProcess = async (job, done) => {
             buildFolder,
             jsonFolder,
             job
-        })
+        })   
 
     }else{  // narmal generate
        res = await startCreating({
@@ -74,16 +76,35 @@ const generateImageProcess = async (job, done) => {
 
     }
 
+
+
+
     //if (includes(res, "Error")) {
     if( res == "Error"){
       returnData.status = "Failed"
       done(new Error("Can not generate because total supply more than layer"), returnData)
     } else {
       //TODO upload to IPFS
+//       const result =  await uploadToPinata({
+//         layersElement,
+//         totalSupply,
+//         projectName,
+//         projectDir,
+//         buildFolder,
+//         jsonFolder,
+//         job
+//       })
+//     console.log(result)
+//      const jsonRes =  await uploadJson(jsonFolder ,projectName)
 
-  
+//    console.log(jsonRes)
+    //   console.log("result",  result)
 
+      //TODO update ipfs hash to database
+     console.log("done")
       done(null, returnData)
+
+
     }
 
   } catch (ex) {

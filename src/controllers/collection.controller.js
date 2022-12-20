@@ -310,6 +310,8 @@ const controller = {
         const { id } = params
         const {layersElement ,ownerId=null, projectDir:dir, totalSupply ,collection} = body
         const projectDir = `./folder/` + dir
+        const projectName = dir
+
 
 
         let paramCollection = { ...collection }
@@ -322,6 +324,7 @@ const controller = {
           projectDir,
           id,
           ownerId,
+          projectName,
           jobType: GENERATE_COLLECTION
         }
 

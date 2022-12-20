@@ -6,7 +6,7 @@ import fsx from 'fs-extra';
 import { startCreating } from '../libs/genarate'
 import { last } from "lodash";
 import { addGenerateImageQueue } from "../queues/generate-image-queue";
-import { GENERATE_COLLECTION ,GENERATE_IMAGE } from "../constants";
+import { GENERATE_COLLECTION, GENERATE_IMAGE } from "../constants";
 
 const controller = {
 
@@ -143,7 +143,7 @@ const controller = {
       let pathLayer = []
       for (var i = 0; i < req.files.length; i++) {
         const fileName = req.files[i].filename;
-        pathLayer.push(
+        pathLayer.unshift(
           {
             path: `${createDir.replace('.', '')}/${fileName}`,
             name: fileName.replace('.png', ''),
@@ -160,13 +160,13 @@ const controller = {
 
       }
       const resCollection = await Collection.findById(collectionId)
-      resCollection.layers.push({
+      resCollection.layers.unshift({
         name: layerName,
         images: pathLayer,
       })
       resCollection.save()
 
-      return new APIResponse(200, { layers: [last(resCollection.layers)] });
+      return new APIResponse(200, { layers: [resCollection.layers[0]] });
 
     } catch (ex) {
       console.log("ex", ex)
@@ -307,40 +307,40 @@ const controller = {
     try {
 
 
-        const { id } = params
-        const {layersElement ,ownerId=null, projectDir:dir, totalSupply ,collection} = body
-        const projectDir = `./folder/` + dir
+      const { id } = params
+      const { layersElement, ownerId = null, projectDir: dir, totalSupply, collection } = body
+      const projectDir = `./folder/` + dir
 
 
-        let paramCollection = { ...collection }
-        paramCollection.status = "process"
-        const res = await Collection.updateById(id, paramCollection)
-  
-        const param = {
-          layersElement,
-          totalSupply,
-          projectDir,
-          id,
-          ownerId,
-          jobType: GENERATE_COLLECTION
-        }
+      let paramCollection = { ...collection }
+      paramCollection.status = "process"
+      const res = await Collection.updateById(id, paramCollection)
 
-        //TODO update database
-        
-  
-     //  ADD Queue
-        await addGenerateImageQueue(param)
-  
-  
-        return new APIResponse(201, "OK");
-      } catch (ex) {
-        console.log(ex)
-        throw new APIError({
-          status: httpStatus.INTERNAL_SERVER_ERROR,
-          message: "Cannot genarate image",
-        });
-  
+      const param = {
+        layersElement,
+        totalSupply,
+        projectDir,
+        id,
+        ownerId,
+        jobType: GENERATE_COLLECTION
       }
+
+      //TODO update database
+
+
+      //  ADD Queue
+      await addGenerateImageQueue(param)
+
+
+      return new APIResponse(201, "OK");
+    } catch (ex) {
+      console.log(ex)
+      throw new APIError({
+        status: httpStatus.INTERNAL_SERVER_ERROR,
+        message: "Cannot genarate image",
+      });
+
+    }
 
   }
 

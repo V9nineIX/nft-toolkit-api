@@ -594,7 +594,7 @@ const generateCollection = async ({
             // console.log(" layersElement", layersElement)
               //TODO
                let loadedElements = [];
-               const { dna , layers ,  metaData } = layersElement[editionCount-1]
+               let { dna , layers ,  metaData } = layersElement[editionCount-1]
                 /// revers layer for genreate
                  layers =  _.reverse(layers)
 

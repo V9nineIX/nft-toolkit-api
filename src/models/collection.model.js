@@ -43,10 +43,6 @@ const collectionSchema = new mongoose.Schema({
         type: String,
         default: "",
     },
-    status: {
-        type: String,
-        default: "",
-    },
     symbol: {
         type: String,
         default: "",

@@ -18,19 +18,79 @@ const { BullAdapter } = require('@bull-board/api/bullAdapter')
 import { generateImageQueue } from "./queues/generate-image-queue";
 import queueListeners from "./queues/queueListeners";
 import {  API_POST_SIZE_LIMIT } from "./constants"
-
+const fs = require('fs');
+import Collection from "./models/collection.model";
 
 const grapQLServer = new ApolloServer({
   playground: true,
   typeDefs: gql`
       type Query {
-        hello: String
+        hello: String,
+        meta: Meta,
+        nft(id: String):NFT
       }
+      type Attributes {
+        trait_type: String,
+        value: String
+      }
+
+      type Meta {
+         name: String,
+         description: String,
+         image: String,
+         edition:String,
+         date: String,
+         attributes:[Attributes]
+      }
+
+      type NFT {
+         name: String,
+         ownerId:String,
+         status:String,
+         symbol:String,
+         description:String,
+         totalSupply:String,
+         layers:[Layer]
+      }
+
+      type Layer {
+        name: String,
+        _id: String,
+      }
+ 
     `,
   resolvers: {
     Query: {
       hello: () => 'Hello world!',
+      meta: () => {
+        const data = JSON.parse(fs.readFileSync('./build/json/1.json', 'utf-8'));
+        return data
+       },
+      nft: async (_, {id}) => {
+           console.log("arg" , id)
+           //"63a194fe997b22db6e591f6c"
+           //get collection inf0
+           const res = await Collection.findByCollectionId(id);
+           console.log("-----res----" ,res[0])
+      
+           const { projectDir } = res[0]
+           //TODO: get meta from json file
+           try {
+           const data = JSON.parse(fs.readFileSync(`./folder/${projectDir}/build/json/1.json`, 'utf-8'));
+           console.log("data",data)
+           }catch(ex){
+
+           }
+
+           return res[0]
+        }
     },
+    // NFT: {
+    //    meta: () => {
+    //     const data = JSON.parse(fs.readFileSync('../build/json/1.json', 'utf-8'));
+    //     return data
+    //    }
+    // }
   }
 })
 
@@ -142,6 +202,8 @@ route(app);
 httpServer.listen(server.port, server.host, () =>
   console.log(`Server has started on ${server.host}:${server.port} ${grapQLServer.graphqlPath}`)
 );
+
+
 
 
 

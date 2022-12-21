@@ -27,6 +27,7 @@ const _ = require('lodash')
 
 
 
+
 // If you have selected Solana then the collection starts from 0 automatically
 // const layerConfigurations = [
 //     {
@@ -176,18 +177,19 @@ const drawBackground = () => {
   ctx.fillRect(0, 0, format.width, format.height);
 };
 
-const addMetadata = (_dna, _edition, jsonFolder = `${buildDir}/json`) => {
-  let dateTime = Date.now();
+const addMetadata = (_dna, _edition, jsonFolder = `${buildDir}/json` ,metaData=null,  ipfsHasId=null) => {
+    return new Promise( async (resolve ,reject) => {
+  
+    let dateTime = Date.now();
   let tempMetadata = {
-    name: `${namePrefix} #${_edition}`,
-    description: description,
-    image: `${baseUri}/${_edition}.png`,
-    dna: sha1(_dna),
+    name: `${metaData?.name}`,
+    description: metaData?.description || "",
+    symbol: metaData?.symbol || "",
+    image: `ipfs://${ipfsHasId}/${_edition}.png`,
     edition: _edition,
     date: dateTime,
     ...extraMetadata,
-    attributes: attributesList,
-    compiler: "PW",
+    attributes: metaData.attributes,
   };
   //   if (network == NETWORK.sol) {
   //     tempMetadata = {
@@ -223,7 +225,7 @@ const addMetadata = (_dna, _edition, jsonFolder = `${buildDir}/json`) => {
     //     JSON.stringify(tempMetadata, null, 2)
     //   );
     fs.writeFileSync(
-      `${jsonFolder}/${_edition}.txt`,
+      `${jsonFolder}/${_edition}.json`,
       JSON.stringify(tempMetadata, null, 2),
       'utf8'
     );
@@ -232,8 +234,9 @@ const addMetadata = (_dna, _edition, jsonFolder = `${buildDir}/json`) => {
     console.log(ex)
   }
 
-
-  attributesList = [];
+    attributesList = [];
+    resolve("write done")
+   });
 };
 
 const addAttributes = (_element) => {
@@ -622,7 +625,7 @@ const generateCollection = async ({
               })
               
                 saveImage(editionCount,  buildFolder);
-                addMetadata(dna, editionCount ,jsonFolder);
+                // addMetadata(dna, editionCount ,jsonFolder);
 
                  console.log(
                     `Created edition: ${editionCount}, with DNA: `
@@ -662,5 +665,6 @@ module.exports = {
     startCreating,
     buildSetup,
     getElements,
-    generateCollection 
+    generateCollection ,
+    addMetadata
 };

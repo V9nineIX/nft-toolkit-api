@@ -307,23 +307,27 @@ const controller = {
     try {
 
 
-      const { id } = params
-      const { layersElement, ownerId = null, projectDir: dir, totalSupply, collection } = body
-      const projectDir = `./folder/` + dir
+        const { id } = params
+        const {layersElement ,ownerId=null, projectDir:dir, totalSupply ,collection} = body
+        const projectDir = `./folder/` + dir
+        const projectName = dir
 
 
-      let paramCollection = { ...collection }
-      paramCollection.status = "process"
-      const res = await Collection.updateById(id, paramCollection)
 
-      const param = {
-        layersElement,
-        totalSupply,
-        projectDir,
-        id,
-        ownerId,
-        jobType: GENERATE_COLLECTION
-      }
+        let paramCollection = { ...collection }
+        paramCollection.status = "process"
+        const res = await Collection.updateById(id, paramCollection)
+  
+        const param = {
+          layersElement,
+          totalSupply,
+          projectDir,
+          id,
+          ownerId,
+          projectName,
+          jobType: GENERATE_COLLECTION
+        }
+
 
       //TODO update database
 

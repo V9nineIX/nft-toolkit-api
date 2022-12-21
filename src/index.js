@@ -50,7 +50,12 @@ const grapQLServer = new ApolloServer({
          symbol:String,
          description:String,
          totalSupply:String,
-         layers:[Layer]
+         projectDir:String,
+         royaltyFee:String,
+         defaultPrice:String,
+         imagePath:String,
+         layers:[Layer],
+         meta:[Meta]
       }
 
       type Layer {
@@ -67,17 +72,17 @@ const grapQLServer = new ApolloServer({
         return data
        },
       nft: async (_, {id}) => {
-           console.log("arg" , id)
            //"63a194fe997b22db6e591f6c"
            //get collection inf0
            const res = await Collection.findByCollectionId(id);
-           console.log("-----res----" ,res[0])
+
       
            const { projectDir } = res[0]
+           res[0].imagePath = `/folder/${projectDir}/build/image/` 
            //TODO: get meta from json file
            try {
-           const data = JSON.parse(fs.readFileSync(`./folder/${projectDir}/build/json/1.json`, 'utf-8'));
-           console.log("data",data)
+            const metadata = JSON.parse(fs.readFileSync(`./folder/${projectDir}/build/json/metadata.json`, 'utf-8'));
+            res[0].meta = metadata
            }catch(ex){
 
            }
@@ -85,12 +90,6 @@ const grapQLServer = new ApolloServer({
            return res[0]
         }
     },
-    // NFT: {
-    //    meta: () => {
-    //     const data = JSON.parse(fs.readFileSync('../build/json/1.json', 'utf-8'));
-    //     return data
-    //    }
-    // }
   }
 })
 

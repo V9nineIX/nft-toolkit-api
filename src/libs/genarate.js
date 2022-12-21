@@ -49,7 +49,7 @@ const _ = require('lodash')
 const canvas = createCanvas(format.width, format.height);
 const ctx = canvas.getContext("2d");
 ctx.imageSmoothingEnabled = format.smoothing;
-var metadataList = [];
+// var metadataList = [];
 var attributesList = [];
 const DNA_DELIMITER = "-";
 const HashlipsGiffer = require(`./HashlipsGiffer.js`);
@@ -177,7 +177,13 @@ const drawBackground = () => {
   ctx.fillRect(0, 0, format.width, format.height);
 };
 
-const addMetadata = (_dna, _edition, jsonFolder = `${buildDir}/json` ,metaData=null,  ipfsHasId=null) => {
+const addMetadata = (_dna, 
+                    _edition,
+                     jsonFolder = `${buildDir}/json` ,
+                     metaData=null, 
+                     ipfsHasId=null,
+                     metadataList = []
+                     ) => {
     return new Promise( async (resolve ,reject) => {
   
     let dateTime = Date.now();
@@ -225,7 +231,7 @@ const addMetadata = (_dna, _edition, jsonFolder = `${buildDir}/json` ,metaData=n
     //     JSON.stringify(tempMetadata, null, 2)
     //   );
     fs.writeFileSync(
-      `${jsonFolder}/${_edition}.json`,
+      `${jsonFolder}/${_edition}.txt`,
       JSON.stringify(tempMetadata, null, 2),
       'utf8'
     );
@@ -386,8 +392,10 @@ const createDna = (_layers) => {
   return randNum.join(DNA_DELIMITER);
 };
 
-const writeMetaData = (_data) => {
-  fs.writeFileSync(`${buildDir}/json/_metadata.json`, _data);
+const writeMetaData = (_data , buildDir=buildDir) => {
+    // console.log("data", _data)
+
+  fs.writeFileSync(`${buildDir}/metadata.json`, _data);
 };
 
 const saveMetaDataSingleFile = (_editionCount) => {
@@ -440,6 +448,8 @@ const startCreating = async ({
     let abstractedIndexes = [];
     let progress = 0;
     const totolSupply = layerConfigurations[layerConfigurations.length - 1].growEditionSizeTo
+
+    console.log("layerConfigurations",layerConfigurations)
 
     for (
       let i = 1;
@@ -552,7 +562,7 @@ const startCreating = async ({
       console.log(layerConfigIndex)
       layerConfigIndex++;
     }
-    // writeMetaData(JSON.stringify(metadataList, null, 2));
+     writeMetaData(JSON.stringify(metadataList, null, 2));
     // console.log("end loop")
     resolve("Finsish")
   }) //  end promise
@@ -569,12 +579,13 @@ const generateCollection = async ({
      job=null
     }) => {
 
-    return new Promise( async (resolve ,reject) => {
-
+    return new Promise( async (resolve ,reject) => {  
     try {
 
      let editionCount = 1
      let progress  = 0
+     let metadataList = []
+          
 
         
         while (editionCount <= totalSupply)
@@ -583,7 +594,9 @@ const generateCollection = async ({
             // console.log(" layersElement", layersElement)
               //TODO
                let loadedElements = [];
-               const { dna , layers } = layersElement[editionCount-1]
+               const { dna , layers ,  metaData } = layersElement[editionCount-1]
+                /// revers layer for genreate
+                 layers =  _.reverse(layers)
 
                 for( const layer   of layers){
                      loadedElements.push(loadLayerImg(layer));
@@ -625,7 +638,7 @@ const generateCollection = async ({
               })
               
                 saveImage(editionCount,  buildFolder);
-                // addMetadata(dna, editionCount ,jsonFolder);
+                addMetadata(dna, editionCount ,jsonFolder , metaData,null ,metadataList);
 
                  console.log(
                     `Created edition: ${editionCount}, with DNA: `
@@ -648,7 +661,7 @@ const generateCollection = async ({
         } //end while gowEdition
 
         
-    // writeMetaData(JSON.stringify(metadataList, null, 2));
+       writeMetaData(JSON.stringify(metadataList, null, 2) ,jsonFolder );
       // console.log("end loop")
        resolve("Finsish")
     }catch(ex){

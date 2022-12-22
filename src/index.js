@@ -7,7 +7,8 @@ import bodyParser from "body-parser";
 const path = require('path')
 import cors from "cors"
 import { ApolloServer, gql } from "apollo-server-express";
-import { includes, isEmpty } from "lodash";
+import { includes, isEmpty ,toLower  ,method  ,mapValues} from "lodash";
+
 // import { graphqlHTTP } from 'express-graphql'
 // import { buildSchema } from 'graphql'
 const http = require('http');
@@ -20,6 +21,8 @@ import queueListeners from "./queues/queueListeners";
 import {  API_POST_SIZE_LIMIT } from "./constants"
 const fs = require('fs');
 import Collection from "./models/collection.model";
+import e from "express";
+
 
 const grapQLServer = new ApolloServer({
   playground: true,
@@ -92,9 +95,6 @@ const grapQLServer = new ApolloServer({
            //"63a194fe997b22db6e591f6c"
            //get collection inf0
            const { id ,limit=null ,offset=0 , filter=[] } = args
-
-          // console.log("filter",filter)
-
            const res = await Collection.findByCollectionId(id);
           
       
@@ -102,30 +102,59 @@ const grapQLServer = new ApolloServer({
            res[0].imagePath = `/folder/${projectDir}/build/image/` 
            //TODO: get meta from json file
            try {
+
             const metadata = JSON.parse(fs.readFileSync(`./folder/${projectDir}/build/json/metadata.json`, 'utf-8'));
             res[0].totalImage = metadata.length
 
+           ///Filter
+            if(!isEmpty(filter)){
+                
+                let filterMetaData = []
 
-            // if(!_.isEmpty(filter)){
+      
 
-            //     for (const meta of  metadata ) {
-                      
-            //         for (const filterObject of filter) {
+                for (const [index, meta] of  metadata.entries() ) {
+                   if(limit && index == limit){
+                        break
+                   }
+
+                   if(limit && index < offset){ // skip index less then offest
+                      continue
+                   }
+
+                    for (const filterObject of filter) {
+
+                        const  filterValue   =  mapValues(filterObject.value, method('toLowerCase'));
+                    
+                        for (const attr of meta.attributes ){
                         
-            //         }
+                         if(attr.trait_type == filterObject.key){
+                            if(!isEmpty(filterValue)) {
+                                if(includes(  filterValue , toLower(attr.value))){
+                                    filterMetaData.push(meta)
+                                }
+                             }
+                         }
 
-            //     }
+                     }
+               
+                    }
+
+                } // end loop
+                
+                res[0].meta = [...filterMetaData]
          
-            //  } // end if
-
-
-            if(limit){
-                 ///filter  
-                res[0].meta = [...metadata].slice(offset, limit)
-            }else{
-                 res[0].meta = [...metadata]
+            } // end if
+            else {
+                if(limit){
+                   res[0].meta = [...metadata].slice(offset, limit)
+               }else{
+                    res[0].meta = [...metadata]
+               }
             }
+
            }catch(ex){
+            console.log("error",ex)
             res[0].totalImage = 0
            }
 

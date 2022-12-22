@@ -62,6 +62,15 @@ const grapQLServer = new ApolloServer({
       type Layer {
         name: String,
         _id: String,
+        images:[Image]
+      }
+
+      type Image {
+         path:String,
+         name:String,
+         title:String,
+         rarity:String
+         count:String
       }
  
     `,
@@ -78,7 +87,7 @@ const grapQLServer = new ApolloServer({
            const { id ,limit=null ,offset=0 } = args
 
            const res = await Collection.findByCollectionId(id);
-
+          
       
            const { projectDir } = res[0]
            res[0].imagePath = `/folder/${projectDir}/build/image/` 

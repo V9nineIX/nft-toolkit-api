@@ -7,7 +7,7 @@ import bodyParser from "body-parser";
 const path = require('path')
 import cors from "cors"
 import { ApolloServer, gql } from "apollo-server-express";
-import { isEmpty } from "lodash";
+import { includes, isEmpty } from "lodash";
 // import { graphqlHTTP } from 'express-graphql'
 // import { buildSchema } from 'graphql'
 const http = require('http');
@@ -27,11 +27,16 @@ const grapQLServer = new ApolloServer({
       type Query {
         hello: String,
         meta: Meta,
-        nft(id: String ,offset: Int, limit: Int):NFT
+        nft(id: String ,offset: Int, limit: Int , filter: [FilterParam] ):NFT
       }
       type Attributes {
         trait_type: String,
         value: String
+      }
+
+      input FilterParam {
+        key: String,
+        value:[String]
       }
 
       type Meta {
@@ -40,7 +45,9 @@ const grapQLServer = new ApolloServer({
          image: String,
          edition:String,
          date: String,
-         attributes:[Attributes]
+         attributes:[Attributes],
+         rawImage:String,
+         dna:String
       }
 
       type NFT {
@@ -84,7 +91,9 @@ const grapQLServer = new ApolloServer({
       nft: async (_, args) => {
            //"63a194fe997b22db6e591f6c"
            //get collection inf0
-           const { id ,limit=null ,offset=0 } = args
+           const { id ,limit=null ,offset=0 , filter=[] } = args
+
+          // console.log("filter",filter)
 
            const res = await Collection.findByCollectionId(id);
           
@@ -95,7 +104,23 @@ const grapQLServer = new ApolloServer({
            try {
             const metadata = JSON.parse(fs.readFileSync(`./folder/${projectDir}/build/json/metadata.json`, 'utf-8'));
             res[0].totalImage = metadata.length
+
+
+            // if(!_.isEmpty(filter)){
+
+            //     for (const meta of  metadata ) {
+                      
+            //         for (const filterObject of filter) {
+                        
+            //         }
+
+            //     }
+         
+            //  } // end if
+
+
             if(limit){
+                 ///filter  
                 res[0].meta = [...metadata].slice(offset, limit)
             }else{
                  res[0].meta = [...metadata]

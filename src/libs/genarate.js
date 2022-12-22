@@ -186,7 +186,7 @@ const addMetadata = (_dna,
                      ) => {
     return new Promise( async (resolve ,reject) => {
   
-    let dateTime = Date.now();
+  let dateTime = Date.now();
   let tempMetadata = {
     name: `${metaData?.name}`,
     description: metaData?.description || "",
@@ -223,8 +223,14 @@ const addMetadata = (_dna,
   //       },
   //     };
   //   }
-  metadataList.push(tempMetadata);
 
+ let rawMetaData ={...tempMetadata ,
+    dna: _dna,
+    rawImage:`${jsonFolder.replace("json","image").substring(1)}/${_edition}.png`
+  } 
+
+  metadataList.push(rawMetaData);
+       
   try {
     //   fs.writeFileSync(
     //     `${buildDir}/json/${_edition}.text`,

@@ -45,7 +45,9 @@ const grapQLServer = new ApolloServer({
          image: String,
          edition:String,
          date: String,
-         attributes:[Attributes]
+         attributes:[Attributes],
+         rawImage:String,
+         dna:String
       }
 
       type NFT {
@@ -91,7 +93,7 @@ const grapQLServer = new ApolloServer({
            //get collection inf0
            const { id ,limit=null ,offset=0 , filter=[] } = args
 
-           console.log("filter",filter)
+          // console.log("filter",filter)
 
            const res = await Collection.findByCollectionId(id);
           

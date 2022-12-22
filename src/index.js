@@ -27,7 +27,7 @@ const grapQLServer = new ApolloServer({
       type Query {
         hello: String,
         meta: Meta,
-        nft(id: String):NFT
+        nft(id: String ,offset: Int, limit: Int):NFT
       }
       type Attributes {
         trait_type: String,
@@ -54,6 +54,7 @@ const grapQLServer = new ApolloServer({
          royaltyFee:String,
          defaultPrice:String,
          imagePath:String,
+         totalImage:String,
          layers:[Layer],
          meta:[Meta]
       }
@@ -71,9 +72,11 @@ const grapQLServer = new ApolloServer({
         const data = JSON.parse(fs.readFileSync('./build/json/1.json', 'utf-8'));
         return data
        },
-      nft: async (_, {id}) => {
+      nft: async (_, args) => {
            //"63a194fe997b22db6e591f6c"
            //get collection inf0
+           const { id ,limit=null ,offset=0 } = args
+
            const res = await Collection.findByCollectionId(id);
 
       
@@ -82,9 +85,14 @@ const grapQLServer = new ApolloServer({
            //TODO: get meta from json file
            try {
             const metadata = JSON.parse(fs.readFileSync(`./folder/${projectDir}/build/json/metadata.json`, 'utf-8'));
-            res[0].meta = metadata
+            res[0].totalImage = metadata.length
+            if(limit){
+                res[0].meta = [...metadata].slice(offset, limit)
+            }else{
+                 res[0].meta = [...metadata]
+            }
            }catch(ex){
-
+            res[0].totalImage = 0
            }
 
            return res[0]

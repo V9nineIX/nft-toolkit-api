@@ -65,7 +65,7 @@ const grapQLServer = new ApolloServer({
          royaltyFee:Float,
          defaultPrice:Float,
          imagePath:String,
-         totalImage:String,
+         totalImage:Int,
          layers:[Layer],
          meta:[Meta]
       }
@@ -105,7 +105,7 @@ const grapQLServer = new ApolloServer({
            try {
 
             const metadata = JSON.parse(fs.readFileSync(`./folder/${projectDir}/build/json/metadata.json`, 'utf-8'));
-            res[0].totalImage = metadata.length
+            //res[0].totalImage = metadata.length
 
            ///Filter
             if(!isEmpty(filter)){
@@ -115,13 +115,15 @@ const grapQLServer = new ApolloServer({
       
 
                 for (const [index, meta] of  metadata.entries() ) {
-                   if(limit && index == limit){
-                        break
-                   }
+                //    if(limit && index == limit){
+                //         break
+                //    }
 
-                   if(limit && index < offset){ // skip index less then offest
-                      continue
-                   }
+                //    if(limit && index < offset){ // skip index less then offest
+                //       continue
+                //    }
+
+
                    let isMatch = false
 
                     for (const filterObject of filter) {
@@ -153,10 +155,17 @@ const grapQLServer = new ApolloServer({
 
                 } // end loop
                 
-                res[0].meta = [...filterMetaData]
+                res[0].totalImage = filterMetaData.length
+                if(limit) {
+                    res[0].meta = [...filterMetaData].slice(offset, limit)
+                }else{
+                    res[0].meta = [...filterMetaData]
+                }
+           
          
             } // end if
             else {
+                res[0].totalImage = metadata.length
                 if(limit){
                    res[0].meta = [...metadata].slice(offset, limit)
                }else{

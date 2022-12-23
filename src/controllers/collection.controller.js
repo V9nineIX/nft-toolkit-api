@@ -7,6 +7,8 @@ import { startCreating } from '../libs/genarate'
 import { last } from "lodash";
 import { addGenerateImageQueue } from "../queues/generate-image-queue";
 import { GENERATE_COLLECTION, GENERATE_IMAGE } from "../constants";
+import { uploadToPinata } from '../ipfs/pinata'
+
 
 const controller = {
 
@@ -346,7 +348,44 @@ const controller = {
 
     }
 
-  }
+  },
+
+  uploadIPFS: async ({ body, params }) => {
+    try{
+        //TODO: upload collection to IPFS
+        const { id } = params
+       // console.log(id)
+
+        const collectionResult = await  Collection.findByCollectionId(id)
+
+        console.log(collectionResult)
+        const { projectDir ,name } = collectionResult[0]
+        const imageFolder = `./folder/` + projectDir + '/build/image/' 
+        const jsonFolder = `./folder/` + projectDir + '/build/json/' 
+
+        const res   =  await uploadToPinata({
+            buildFolder:imageFolder ,
+            projectName:name,
+            projectDir: projectDir,
+            jsonFolder: jsonFolder
+        })
+
+        console.log("res" ,res)
+ 
+        return new APIResponse(201, "upload ok");
+    }catch(ex){
+
+        console.log(ex)
+        throw new APIError({
+          status: httpStatus.INTERNAL_SERVER_ERROR,
+          message: "Cannot upload to IPFS",
+        });
+ 
+    }
+ 
+   }
+
+
 
 
 }; //  end controller

@@ -278,4 +278,32 @@ router.route("/:id").put(handle(controller.updateCollectionById));
 router.route("/removeLayer/:id").post(handle(controller.removeLayerById));
 
 
+/**
+ * @swagger
+ * /v1/collection/uploadToIPFS/{id}:
+ *   post:
+ *     tags: [Collection]
+ *     summary: uploadToIPFS
+*     parameters:
+ *       - in: path
+ *         name: id
+ *         description: Collection Id
+ *         schema:
+ *           type: string
+ *           example: 63a4332da1d63ea7cc31327a
+ *       - in: body
+ *         name: body
+ *         description: Collection's information
+ *         schema:
+ *           type: object
+ *     responses:
+ *       201:
+ *         description: Return status create collection
+ *         schema:
+ *           type: object
+ */
+router.route("/uploadToIPFS/:id").post(handle(controller.uploadIPFS));
+
+
+
 export default router;

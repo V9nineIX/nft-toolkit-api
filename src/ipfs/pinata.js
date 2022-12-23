@@ -55,7 +55,7 @@ const uploadToPinata = async ({
 
         const options = {
             pinataMetadata: {
-                name: projectName
+                name: projectDir
             },
             pinataOptions: {
                 cidVersion: 0
@@ -65,34 +65,61 @@ const uploadToPinata = async ({
 
         const sourcePath = buildFolder;
         // console.log(sourcePath)
-         const { IpfsHash}  = await pinata.pinFromFS(sourcePath, options)
-
+          const { IpfsHash}  = await pinata.pinFromFS(sourcePath, options)
+          console.log("IpfsHash",IpfsHash)
          let editionCount = 1
+
+         const metadata = JSON.parse(fs.readFileSync(`./folder/${projectDir}/build/json/metadata.json`, 'utf-8'));
+         
+         for (const [index, meta] of  metadata.entries() ) {
+
+        //    await addMetadata(
+        //                 null, 
+        //                 index+1 ,
+        //                 jsonFolder,
+        //                 meta,
+        //                 IpfsHash,
+        //                 [],
+        //                 "txt"
+        //                 )
+            // fs.renameSync(
+            //     `./folder/${projectDir}/build/json/${index+1}.txt`
+            //     `./folder/${projectDir}/build/json/${index+1}.json`
+            // )
+
+         } // end loop
+
+            //  fs.renameSync(
+            //     `./folder/${projectDir}/build/json/${1}.txt`
+            //     `./folder/${projectDir}/build/json/${1}.json`
+            // )
+
+
         // while (editionCount <= totalSupply)
-        for (const item of layersElement) 
-        {
-            const { dna ,metaData} = layersElement[editionCount-1]
-            const statusFile =   await addMetadata(dna, 
-                        editionCount ,
-                        jsonFolder,
-                        metaData,
-                        IpfsHash)
-            editionCount++
-           // console.log(statusFile)
-        } //end while
+        // for (const item of layersElement) 
+        // {
+        //     const { dna ,metaData} = layersElement[editionCount-1]
+        //     const statusFile =   await addMetadata(dna, 
+        //                 editionCount ,
+        //                 jsonFolder,
+        //                 metaData,
+        //                 IpfsHash)
+        //     editionCount++
+        //    // console.log(statusFile)
+        // } //end while
 
         //TODO upload json to IPFS
 
         const optionsForJson = {
             pinataMetadata: {
-                name: "json-"+projectName
+                name: "json-"+projectDir
             },
             pinataOptions: {
                 cidVersion: 0
             }
         };
 
-       // const jsonIpfs  = await pinata.pinFromFS(jsonFolder, optionsForJson)
+    //    const jsonIpfs  = await pinata.pinFromFS(jsonFolder, optionsForJson)
 
         // console.log("json",  jsonIpfsHash)
          
@@ -100,6 +127,7 @@ const uploadToPinata = async ({
 
        // console.log(resultJson)
         }catch(ex){
+          // await pinata.unpin(IpfsHash)
             console.log(ex)
         }
 

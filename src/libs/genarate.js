@@ -182,7 +182,8 @@ const addMetadata = (_dna,
                      jsonFolder = `${buildDir}/json` ,
                      metaData=null, 
                      ipfsHasId=null,
-                     metadataList = []
+                     metadataList = [],
+                     extension ="txt"
                      ) => {
     return new Promise( async (resolve ,reject) => {
   
@@ -194,7 +195,7 @@ const addMetadata = (_dna,
     image: `ipfs://${ipfsHasId}/${_edition}.png`,
     edition: _edition,
     date: dateTime,
-    ...extraMetadata,
+    // ...extraMetadata,
     attributes: metaData.attributes,
   };
   //   if (network == NETWORK.sol) {
@@ -237,7 +238,7 @@ const addMetadata = (_dna,
     //     JSON.stringify(tempMetadata, null, 2)
     //   );
     fs.writeFileSync(
-      `${jsonFolder}/${_edition}.txt`,
+      `${jsonFolder}/${_edition}.${extension}`,
       JSON.stringify(tempMetadata, null, 2),
       'utf8'
     );

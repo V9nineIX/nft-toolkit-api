@@ -129,7 +129,7 @@ const grapQLServer = new ApolloServer({
                   
                         for (const attr of meta.attributes ){
                         
-                         if(attr.trait_type == filterObject.key){
+                         if(toLower(attr.trait_type) == toLower(filterObject.key)){
                             if(!isEmpty(filterValue)) {
                                 if(includes(  filterValue , toLower(attr.value))){
                                     filterMetaData.push(meta)

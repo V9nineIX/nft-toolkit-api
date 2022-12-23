@@ -93,11 +93,11 @@ const grapQLServer = new ApolloServer({
         return data
        },
       nft: async (_, args) => {
-           //"63a194fe997b22db6e591f6c"
-           //get collection inf0
+   
+           //get collection info
            const { id ,limit=null ,offset=0 , filter=[] } = args
            const res = await Collection.findByCollectionId(id);
-           res[0]._id = id
+
       
            const { projectDir } = res[0]
            res[0].imagePath = `/folder/${projectDir}/build/image/` 

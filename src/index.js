@@ -122,9 +122,7 @@ const grapQLServer = new ApolloServer({
                    if(limit && index < offset){ // skip index less then offest
                       continue
                    }
-                 //[{key:"body" , value:["Body Magic"] }
-                //  {key:"BG" , value:["red"] }
-                // ]
+
                     for (const filterObject of filter) {
 
                         const  filterValue   =  mapValues(filterObject.value, method('toLowerCase')); //value:["body magic","bacgord"]
@@ -133,7 +131,6 @@ const grapQLServer = new ApolloServer({
                         
                          if(attr.trait_type == filterObject.key){
                             if(!isEmpty(filterValue)) {
-                               // ["body magic"]
                                 if(includes(  filterValue , toLower(attr.value))){
                                     filterMetaData.push(meta)
                                 }

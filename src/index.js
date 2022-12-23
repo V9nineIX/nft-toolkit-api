@@ -111,7 +111,7 @@ const grapQLServer = new ApolloServer({
             if(!isEmpty(filter)){
                 
                 let filterMetaData = []
-
+            
       
 
                 for (const [index, meta] of  metadata.entries() ) {
@@ -122,24 +122,34 @@ const grapQLServer = new ApolloServer({
                    if(limit && index < offset){ // skip index less then offest
                       continue
                    }
+                   let isMatch = false
 
                     for (const filterObject of filter) {
 
                         const  filterValue   =  mapValues(filterObject.value, method('toLowerCase')); //value:["body magic","bacgord"]
-                  
+    
+
                         for (const attr of meta.attributes ){
                         
                          if(toLower(attr.trait_type) == toLower(filterObject.key)){
                             if(!isEmpty(filterValue)) {
                                 if(includes(  filterValue , toLower(attr.value))){
+        
                                     filterMetaData.push(meta)
+                                    isMatch = true
+
                                 }
                              }
                          }
-
-                     }
+                         if(isMatch){ // exit loop
+                             break
+                         }
+                       }
+                       if(isMatch){ // exit loop
+                           break
+                       }
                
-                    }
+                    } // end loop filter
 
                 } // end loop
                 

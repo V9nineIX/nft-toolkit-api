@@ -155,9 +155,9 @@ const grapQLServer = new ApolloServer({
 
                 } // end loop
                 
+                res[0].totalImage = filterMetaData.length
                 if(limit) {
                     res[0].meta = [...filterMetaData].slice(offset, limit)
-                    res[0].totalImage = filterMetaData.length
                 }else{
                     res[0].meta = [...filterMetaData]
                 }

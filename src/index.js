@@ -21,7 +21,7 @@ import queueListeners from "./queues/queueListeners";
 import {  API_POST_SIZE_LIMIT } from "./constants"
 const fs = require('fs');
 import Collection from "./models/collection.model";
-import e from "express";
+
 
 
 const grapQLServer = new ApolloServer({
@@ -54,6 +54,7 @@ const grapQLServer = new ApolloServer({
       }
 
       type NFT {
+         _id: String,
          name: String,
          ownerId:String,
          status:String,
@@ -61,8 +62,8 @@ const grapQLServer = new ApolloServer({
          description:String,
          totalSupply:String,
          projectDir:String,
-         royaltyFee:String,
-         defaultPrice:String,
+         royaltyFee:Float,
+         defaultPrice:Float,
          imagePath:String,
          totalImage:String,
          layers:[Layer],
@@ -92,11 +93,11 @@ const grapQLServer = new ApolloServer({
         return data
        },
       nft: async (_, args) => {
-           //"63a194fe997b22db6e591f6c"
-           //get collection inf0
+   
+           //get collection info
            const { id ,limit=null ,offset=0 , filter=[] } = args
            const res = await Collection.findByCollectionId(id);
-          
+
       
            const { projectDir } = res[0]
            res[0].imagePath = `/folder/${projectDir}/build/image/` 
@@ -124,8 +125,8 @@ const grapQLServer = new ApolloServer({
 
                     for (const filterObject of filter) {
 
-                        const  filterValue   =  mapValues(filterObject.value, method('toLowerCase'));
-                    
+                        const  filterValue   =  mapValues(filterObject.value, method('toLowerCase')); //value:["body magic","bacgord"]
+                  
                         for (const attr of meta.attributes ){
                         
                          if(attr.trait_type == filterObject.key){

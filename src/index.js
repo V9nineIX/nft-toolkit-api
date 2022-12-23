@@ -54,6 +54,7 @@ const grapQLServer = new ApolloServer({
       }
 
       type NFT {
+         _id: String,
          name: String,
          ownerId:String,
          status:String,
@@ -96,7 +97,7 @@ const grapQLServer = new ApolloServer({
            //get collection inf0
            const { id ,limit=null ,offset=0 , filter=[] } = args
            const res = await Collection.findByCollectionId(id);
-          
+           res[0]._id = id
       
            const { projectDir } = res[0]
            res[0].imagePath = `/folder/${projectDir}/build/image/` 

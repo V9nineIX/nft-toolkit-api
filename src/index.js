@@ -61,8 +61,8 @@ const grapQLServer = new ApolloServer({
          description:String,
          totalSupply:String,
          projectDir:String,
-         royaltyFee:String,
-         defaultPrice:String,
+         royaltyFee:Float,
+         defaultPrice:Float,
          imagePath:String,
          totalImage:String,
          layers:[Layer],
@@ -121,15 +121,18 @@ const grapQLServer = new ApolloServer({
                    if(limit && index < offset){ // skip index less then offest
                       continue
                    }
-
+                 //[{key:"body" , value:["Body Magic"] }
+                //  {key:"BG" , value:["red"] }
+                // ]
                     for (const filterObject of filter) {
 
-                        const  filterValue   =  mapValues(filterObject.value, method('toLowerCase'));
-                    
+                        const  filterValue   =  mapValues(filterObject.value, method('toLowerCase')); //value:["body magic","bacgord"]
+                  
                         for (const attr of meta.attributes ){
                         
                          if(attr.trait_type == filterObject.key){
                             if(!isEmpty(filterValue)) {
+                               // ["body magic"]
                                 if(includes(  filterValue , toLower(attr.value))){
                                     filterMetaData.push(meta)
                                 }

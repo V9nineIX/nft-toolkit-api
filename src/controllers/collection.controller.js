@@ -354,23 +354,25 @@ const controller = {
     try{
         //TODO: upload collection to IPFS
         const { id } = params
-       // console.log(id)
+        const {jwtToken = null} = body
+
 
         const collectionResult = await  Collection.findByCollectionId(id)
 
-        console.log(collectionResult)
+  
         const { projectDir ,name } = collectionResult[0]
         const imageFolder = `./folder/` + projectDir + '/build/image/' 
         const jsonFolder = `./folder/` + projectDir + '/build/json/' 
-
+ 
         const res   =  await uploadToPinata({
             buildFolder:imageFolder ,
             projectName:name,
             projectDir: projectDir,
-            jsonFolder: jsonFolder
+            jsonFolder: jsonFolder,
+            JWTKey: jwtToken
         })
 
-        console.log("res" ,res)
+       // console.log("res" ,res)
  
         return new APIResponse(201, "upload ok");
     }catch(ex){

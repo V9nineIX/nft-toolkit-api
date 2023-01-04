@@ -354,7 +354,7 @@ const controller = {
     try{
         //TODO: upload collection to IPFS
         const { id } = params
-        const {jwtToken = null} = body
+        const {jwtToken = null ,provider="pinata" } = body
 
 
         const collectionResult = await  Collection.findByCollectionId(id)

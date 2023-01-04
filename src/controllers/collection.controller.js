@@ -141,6 +141,7 @@ const controller = {
       const collectionId = req.body.collectionId;
       const createDir = './folder/' + projectDir + "/" + layerName;
 
+
       fsx.ensureDir(createDir);
       let pathLayer = []
       for (var i = 0; i < req.files.length; i++) {
@@ -152,6 +153,8 @@ const controller = {
             title: fileName.replace('.png', ''),
           }
         )
+
+
         fsx.move('./folder/' + fileName, createDir + '/' + fileName, function (err) {
           if (err) {
             console.error(err);
@@ -385,7 +388,53 @@ const controller = {
  
     }
  
-   }
+   },
+
+   uploadCustomToken: async({ body , params  ,files}) => {
+     //TODO upload custom token
+     try {
+
+      //  const { id } = params
+        const { collectionId  ,projectDir } = body
+      
+
+        const imageDir = './folder/' + projectDir + "/" + `build/image`;
+  
+        fsx.ensureDir(imageDir); // male directory
+  
+        for (var i = 0; i < files.length; i++) {
+          const fileName = files[i].filename;
+          let lastedFileIndex = 1 
+
+          // count lasted file index
+          fsx.readdir(dir, (err, files) => {
+            lastedFileIndex =  files.length+(i+1)
+          });
+        
+
+          fsx.rename('./folder/'+fileName, './folder/'+lastedFileIndex+".png")
+
+          fsx.move('./folder/' + lastedFileIndex+".png", createDir + '/' +lastedFileIndex+".png", function (err) {
+
+            if (err) {
+              console.error(err);
+            } else {
+              console.log("move file finish")
+            }
+          });
+
+          //TODO create json file
+
+  
+        } // end loop
+
+     }catch(ex){
+         console.log(ex)
+     }
+
+     
+     
+  } 
 
 
 

@@ -305,5 +305,26 @@ router.route("/removeLayer/:id").post(handle(controller.removeLayerById));
 router.route("/uploadToIPFS/:id").post(handle(controller.uploadIPFS));
 
 
+/**
+ * @swagger
+ * /v1/collection/uploadCustomToken:
+ *   post:
+ *     tags: [Collection]
+ *     summary: Upload Custom Token
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         description: Collection's information
+ *         schema:
+ *           type: object
+ *     responses:
+ *       201:
+ *         description: Return status create collection
+ *         schema:
+ *           type: object
+ */
+
+router.route("/uploadCustomToken").post(upload.array('files', MAX_FILE_UPLOAD), handle(controller.uploadCustomToken));
+
 
 export default router;

@@ -183,7 +183,8 @@ const addMetadata = (_dna,
                      metaData=null, 
                      ipfsHasId=null,
                      metadataList = [],
-                     extension ="txt"
+                     extension ="txt",
+                     isWriteSingleJson=true
                      ) => {
     return new Promise( async (resolve ,reject) => {
   
@@ -232,24 +233,24 @@ const addMetadata = (_dna,
 
   metadataList.push(rawMetaData);
        
-  try {
-    //   fs.writeFileSync(
-    //     `${buildDir}/json/${_edition}.text`,
-    //     JSON.stringify(tempMetadata, null, 2)
-    //   );
-    fs.writeFileSync(
-      `${jsonFolder}/${_edition}.${extension}`,
-      JSON.stringify(tempMetadata, null, 2),
-      'utf8'
-    );
+  if(isWriteSingleJson){
+    try {
 
-  } catch (ex) {
-    console.log(ex)
+        fs.writeFileSync(
+        `${jsonFolder}/${_edition}.${extension}`,
+        JSON.stringify(tempMetadata, null, 2),
+        'utf8'
+        );
+
+    } catch (ex) {
+        console.log(ex)
+    }
   }
 
     attributesList = [];
     resolve("write done")
    });
+
 };
 
 const addAttributes = (_element) => {
@@ -645,7 +646,7 @@ const generateCollection = async ({
               })
               
                 saveImage(editionCount,  buildFolder);
-                addMetadata(dna, editionCount ,jsonFolder , metaData,null ,metadataList);
+                addMetadata(dna, editionCount ,jsonFolder , metaData,null ,metadataList ,"json" ,false);
 
                  console.log(
                     `Created edition: ${editionCount}, with DNA: `

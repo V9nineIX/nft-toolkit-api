@@ -3,7 +3,8 @@ import Collection from "../models/collection.model";
 import APIResponse from "../utils/api-response";
 import APIError from "../utils/api-error";
 import fsx from 'fs-extra';
-import { startCreating } from '../libs/genarate'
+import fs from 'fs';
+import { startCreating ,writeMetaData } from '../libs/genarate'
 import { last } from "lodash";
 import { addGenerateImageQueue } from "../queues/generate-image-queue";
 import { GENERATE_COLLECTION, GENERATE_IMAGE } from "../constants";
@@ -153,8 +154,6 @@ const controller = {
             title: fileName.replace('.png', ''),
           }
         )
-
-
         fsx.move('./folder/' + fileName, createDir + '/' + fileName, function (err) {
           if (err) {
             console.error(err);
@@ -399,17 +398,23 @@ const controller = {
       
 
         const imageDir = './folder/' + projectDir + "/" + `build/image`;
+        const jsonDir = './folder/' + projectDir + "/" + `build/json`;
   
-        fsx.ensureDir(imageDir); // male directory
-  
-        for (var i = 0; i < files.length; i++) {
-          const fileName = files[i].filename;
-          let lastedFileIndex = 1 
+        fsx.ensureDir(imageDir); // make directory
 
           // count lasted file index
           fsx.readdir(dir, (err, files) => {
             lastedFileIndex =  files.length+(i+1)
           });
+   
+        let dateTime = Date.now();
+        let metadataCustomTokenList = []
+  
+        for (var i = 0; i < files.length; i++) {
+          const fileName = files[i].filename;
+          let lastedFileIndex = 1 
+
+        
         
 
           fsx.rename('./folder/'+fileName, './folder/'+lastedFileIndex+".png")
@@ -423,10 +428,43 @@ const controller = {
             }
           });
 
-          //TODO create json file
+        //TODO create json file
+    
+        let tempMetadata = {
+            name: "",
+            description: "",
+            symbol: "",
+            image: "",
+            edition: lastedFileIndex,
+            date: dateTime,
+            attributes: [],
+            dna: "",
+            rawImage: createDir + '/' +lastedFileIndex+".png"
+
+        };
+
+        metadataCustomTokenList.push(tempMetadata)
 
   
         } // end loop
+
+        //TODO // write file
+
+        fsx.ensureDir(jsonDir) // mkdir
+
+        let  metadata = []
+        if (fs.existsSync(`${jsonDir}/metadata.json`)) {
+            metadata = JSON.parse(fs.readFileSync(`${jsonDir}/metadata.json`, 'utf-8'));
+            metadata = [...metadata , ...metadataCustomTokenList]
+        }else{
+            metadata  = [...metadataCustomTokenList]
+
+        }
+
+        writeMetaData(JSON.stringify(metadata null, 2) ,jsonDir );
+
+
+
 
      }catch(ex){
          console.log(ex)

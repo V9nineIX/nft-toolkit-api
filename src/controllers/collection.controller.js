@@ -146,7 +146,7 @@ const controller = {
 
       fsx.ensureDir(createDir);
       let pathLayer = []
-      for (var i = 0; i < req.files.length; i++) {
+      for (let i = 0; i < req.files.length; i++) {
         const fileName = req.files[i].filename;
         pathLayer.unshift(
           {

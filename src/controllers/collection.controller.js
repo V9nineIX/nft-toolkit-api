@@ -146,7 +146,7 @@ const controller = {
 
       fsx.ensureDir(createDir);
       let pathLayer = []
-      for (var i = 0; i < req.files.length; i++) {
+      for (let i = 0; i < req.files.length; i++) {
         const fileName = req.files[i].filename;
         pathLayer.unshift(
           {
@@ -409,24 +409,12 @@ const controller = {
         let dateTime = Date.now();
         let metadataCustomTokenList = []
   
-        for (var i = 0; i < files.length; i++) {
+        for (let i = 0; i < files.length; i++) {
           const fileName = files[i].filename;
           lastedFileIndex++
     
-    
 
-          await renameFile('./folder/'+fileName, './folder/'+lastedFileIndex+".png" )
-
-        //   fsx.rename('./folder/'+fileName, './folder/'+lastedFileIndex+".png")
-        
-          fsx.move('./folder/' + lastedFileIndex+".png", imageDir + '/' +lastedFileIndex+".png", function (err) {
-
-            if (err) {
-              console.error(err);
-            } else {
-              console.log("move file finish")
-            }
-          });
+          await renameFile('./folder/'+fileName, imageDir + '/' +lastedFileIndex+".png", )
 
         //TODO create json file
     

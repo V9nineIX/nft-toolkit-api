@@ -681,11 +681,11 @@ const generateCollection = async ({
 
 
 
-
 module.exports = { 
     startCreating,
     buildSetup,
     getElements,
     generateCollection ,
-    addMetadata
+    addMetadata,
+    writeMetaData
 };

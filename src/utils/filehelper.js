@@ -11,3 +11,8 @@ function countFilesInDir(dir) {
       });
     });
   }
+
+  module.exports = { 
+    countFilesInDir: countFilesInDir
+
+  }

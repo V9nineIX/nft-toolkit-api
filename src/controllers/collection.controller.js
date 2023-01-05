@@ -9,6 +9,7 @@ import { last } from "lodash";
 import { addGenerateImageQueue } from "../queues/generate-image-queue";
 import { GENERATE_COLLECTION, GENERATE_IMAGE } from "../constants";
 import { uploadToPinata } from '../ipfs/pinata'
+import {  countFilesInDir } from '../utils/fileHelper'
 
 
 const controller = {
@@ -403,19 +404,15 @@ const controller = {
         fsx.ensureDir(imageDir); // make directory
 
           // count lasted file index
-          fsx.readdir(dir, (err, files) => {
-            lastedFileIndex =  files.length+(i+1)
-          });
+        let lastedFileIndex  = await countFilesInDir(imageDir)
    
         let dateTime = Date.now();
         let metadataCustomTokenList = []
   
         for (var i = 0; i < files.length; i++) {
           const fileName = files[i].filename;
-          let lastedFileIndex = 1 
-
-        
-        
+    
+    
 
           fsx.rename('./folder/'+fileName, './folder/'+lastedFileIndex+".png")
 

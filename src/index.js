@@ -21,7 +21,7 @@ import queueListeners from "./queues/queueListeners";
 import {  API_POST_SIZE_LIMIT } from "./constants"
 const fs = require('fs');
 import Collection from "./models/collection.model";
-import { updateMeta }  from "./libs/metaHandler"
+import { updateMeta ,  deleteMeta}  from "./libs/metaHandler"
 import { getJsonDir } from './utils/directoryHelper'
 import { loadMetaJson } from './libs/metaHandler'
 
@@ -109,7 +109,7 @@ const grapQLServer = new ApolloServer({
       }
 
       type Mutation {
-          deleteMeta(id: String):String,
+          deleteMeta(id: String , edition: Int):Boolean,
           updateMeta(id: String , meta:MetaParam ):Boolean
       }
  
@@ -252,12 +252,19 @@ const grapQLServer = new ApolloServer({
        }
     },
     Mutation: {
-        deleteMeta: (_, { id }) => {
-          // Perform database operations to create a new object
-        //console.log("delete")
-         //TODO: file
+        deleteMeta: async(_, { id , edition }) => {
+            try{
+                const res = await Collection.findByCollectionId(id);
+                const { projectDir } = res[0]
+                   
+                const result =   await deleteMeta({ projectDir , edition })
 
-          return "delete OK"
+            }catch(ex){
+                console.log(ex)
+
+            }
+
+
         },
         updateMeta: async (_, {id , meta }) => {
             // console.log(meta)

@@ -9,7 +9,7 @@ import { last } from "lodash";
 import { addGenerateImageQueue } from "../queues/generate-image-queue";
 import { GENERATE_COLLECTION, GENERATE_IMAGE } from "../constants";
 import { uploadToPinata } from '../ipfs/pinata'
-import {  countFilesInDir } from '../utils/fileHelper'
+import {  countFilesInDir  , renameFile} from '../utils/fileHelper'
 
 
 const controller = {
@@ -415,9 +415,11 @@ const controller = {
     
     
 
-          fsx.rename('./folder/'+fileName, './folder/'+lastedFileIndex+".png")
+          await renameFile('./folder/'+fileName, './folder/'+lastedFileIndex+".png" )
 
-          fsx.move('./folder/' + lastedFileIndex+".png", createDir + '/' +lastedFileIndex+".png", function (err) {
+        //   fsx.rename('./folder/'+fileName, './folder/'+lastedFileIndex+".png")
+        
+          fsx.move('./folder/' + lastedFileIndex+".png", imageDir + '/' +lastedFileIndex+".png", function (err) {
 
             if (err) {
               console.error(err);
@@ -437,7 +439,7 @@ const controller = {
             date: dateTime,
             attributes: [],
             dna: "",
-            rawImage: createDir + '/' +lastedFileIndex+".png"
+            rawImage: imageDir + '/' +lastedFileIndex+".png"
 
         };
 
@@ -459,13 +461,18 @@ const controller = {
 
         }
 
-        writeMetaData(JSON.stringify(metadata null, 2) ,jsonDir );
+        writeMetaData(JSON.stringify(metadata ,null, 2) ,jsonDir );
 
 
 
-
+        return new APIResponse(201, "upload ok");
      }catch(ex){
          console.log(ex)
+         throw new APIError({
+            status: httpStatus.INTERNAL_SERVER_ERROR,
+            message: "Cannot upload to image",
+          });
+   
      }
 
      

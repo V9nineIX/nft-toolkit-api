@@ -404,6 +404,7 @@ const writeMetaData = (_data , buildDir=buildDir) => {
     // console.log("data", _data)
 
   fs.writeFileSync(`${buildDir}/metadata.json`, _data);
+  
 };
 
 const saveMetaDataSingleFile = (_editionCount) => {

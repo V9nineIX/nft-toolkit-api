@@ -22,6 +22,8 @@ import {  API_POST_SIZE_LIMIT } from "./constants"
 const fs = require('fs');
 import Collection from "./models/collection.model";
 import { updateMeta ,  deleteMeta}  from "./libs/metaHandler"
+import { getJsonDir } from './utils/directoryHelper'
+import { loadMetaJson } from './libs/metaHandler'
 
 
 
@@ -31,8 +33,10 @@ const grapQLServer = new ApolloServer({
       type Query {
         hello: String,
         meta: Meta,
-        nft(id: String ,offset: Int, limit: Int , filter: [FilterParam] ):NFT
+        nft(id: String ,offset: Int, limit: Int , filter: [FilterParam] ):NFT,
+        customToken(id: String ,offset: Int, limit: Int): CustomToken
       }
+
       type Attributes {
         trait_type: String,
         value: String
@@ -83,6 +87,12 @@ const grapQLServer = new ApolloServer({
          layers:[Layer],
          meta:[Meta]
       }
+
+      type CustomToken {
+        totalImage:Int,
+        meta:[Meta]
+      }
+
 
       type Layer {
         name: String,
@@ -198,7 +208,48 @@ const grapQLServer = new ApolloServer({
            }
 
            return res[0]
-        }
+        },
+
+        customToken: async (_, args) => {
+   
+          //get collection info
+          const { id ,limit=null ,offset=0} = args
+
+          const res = await Collection.findByCollectionId(id);
+     
+          const { projectDir } = res[0]
+          const json = getJsonDir(projectDir)
+
+          res[0].imagePath = `/folder/${projectDir}/build/image/` 
+
+          let result = {}
+          try {
+            // check file already exist
+            if (fs.existsSync(`${json}/metadata.json`)) {
+              const metadata = await loadMetaJson({projectDir})
+
+              if(!isEmpty(metadata)) {
+                result.totalImage = metadata.length
+
+                if(limit){
+                  result.meta = [...metadata].slice(offset, limit)
+                }else{
+                  result.meta = [...metadata]
+                }
+
+              }
+            } else {
+              result = []
+            }
+
+
+          }catch(ex){
+           console.log("error",ex)
+           result = [{ totalImage: 0 }]
+          }
+
+          return result
+       }
     },
     Mutation: {
         deleteMeta: async(_, { id , edition }) => {

@@ -7,7 +7,7 @@ import bodyParser from "body-parser";
 const path = require('path')
 import cors from "cors"
 import { ApolloServer, gql } from "apollo-server-express";
-import { includes, isEmpty ,toLower  ,method  ,mapValues} from "lodash";
+import { includes, isEmpty ,toLower  ,method  ,mapValues ,find ,findIndex} from "lodash";
 
 // import { graphqlHTTP } from 'express-graphql'
 // import { buildSchema } from 'graphql'
@@ -21,6 +21,7 @@ import queueListeners from "./queues/queueListeners";
 import {  API_POST_SIZE_LIMIT } from "./constants"
 const fs = require('fs');
 import Collection from "./models/collection.model";
+import { updateMeta }  from "./libs/metaHandler"
 
 
 
@@ -40,6 +41,19 @@ const grapQLServer = new ApolloServer({
       input FilterParam {
         key: String,
         value:[String]
+      }
+
+
+      input MetaParam {
+        edition: Int,
+        attributes:[AttributesParam],
+      }
+
+ 
+
+      input AttributesParam {
+        trait_type: String,
+        value: String
       }
 
       type Meta {
@@ -83,9 +97,14 @@ const grapQLServer = new ApolloServer({
          rarity:String
          count:String
       }
+
+      type Mutation {
+          deleteMeta(id: String):String,
+          updateMeta(id: String , meta:MetaParam ):Boolean
+      }
  
     `,
-  resolvers: {
+  resolvers: { 
     Query: {
       hello: () => 'Hello world!',
       meta: () => {
@@ -181,6 +200,32 @@ const grapQLServer = new ApolloServer({
            return res[0]
         }
     },
+    Mutation: {
+        deleteMeta: (_, { id }) => {
+          // Perform database operations to create a new object
+        //console.log("delete")
+         //TODO: file
+
+          return "delete OK"
+        },
+        updateMeta: async (_, {id , meta }) => {
+            // console.log(meta)
+        try {
+           const res = await Collection.findByCollectionId(id);
+      
+           const { projectDir } = res[0]
+           const { edition=null  , attributes=[] } = meta
+
+           const metadata =  await updateMeta({projectDir, edition, attributes})
+
+          return true
+   
+        } catch(ex){
+            throw new Error("Error can not update meta")
+        }
+
+        }
+      }
   }
 })
 

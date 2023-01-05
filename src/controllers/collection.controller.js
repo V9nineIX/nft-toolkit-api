@@ -417,7 +417,7 @@ const controller = {
           await renameFile('./folder/'+fileName, imageDir + '/' +lastedFileIndex+".png", )
 
         //TODO create json file
-    
+
         let tempMetadata = {
             name: "",
             description: "",
@@ -427,7 +427,7 @@ const controller = {
             date: dateTime,
             attributes: [],
             dna: "",
-            rawImage: imageDir + '/' +lastedFileIndex+".png"
+            rawImage: imageDir.substring(1) + '/' +lastedFileIndex+".png"
 
         };
 

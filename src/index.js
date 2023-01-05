@@ -7,7 +7,7 @@ import bodyParser from "body-parser";
 const path = require('path')
 import cors from "cors"
 import { ApolloServer, gql } from "apollo-server-express";
-import { includes, isEmpty ,toLower  ,method  ,mapValues} from "lodash";
+import { includes, isEmpty ,toLower  ,method  ,mapValues, lowerFirst} from "lodash";
 
 // import { graphqlHTTP } from 'express-graphql'
 // import { buildSchema } from 'graphql'
@@ -31,7 +31,7 @@ const grapQLServer = new ApolloServer({
         hello: String,
         meta: Meta,
         nft(id: String ,offset: Int, limit: Int , filter: [FilterParam] ):NFT,
-        customToken(id: String ,offset: Int, limit: Int): Meta
+        customToken(id: String ,offset: Int, limit: Int): [Meta]
       }
 
       type Attributes {
@@ -188,90 +188,35 @@ const grapQLServer = new ApolloServer({
           //get collection info
           const { id ,limit=null ,offset=0} = args
 
-          console.log('id', id);
           const res = await Collection.findByCollectionId(id);
-
      
           const { projectDir } = res[0]
           res[0].imagePath = `/folder/${projectDir}/build/image/` 
           //TODO: get meta from json file
+
+          let result = []
           try {
-
            const metadata = JSON.parse(fs.readFileSync(`./folder/${projectDir}/build/json/metadata.json`, 'utf-8'));
-           //res[0].totalImage = metadata.length
 
-          ///Filter
-          //  if(!isEmpty(filter)){
-               
-               let filterMetaData = []
-           
-     
+           if(!isEmpty(metadata)) {
+            for (const meta of  metadata) {
+              result.push({...meta, totalImage: metadata.length})
+            }
 
-               for (const [index, meta] of  metadata.entries() ) {
-               //    if(limit && index == limit){
-               //         break
-               //    }
+            if(limit){
+              result = [...result].slice(offset, limit)
+            }else{
+              result = [...result]
+            }
+           }
 
-               //    if(limit && index < offset){ // skip index less then offest
-               //       continue
-               //    }
-
-
-                  let isMatch = false
-
-                   for (const filterObject of filter) {
-
-                       const  filterValue   =  mapValues(filterObject.value, method('toLowerCase')); //value:["body magic","bacgord"]
-   
-
-                       for (const attr of meta.attributes ){
-                       
-                        if(toLower(attr.trait_type) == toLower(filterObject.key)){
-                           if(!isEmpty(filterValue)) {
-                               if(includes(  filterValue , toLower(attr.value))){
-       
-                                   filterMetaData.push(meta)
-                                   isMatch = true
-
-                               }
-                            }
-                        }
-                        if(isMatch){ // exit loop
-                            break
-                        }
-                      }
-                      if(isMatch){ // exit loop
-                          break
-                      }
-              
-                   } // end loop filter
-
-               } // end loop
-               
-               res[0].totalImage = filterMetaData.length
-               if(limit) {
-                   res[0].meta = [...filterMetaData].slice(offset, limit)
-               }else{
-                   res[0].meta = [...filterMetaData]
-               }
-          
-        
-          //  } // end if
-          //  else {
-          //      res[0].totalImage = metadata.length
-          //      if(limit){
-          //         res[0].meta = [...metadata].slice(offset, limit)
-          //     }else{
-          //          res[0].meta = [...metadata]
-          //     }
-          //  }
 
           }catch(ex){
            console.log("error",ex)
-           res[0].totalImage = 0
+           result = [{ totalImage: 0 }]
           }
 
-          return res[0]
+          return result
        }
     },
   }

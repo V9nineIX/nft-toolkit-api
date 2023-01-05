@@ -411,6 +411,7 @@ const controller = {
   
         for (var i = 0; i < files.length; i++) {
           const fileName = files[i].filename;
+          lastedFileIndex++
     
     
 

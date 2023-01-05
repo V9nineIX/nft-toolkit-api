@@ -22,6 +22,8 @@ import {  API_POST_SIZE_LIMIT } from "./constants"
 const fs = require('fs');
 import Collection from "./models/collection.model";
 import { updateMeta }  from "./libs/metaHandler"
+import { getJsonDir } from './utils/directoryHelper'
+import { loadMetaJson } from './libs/metaHandler'
 
 
 
@@ -32,7 +34,7 @@ const grapQLServer = new ApolloServer({
         hello: String,
         meta: Meta,
         nft(id: String ,offset: Int, limit: Int , filter: [FilterParam] ):NFT,
-        customToken(id: String ,offset: Int, limit: Int): [Meta]
+        customToken(id: String ,offset: Int, limit: Int): CustomToken
       }
 
       type Attributes {
@@ -85,6 +87,12 @@ const grapQLServer = new ApolloServer({
          layers:[Layer],
          meta:[Meta]
       }
+
+      type CustomToken {
+        totalImage:Int,
+        meta:[Meta]
+      }
+
 
       type Layer {
         name: String,
@@ -210,24 +218,29 @@ const grapQLServer = new ApolloServer({
           const res = await Collection.findByCollectionId(id);
      
           const { projectDir } = res[0]
+          const json = getJsonDir(projectDir)
+
           res[0].imagePath = `/folder/${projectDir}/build/image/` 
-          //TODO: get meta from json file
 
-          let result = []
+          let result = {}
           try {
-           const metadata = JSON.parse(fs.readFileSync(`./folder/${projectDir}/build/json/metadata.json`, 'utf-8'));
+            // check file already exist
+            if (fs.existsSync(`${json}/metadata.json`)) {
+              const metadata = await loadMetaJson({projectDir})
 
-           if(!isEmpty(metadata)) {
-            for (const meta of  metadata) {
-              result.push({...meta, totalImage: metadata.length})
-            }
+              if(!isEmpty(metadata)) {
+                result.totalImage = metadata.length
 
-            if(limit){
-              result = [...result].slice(offset, limit)
-            }else{
-              result = [...result]
+                if(limit){
+                  result.meta = [...metadata].slice(offset, limit)
+                }else{
+                  result.meta = [...metadata]
+                }
+
+              }
+            } else {
+              result = []
             }
-           }
 
 
           }catch(ex){

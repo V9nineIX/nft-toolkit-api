@@ -30,8 +30,10 @@ const grapQLServer = new ApolloServer({
       type Query {
         hello: String,
         meta: Meta,
-        nft(id: String ,offset: Int, limit: Int , filter: [FilterParam] ):NFT
+        nft(id: String ,offset: Int, limit: Int , filter: [FilterParam] ):NFT,
+        customToken(id: String ,offset: Int, limit: Int): Meta
       }
+
       type Attributes {
         trait_type: String,
         value: String
@@ -179,7 +181,98 @@ const grapQLServer = new ApolloServer({
            }
 
            return res[0]
-        }
+        },
+
+        customToken: async (_, args) => {
+   
+          //get collection info
+          const { id ,limit=null ,offset=0} = args
+
+          console.log('id', id);
+          const res = await Collection.findByCollectionId(id);
+
+     
+          const { projectDir } = res[0]
+          res[0].imagePath = `/folder/${projectDir}/build/image/` 
+          //TODO: get meta from json file
+          try {
+
+           const metadata = JSON.parse(fs.readFileSync(`./folder/${projectDir}/build/json/metadata.json`, 'utf-8'));
+           //res[0].totalImage = metadata.length
+
+          ///Filter
+          //  if(!isEmpty(filter)){
+               
+               let filterMetaData = []
+           
+     
+
+               for (const [index, meta] of  metadata.entries() ) {
+               //    if(limit && index == limit){
+               //         break
+               //    }
+
+               //    if(limit && index < offset){ // skip index less then offest
+               //       continue
+               //    }
+
+
+                  let isMatch = false
+
+                   for (const filterObject of filter) {
+
+                       const  filterValue   =  mapValues(filterObject.value, method('toLowerCase')); //value:["body magic","bacgord"]
+   
+
+                       for (const attr of meta.attributes ){
+                       
+                        if(toLower(attr.trait_type) == toLower(filterObject.key)){
+                           if(!isEmpty(filterValue)) {
+                               if(includes(  filterValue , toLower(attr.value))){
+       
+                                   filterMetaData.push(meta)
+                                   isMatch = true
+
+                               }
+                            }
+                        }
+                        if(isMatch){ // exit loop
+                            break
+                        }
+                      }
+                      if(isMatch){ // exit loop
+                          break
+                      }
+              
+                   } // end loop filter
+
+               } // end loop
+               
+               res[0].totalImage = filterMetaData.length
+               if(limit) {
+                   res[0].meta = [...filterMetaData].slice(offset, limit)
+               }else{
+                   res[0].meta = [...filterMetaData]
+               }
+          
+        
+          //  } // end if
+          //  else {
+          //      res[0].totalImage = metadata.length
+          //      if(limit){
+          //         res[0].meta = [...metadata].slice(offset, limit)
+          //     }else{
+          //          res[0].meta = [...metadata]
+          //     }
+          //  }
+
+          }catch(ex){
+           console.log("error",ex)
+           res[0].totalImage = 0
+          }
+
+          return res[0]
+       }
     },
   }
 })

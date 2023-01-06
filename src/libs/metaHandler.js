@@ -1,5 +1,13 @@
 import fs from 'fs'
-import { includes, isEmpty ,toLower  ,method  ,mapValues ,find ,findIndex} from "lodash";
+import { includes,
+         isEmpty ,
+         toLower  ,
+         method  ,
+         mapValues ,
+         find ,
+         findIndex,
+         filter
+        } from "lodash";
 import { writeMetaData } from './genarate'
 import { getJsonDir } from '../utils/directoryHelper'
 
@@ -49,12 +57,47 @@ const  updateMeta = async({  projectDir=null ,edition=null , attributes=[] }) =>
       }
 
     })  // end promise
-   
+}
 
+const deleteMeta = async({projectDir=null ,edition=null}) => {
+    return new Promise( async (resolve ,reject) => { 
+
+        if(!edition){
+            reject(new Error("edition is require"))
+       }
+
+        try{
+            const metadata =  await loadMetaJson({projectDir})
+            const newMetadata = filter(metadata , (item) => item.edition != edition )
+            let result = [] 
+            for( const [idx ,metaItem ] of newMetadata.entries()){
+                     result.push({...metaItem , edition:idx+1})
+            }
+            
+            writeMetaData(JSON.stringify(result ,null, 2) ,getJsonDir(projectDir))
+
+            //TODO update meta json file
+
+
+            //TODO : delete image
+            
+
+
+
+          resolve(result)
+
+        }catch(ex){
+            console.log(ex)
+            reject(new Error("Can delete metadata"))
+
+        }
+
+    })
 }
 
 module.exports = {
     updateMeta,
-    loadMetaJson 
+    loadMetaJson,
+    deleteMeta 
 
 }

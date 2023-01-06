@@ -4,8 +4,8 @@ import APIResponse from "../utils/api-response";
 import APIError from "../utils/api-error";
 import fsx from 'fs-extra';
 import fs from 'fs';
-import { startCreating ,writeMetaData } from '../libs/genarate'
-import { last } from "lodash";
+import { startCreating, writeMetaData } from '../libs/genarate'
+import { last, map } from "lodash";
 import { addGenerateImageQueue } from "../queues/generate-image-queue";
 import { GENERATE_COLLECTION, GENERATE_IMAGE } from "../constants";
 import { uploadToPinata } from '../ipfs/pinata'
@@ -313,26 +313,26 @@ const controller = {
     try {
 
 
-        const { id } = params
-        const {layersElement ,ownerId=null, projectDir:dir, totalSupply ,collection} = body
-        const projectDir = `./folder/` + dir
-        const projectName = dir
+      const { id } = params
+      const { layersElement, ownerId = null, projectDir: dir, totalSupply, collection } = body
+      const projectDir = `./folder/` + dir
+      const projectName = dir
 
 
 
-        let paramCollection = { ...collection }
-        paramCollection.status = "process"
-        const res = await Collection.updateById(id, paramCollection)
-  
-        const param = {
-          layersElement,
-          totalSupply,
-          projectDir,
-          id,
-          ownerId,
-          projectName,
-          jobType: GENERATE_COLLECTION
-        }
+      let paramCollection = { ...collection }
+      paramCollection.status = "process"
+      const res = await Collection.updateById(id, paramCollection)
+
+      const param = {
+        layersElement,
+        totalSupply,
+        projectDir,
+        id,
+        ownerId,
+        projectName,
+        jobType: GENERATE_COLLECTION
+      }
 
 
       //TODO update database
@@ -355,110 +355,117 @@ const controller = {
   },
 
   uploadIPFS: async ({ body, params }) => {
-    try{
-        //TODO: upload collection to IPFS
-        const { id } = params
-        const {jwtToken = null ,provider="pinata" } = body
+    try {
+      //TODO: upload collection to IPFS
+      const { id } = params
+      const { jwtToken = null, provider = "pinata" } = body
 
 
-        const collectionResult = await  Collection.findByCollectionId(id)
+      const collectionResult = await Collection.findByCollectionId(id)
 
-  
-        const { projectDir ,name } = collectionResult[0]
-        const imageFolder = `./folder/` + projectDir + '/build/image/' 
-        const jsonFolder = `./folder/` + projectDir + '/build/json/' 
- 
-        const res   =  await uploadToPinata({
-            buildFolder:imageFolder ,
-            projectName:name,
-            projectDir: projectDir,
-            jsonFolder: jsonFolder,
-            JWTKey: jwtToken
-        })
 
-       // console.log("res" ,res)
- 
-        return new APIResponse(201, "upload ok");
-    }catch(ex){
+      const { projectDir, name } = collectionResult[0]
+      const imageFolder = `./folder/` + projectDir + '/build/image/'
+      const jsonFolder = `./folder/` + projectDir + '/build/json/'
 
-        console.log(ex)
-        throw new APIError({
-          status: httpStatus.INTERNAL_SERVER_ERROR,
-          message: "Cannot upload to IPFS",
-        });
- 
+      const res = await uploadToPinata({
+        buildFolder: imageFolder,
+        projectName: name,
+        projectDir: projectDir,
+        jsonFolder: jsonFolder,
+        JWTKey: jwtToken
+      })
+
+      // console.log("res" ,res)
+
+      return new APIResponse(201, "upload ok");
+    } catch (ex) {
+
+      console.log(ex)
+      throw new APIError({
+        status: httpStatus.INTERNAL_SERVER_ERROR,
+        message: "Cannot upload to IPFS",
+      });
+
     }
- 
-   },
 
-   uploadCustomToken: async({ body , params  ,files}) => {
-     //TODO upload custom token
-     try {
+  },
+
+  uploadCustomToken: async ({ body, params, files }) => {
+    //TODO upload custom token
+    try {
 
       //  const { id } = params
-        const { collectionId  ,projectDir } = body
-      
+      const { collectionId, projectDir } = body
 
-        const imageDir = './folder/' + projectDir + "/" + `build/image`;
-        const jsonDir = './folder/' + projectDir + "/" + `build/json`;
-  
-       // fsx.ensureDir(imageDir); // make directory
 
-        await createDirectory(imageDir)
 
-        
 
-          // count lasted file index
-        let lastedFileIndex  = await countFilesInDir(imageDir)
-   
-        let dateTime = Date.now();
-        let metadataCustomTokenList = []
-  
-        for (let i = 0; i < files.length; i++) {
-          const fileName = files[i].filename;
-          lastedFileIndex++
-    
+      const res = await Collection.findById(collectionId)
+      const resAtt = map(res?.layers, function (e) {
+        return {
+          trait_type: e?.name,
+          value: ""
+        }
+      })
 
-          await renameFile('./folder/'+fileName, imageDir + '/' +lastedFileIndex+".png", )
+
+
+      const imageDir = './folder/' + projectDir + "/" + `build/image`;
+      const jsonDir = './folder/' + projectDir + "/" + `build/json`;
+
+      //fsx.ensureDir(imageDir); // make directory
+      await createDirectory(imageDir) // make directory
+
+      // count lasted file index
+      let lastedFileIndex = await countFilesInDir(imageDir)
+
+      let dateTime = Date.now();
+      let metadataCustomTokenList = []
+
+      for (let i = 0; i < files.length; i++) {
+        const fileName = files[i].filename;
+        lastedFileIndex++
+
+
+        await renameFile('./folder/' + fileName, imageDir + '/' + lastedFileIndex + ".png",)
 
         //TODO create json file
 
         let tempMetadata = {
-            name: "",
-            description: "",
-            symbol: "",
-            image: "",
-            edition: lastedFileIndex,
-            date: dateTime,
-            attributes: [],
-            dna: "",
-            rawImage: imageDir.substring(1) + '/' +lastedFileIndex+".png"
-
+          name: "",
+          description: "",
+          symbol: "",
+          image: "",
+          edition: lastedFileIndex,
+          date: dateTime,
+          attributes: resAtt,
+          dna: "",
+          rawImage: imageDir.substring(1) + '/' + lastedFileIndex + ".png",
+          tokenType: "custom",
         };
 
         metadataCustomTokenList.push(tempMetadata)
 
-  
-        } // end loop
 
-        //TODO // write file
+      } // end loop
 
         // fsx.ensureDir(jsonDir) // mkdir
         await createDirectory(jsonDir)
 
-        let  metadata = []
-        if (fs.existsSync(`${jsonDir}/metadata.json`)) {
-            metadata = JSON.parse(fs.readFileSync(`${jsonDir}/metadata.json`, 'utf-8'));
-            metadata = [...metadata , ...metadataCustomTokenList]
-        }else{
-            metadata  = [...metadataCustomTokenList]
 
-        }
+      let metadata = []
+      if (fs.existsSync(`${jsonDir}/metadata.json`)) {
+        metadata = JSON.parse(fs.readFileSync(`${jsonDir}/metadata.json`, 'utf-8'));
+        metadata = [...metadata, ...metadataCustomTokenList]
+      } else {
+        metadata = [...metadataCustomTokenList]
 
-        writeMetaData(JSON.stringify(metadata ,null, 2) ,jsonDir);
+      }
 
+      writeMetaData(JSON.stringify(metadata, null, 2), jsonDir);
 
-        return new APIResponse(201, "upload ok");
+     return new APIResponse(201, "upload ok");
 
      }catch(ex){
          console.log(ex)
@@ -469,9 +476,7 @@ const controller = {
    
      }
 
-     
-     
-  } 
+  }
 
 
 

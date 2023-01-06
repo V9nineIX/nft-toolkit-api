@@ -225,8 +225,6 @@ const grapQLServer = new ApolloServer({
         const { projectDir } = res[0]
         const json = getJsonDir(projectDir)
 
-        res[0].imagePath = `/folder/${projectDir}/build/image/`
-
         let result = {}
         try {
           // check file already exist
@@ -244,13 +242,13 @@ const grapQLServer = new ApolloServer({
 
             }
           } else {
-            result = []
+            result = {}
           }
 
 
         } catch (ex) {
           console.log("error", ex)
-          result = [{ totalImage: 0 }]
+          result.totalImage = 0
         }
 
         return result

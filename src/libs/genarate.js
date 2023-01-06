@@ -177,79 +177,81 @@ const drawBackground = () => {
   ctx.fillRect(0, 0, format.width, format.height);
 };
 
-const addMetadata = (_dna, 
-                    _edition,
-                     jsonFolder = `${buildDir}/json` ,
-                     metaData=null, 
-                     ipfsHasId=null,
-                     metadataList = [],
-                     extension ="txt",
-                     isWriteSingleJson=true
-                     ) => {
-    return new Promise( async (resolve ,reject) => {
-  
-  let dateTime = Date.now();
-  let tempMetadata = {
-    name: `${metaData?.name}`,
-    description: metaData?.description || "",
-    symbol: metaData?.symbol || "",
-    image: `ipfs://${ipfsHasId}/${_edition}.png`,
-    edition: _edition,
-    date: dateTime,
-    // ...extraMetadata,
-    attributes: metaData.attributes,
-  };
-  //   if (network == NETWORK.sol) {
-  //     tempMetadata = {
-  //       //Added metadata for solana
-  //       name: tempMetadata.name,
-  //       symbol: solanaMetadata.symbol,
-  //       description: tempMetadata.description,
-  //       //Added metadata for solana
-  //       seller_fee_basis_points: solanaMetadata.seller_fee_basis_points,
-  //       image: `${_edition}.png`,
-  //       //Added metadata for solana
-  //       external_url: solanaMetadata.external_url,
-  //       edition: _edition,
-  //       ...extraMetadata,
-  //       attributes: tempMetadata.attributes,
-  //       properties: {
-  //         files: [
-  //           {
-  //             uri: `${_edition}.png`,
-  //             type: "image/png",
-  //           },
-  //         ],
-  //         category: "image",
-  //         creators: solanaMetadata.creators,
-  //       },
-  //     };
-  //   }
+const addMetadata = (_dna,
+  _edition,
+  jsonFolder = `${buildDir}/json`,
+  metaData = null,
+  ipfsHasId = null,
+  metadataList = [],
+  extension = "txt",
+  isWriteSingleJson = true
+) => {
+  return new Promise(async (resolve, reject) => {
 
- let rawMetaData ={...tempMetadata ,
-    dna: _dna,
-    rawImage:`${jsonFolder.replace("json","image").substring(1)}/${_edition}.png`
-  } 
+    let dateTime = Date.now();
+    let tempMetadata = {
+      name: `${metaData?.name}`,
+      description: metaData?.description || "",
+      symbol: metaData?.symbol || "",
+      image: `ipfs://${ipfsHasId}/${_edition}.png`,
+      edition: _edition,
+      date: dateTime,
+      // ...extraMetadata,
+      attributes: metaData.attributes,
+      tokenType: "generate",
+    };
+    //   if (network == NETWORK.sol) {
+    //     tempMetadata = {
+    //       //Added metadata for solana
+    //       name: tempMetadata.name,
+    //       symbol: solanaMetadata.symbol,
+    //       description: tempMetadata.description,
+    //       //Added metadata for solana
+    //       seller_fee_basis_points: solanaMetadata.seller_fee_basis_points,
+    //       image: `${_edition}.png`,
+    //       //Added metadata for solana
+    //       external_url: solanaMetadata.external_url,
+    //       edition: _edition,
+    //       ...extraMetadata,
+    //       attributes: tempMetadata.attributes,
+    //       properties: {
+    //         files: [
+    //           {
+    //             uri: `${_edition}.png`,
+    //             type: "image/png",
+    //           },
+    //         ],
+    //         category: "image",
+    //         creators: solanaMetadata.creators,
+    //       },
+    //     };
+    //   }
 
-  metadataList.push(rawMetaData);
-       
-  if(isWriteSingleJson){
-    try {
+    let rawMetaData = {
+      ...tempMetadata,
+      dna: _dna,
+      rawImage: `${jsonFolder.replace("json", "image").substring(1)}/${_edition}.png`
+    }
+
+    metadataList.push(rawMetaData);
+
+    if (isWriteSingleJson) {
+      try {
 
         fs.writeFileSync(
-        `${jsonFolder}/${_edition}.${extension}`,
-        JSON.stringify(tempMetadata, null, 2),
-        'utf8'
+          `${jsonFolder}/${_edition}.${extension}`,
+          JSON.stringify(tempMetadata, null, 2),
+          'utf8'
         );
 
-    } catch (ex) {
+      } catch (ex) {
         console.log(ex)
+      }
     }
-  }
 
     attributesList = [];
     resolve("write done")
-   });
+  });
 
 };
 
@@ -265,9 +267,9 @@ const loadLayerImg = async (_layer) => {
   try {
     return new Promise(async (resolve) => {
 
-      let imagePath =  _layer.selectedElement.path
-      if( imagePath.charAt(0) != ".")
-      imagePath =  "."+imagePath 
+      let imagePath = _layer.selectedElement.path
+      if (imagePath.charAt(0) != ".")
+        imagePath = "." + imagePath
 
       const image = await loadImage(`${imagePath}`);
       resolve({ layer: _layer, loadedImage: image });
@@ -400,11 +402,11 @@ const createDna = (_layers) => {
   return randNum.join(DNA_DELIMITER);
 };
 
-const writeMetaData = (_data , buildDir=buildDir) => {
-    // console.log("data", _data)
+const writeMetaData = (_data, buildDir = buildDir) => {
+  // console.log("data", _data)
 
   fs.writeFileSync(`${buildDir}/metadata.json`, _data);
-  
+
 };
 
 const saveMetaDataSingleFile = (_editionCount) => {
@@ -458,7 +460,7 @@ const startCreating = async ({
     let progress = 0;
     const totolSupply = layerConfigurations[layerConfigurations.length - 1].growEditionSizeTo
 
-    console.log("layerConfigurations",layerConfigurations)
+    console.log("layerConfigurations", layerConfigurations)
 
     for (
       let i = 1;
@@ -571,7 +573,7 @@ const startCreating = async ({
       console.log(layerConfigIndex)
       layerConfigIndex++;
     }
-     writeMetaData(JSON.stringify(metadataList, null, 2));
+    writeMetaData(JSON.stringify(metadataList, null, 2));
     // console.log("end loop")
     resolve("Finsish")
   }) //  end promise
@@ -580,113 +582,112 @@ const startCreating = async ({
 
 
 const generateCollection = async ({
-    layersElement ,
-     totalSupply,
-     projectDir,
-     buildFolder,
-     jsonFolder,
-     job=null
-    }) => {
+  layersElement,
+  totalSupply,
+  projectDir,
+  buildFolder,
+  jsonFolder,
+  job = null
+}) => {
 
-    return new Promise( async (resolve ,reject) => {  
+  return new Promise(async (resolve, reject) => {
     try {
 
-     let editionCount = 1
-     let progress  = 0
-     let metadataList = []
-          
-
-        
-        while (editionCount <= totalSupply)
-         {
-       
-            // console.log(" layersElement", layersElement)
-              //TODO
-               let loadedElements = [];
-               let { dna=null , layers ,  metaData } = layersElement[editionCount-1]
-                /// revers layer for genreate
-                 layers =  _.reverse(layers)
-
-                for( const layer   of layers){
-                     loadedElements.push(loadLayerImg(layer));
-                }
+      let editionCount = 1
+      let progress = 0
+      let metadataList = []
 
 
-    
-             await Promise.all(loadedElements).then((renderObjectArray) => {
-                debugLogs ? console.log("Clearing canvas") : null;
-                ctx.clearRect(0, 0, format.width, format.height);
-                // if (gif.export) {
-                // hashlipsGiffer = new HashlipsGiffer(
-                //     canvas,
-                //     ctx,
-                //     `${buildDir}/gifs/${abstractedIndexes[0]}.gif`,
-                //     gif.repeat,
-                //     gif.quality,
-                //     gif.delay
-                // );
-                // hashlipsGiffer.start();
-                // }
-                // if (background.generate) {
-                // drawBackground();
-                // }
-             renderObjectArray.forEach((renderObject, index) => {
-            
-                drawElement(
-                    renderObject,
-                    index,
-                    layers.length
-                );
-                // if (gif.export) {
-                //     hashlipsGiffer.add();
-                // }
-                // });
-                // if (gif.export) {
-                // hashlipsGiffer.stop();
-                // }
-              })
-              
-                saveImage(editionCount,  buildFolder);
-                addMetadata(dna, editionCount ,jsonFolder , metaData,null ,metadataList ,"json" ,false);
 
-                 console.log(
-                    `Created edition: ${editionCount}, with DNA: `
-                 );
-               
-             });
+      while (editionCount <= totalSupply) {
+
+        // console.log(" layersElement", layersElement)
+        //TODO
+        let loadedElements = [];
+        let { dna = null, layers, metaData } = layersElement[editionCount - 1]
+        /// revers layer for genreate
+        layers = _.reverse(layers)
+
+        for (const layer of layers) {
+          loadedElements.push(loadLayerImg(layer));
+        }
 
 
-           
-             progress = ((editionCount / totalSupply) * 100).toFixed()
-             console.log( "progress ...",progress+"%");
-             //TODO update progress
-             if(job){
-                job.progress(progress)
-             }
 
-              editionCount++;
-      
+        await Promise.all(loadedElements).then((renderObjectArray) => {
+          debugLogs ? console.log("Clearing canvas") : null;
+          ctx.clearRect(0, 0, format.width, format.height);
+          // if (gif.export) {
+          // hashlipsGiffer = new HashlipsGiffer(
+          //     canvas,
+          //     ctx,
+          //     `${buildDir}/gifs/${abstractedIndexes[0]}.gif`,
+          //     gif.repeat,
+          //     gif.quality,
+          //     gif.delay
+          // );
+          // hashlipsGiffer.start();
+          // }
+          // if (background.generate) {
+          // drawBackground();
+          // }
+          renderObjectArray.forEach((renderObject, index) => {
 
-        } //end while gowEdition
+            drawElement(
+              renderObject,
+              index,
+              layers.length
+            );
+            // if (gif.export) {
+            //     hashlipsGiffer.add();
+            // }
+            // });
+            // if (gif.export) {
+            // hashlipsGiffer.stop();
+            // }
+          })
 
-        
-       writeMetaData(JSON.stringify(metadataList, null, 2) ,jsonFolder );
+          saveImage(editionCount, buildFolder);
+          addMetadata(dna, editionCount, jsonFolder, metaData, null, metadataList, "json", false);
+
+          console.log(
+            `Created edition: ${editionCount}, with DNA: `
+          );
+
+        });
+
+
+
+        progress = ((editionCount / totalSupply) * 100).toFixed()
+        console.log("progress ...", progress + "%");
+        //TODO update progress
+        if (job) {
+          job.progress(progress)
+        }
+
+        editionCount++;
+
+
+      } //end while gowEdition
+
+
+      writeMetaData(JSON.stringify(metadataList, null, 2), jsonFolder);
       // console.log("end loop")
-       resolve("Finsish")
-    }catch(ex){
-       console.log(ex)
-       resolve("Error")
-     }
-    }) //  end promise
- };
+      resolve("Finsish")
+    } catch (ex) {
+      console.log(ex)
+      resolve("Error")
+    }
+  }) //  end promise
+};
 
 
 
-module.exports = { 
-    startCreating,
-    buildSetup,
-    getElements,
-    generateCollection ,
-    addMetadata,
-    writeMetaData
+module.exports = {
+  startCreating,
+  buildSetup,
+  getElements,
+  generateCollection,
+  addMetadata,
+  writeMetaData
 };

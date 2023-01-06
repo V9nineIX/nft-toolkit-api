@@ -9,8 +9,9 @@ import { includes,
          findIndex,
          filter
         } from "lodash";
-import { writeMetaData } from './genarate'
+import { writeMetaData ,addMetadata } from './genarate'
 import { getJsonDir } from '../utils/directoryHelper'
+
 
 const getMetaDirectory = (projectDir) => {
     return `./folder/${projectDir}/build/json/metadata.json`
@@ -18,6 +19,10 @@ const getMetaDirectory = (projectDir) => {
 
 const getImageDirectory = (projectDir) => {
     return `./folder/${projectDir}/build/image`
+}
+
+const getJsonDirectory = (projectDir) => {
+    return `./folder/${projectDir}/build/json`
 }
 
 
@@ -98,11 +103,43 @@ const deleteMeta = async({projectDir=null ,edition=null}) => {
         }
 
     })
-}
+ }
+
+ const writeMetaForIPFS = ({ projectDir=null , IpfsHash=null }) => {
+    return new Promise( async (resolve ,reject) => { 
+        try {
+            const metadata   =  await loadMetaJson({projectDir})
+            const jsonFolder =  getJsonDirectory(projectDir)
+
+            for (const [index, meta] of  metadata.entries() ) {
+
+                await addMetadata(
+                             null, 
+                             index+1 ,
+                             jsonFolder,
+                             meta,
+                             IpfsHash,
+                             [],
+                             "json"
+                          )
+     
+              } // end loop
+
+            resolve(true)
+
+        }catch(ex){
+            reject(new Error("Can not wirte metadata"))
+        }
+
+
+    })
+
+ }
 
 module.exports = {
     updateMeta,
     loadMetaJson,
-    deleteMeta 
+    deleteMeta,
+    writeMetaForIPFS
 
 }

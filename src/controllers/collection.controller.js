@@ -10,6 +10,7 @@ import { addGenerateImageQueue } from "../queues/generate-image-queue";
 import { GENERATE_COLLECTION, GENERATE_IMAGE } from "../constants";
 import { uploadToPinata } from '../ipfs/pinata'
 import {  countFilesInDir  , renameFile} from '../utils/fileHelper'
+import { createDirectory } from '../utils/directoryHelper'
 
 
 const controller = {
@@ -401,7 +402,11 @@ const controller = {
         const imageDir = './folder/' + projectDir + "/" + `build/image`;
         const jsonDir = './folder/' + projectDir + "/" + `build/json`;
   
-        fsx.ensureDir(imageDir); // make directory
+       // fsx.ensureDir(imageDir); // make directory
+
+        await createDirectory(imageDir)
+
+        
 
           // count lasted file index
         let lastedFileIndex  = await countFilesInDir(imageDir)
@@ -438,7 +443,8 @@ const controller = {
 
         //TODO // write file
 
-        fsx.ensureDir(jsonDir) // mkdir
+        // fsx.ensureDir(jsonDir) // mkdir
+        await createDirectory(jsonDir)
 
         let  metadata = []
         if (fs.existsSync(`${jsonDir}/metadata.json`)) {
@@ -449,11 +455,11 @@ const controller = {
 
         }
 
-        writeMetaData(JSON.stringify(metadata ,null, 2) ,jsonDir );
-
+        writeMetaData(JSON.stringify(metadata ,null, 2) ,jsonDir);
 
 
         return new APIResponse(201, "upload ok");
+
      }catch(ex){
          console.log(ex)
          throw new APIError({

@@ -78,6 +78,12 @@ const deleteMeta = async({projectDir=null ,edition=null}) => {
 
             //TODO update meta json file
 
+
+            //TODO : delete image
+            
+
+
+
           resolve(result)
 
         }catch(ex){

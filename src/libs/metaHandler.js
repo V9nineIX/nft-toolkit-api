@@ -41,7 +41,7 @@ const loadMetaJson = ({
 
 }
 
-const  updateMeta = async({  projectDir=null ,edition=null , attributes=[] }) => {
+const  updateMeta = async({  projectDir=null ,edition=null , attributes=[] ,customAttributes=[] }) => {
     return new Promise( async (resolve ,reject) => {  
       if(!edition){
            reject(new Error("edition is require"))
@@ -49,7 +49,7 @@ const  updateMeta = async({  projectDir=null ,edition=null , attributes=[] }) =>
       try {
         const metadata =  await loadMetaJson({projectDir})
         const targetMetaDataIndex  =  findIndex(metadata, {edition: parseInt(edition)})
-        metadata[targetMetaDataIndex]  =  {...metadata[targetMetaDataIndex] ,attributes:attributes }
+        metadata[targetMetaDataIndex]  =  {...metadata[targetMetaDataIndex] ,attributes:attributes ,customAttributes:customAttributes }
         const jsonDir = getJsonDir(projectDir)
         //console.log(meta)
 

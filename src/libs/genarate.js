@@ -197,8 +197,7 @@ const addMetadata = (_dna,
       edition: _edition,
       date: dateTime,
       // ...extraMetadata,
-      attributes: metaData.attributes,
-      tokenType: "generate",
+      attributes: metaData.attributes
     };
     //   if (network == NETWORK.sol) {
     //     tempMetadata = {

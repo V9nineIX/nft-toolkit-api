@@ -256,16 +256,24 @@ const grapQLServer = new ApolloServer({
     },
     Mutation: {
       deleteMeta: async (_, { id, edition }) => {
+        let status = false
+
         try {
           const res = await Collection.findByCollectionId(id);
           const { projectDir } = res[0]
 
           const result = await deleteMeta({ projectDir, edition })
 
+
+          if(result) {
+            status = true
+          }
+
         } catch (ex) {
           console.log(ex)
-
         }
+
+        return status
 
 
       },

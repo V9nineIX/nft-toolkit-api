@@ -213,14 +213,14 @@ const grapQLServer = new ApolloServer({
         customToken: async (_, args) => {
    
           //get collection info
-          const { id ,limit=null ,offset=0} = args
+          const { id ,limit=null ,offset=0 } = args
 
-          const res = await Collection.findByCollectionId(id);
+          const res = await Collection.findByCollectionId(id); // find collection
      
           const { projectDir } = res[0]
           const json = getJsonDir(projectDir)
 
-          res[0].imagePath = `/folder/${projectDir}/build/image/` 
+          // res[0].imagePath = `/folder/${projectDir}/build/image/` 
 
           let result = {}
           try {
@@ -239,13 +239,14 @@ const grapQLServer = new ApolloServer({
 
               }
             } else {
-              result = []
+              result = {}
             }
 
 
           }catch(ex){
            console.log("error",ex)
-           result = [{ totalImage: 0 }]
+           result.totalImage = 0
+           result.meta = []
           }
 
           return result

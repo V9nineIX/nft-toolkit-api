@@ -230,7 +230,8 @@ const addMetadata = (_dna,
     let rawMetaData = {
       ...tempMetadata,
       dna: _dna,
-      rawImage: `${jsonFolder.replace("json", "image").substring(1)}/${_edition}.png`
+      rawImage: `${jsonFolder.replace("json", "image").substring(1)}/${_edition}.png`,
+      tokenType: "generate"
     }
 
     metadataList.push(rawMetaData);

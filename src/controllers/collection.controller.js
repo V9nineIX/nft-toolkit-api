@@ -9,7 +9,8 @@ import { last, map } from "lodash";
 import { addGenerateImageQueue } from "../queues/generate-image-queue";
 import { GENERATE_COLLECTION, GENERATE_IMAGE } from "../constants";
 import { uploadToPinata } from '../ipfs/pinata'
-import { countFilesInDir, renameFile } from '../utils/fileHelper'
+import {  countFilesInDir  , renameFile} from '../utils/fileHelper'
+import { createDirectory } from '../utils/directoryHelper'
 
 
 const controller = {
@@ -413,7 +414,8 @@ const controller = {
       const imageDir = './folder/' + projectDir + "/" + `build/image`;
       const jsonDir = './folder/' + projectDir + "/" + `build/json`;
 
-      fsx.ensureDir(imageDir); // make directory
+      //fsx.ensureDir(imageDir); // make directory
+      await createDirectory(imageDir) // make directory
 
       // count lasted file index
       let lastedFileIndex = await countFilesInDir(imageDir)
@@ -448,9 +450,9 @@ const controller = {
 
       } // end loop
 
-      //TODO // write file
+        // fsx.ensureDir(jsonDir) // mkdir
+        await createDirectory(jsonDir)
 
-      fsx.ensureDir(jsonDir) // mkdir
 
       let metadata = []
       if (fs.existsSync(`${jsonDir}/metadata.json`)) {
@@ -463,19 +465,16 @@ const controller = {
 
       writeMetaData(JSON.stringify(metadata, null, 2), jsonDir);
 
+     return new APIResponse(201, "upload ok");
 
-
-      return new APIResponse(201, "upload ok");
-    } catch (ex) {
-      console.log(ex)
-      throw new APIError({
-        status: httpStatus.INTERNAL_SERVER_ERROR,
-        message: "Cannot upload to image",
-      });
-
-    }
-
-
+     }catch(ex){
+         console.log(ex)
+         throw new APIError({
+            status: httpStatus.INTERNAL_SERVER_ERROR,
+            message: "Cannot upload to image",
+          });
+   
+     }
 
   }
 

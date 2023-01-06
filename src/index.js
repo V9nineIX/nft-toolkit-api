@@ -51,6 +51,7 @@ const grapQLServer = new ApolloServer({
       input MetaParam {
         edition: Int,
         attributes:[AttributesParam],
+        customAttributes:[AttributesParam]
       }
 
  
@@ -70,6 +71,9 @@ const grapQLServer = new ApolloServer({
          rawImage:String,
          dna:String,
          tokenType:String,
+         customAttributes:[Attributes],
+         qty: Int,
+         type: String,
       }
 
       type NFT {
@@ -273,9 +277,9 @@ const grapQLServer = new ApolloServer({
           const res = await Collection.findByCollectionId(id);
 
           const { projectDir } = res[0]
-          const { edition = null, attributes = [] } = meta
+          const { edition = null, attributes = [] ,customAttributes=[] } = meta
 
-          const metadata = await updateMeta({ projectDir, edition, attributes })
+          const metadata = await updateMeta({ projectDir, edition, attributes ,customAttributes })
 
           return true
 

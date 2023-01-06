@@ -230,7 +230,9 @@ const addMetadata = (_dna,
       ...tempMetadata,
       dna: _dna,
       rawImage: `${jsonFolder.replace("json", "image").substring(1)}/${_edition}.png`,
-      tokenType: "generate"
+      tokenType: "generate",
+      qty: 1,
+      type:"ERC721"
     }
 
     metadataList.push(rawMetaData);

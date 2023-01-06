@@ -256,7 +256,7 @@ const grapQLServer = new ApolloServer({
     },
     Mutation: {
       deleteMeta: async (_, { id, edition }) => {
-        let meta = false
+        let status = false
 
         try {
           const res = await Collection.findByCollectionId(id);
@@ -266,14 +266,14 @@ const grapQLServer = new ApolloServer({
 
 
           if(result) {
-            meta = true
+            status = true
           }
 
         } catch (ex) {
           console.log(ex)
         }
 
-        return meta
+        return status
 
 
       },

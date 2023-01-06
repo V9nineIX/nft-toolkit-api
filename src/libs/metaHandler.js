@@ -1,4 +1,5 @@
 import fs from 'fs'
+import fsx from 'fs-extra'
 import { includes,
          isEmpty ,
          toLower  ,
@@ -13,6 +14,10 @@ import { getJsonDir } from '../utils/directoryHelper'
 
 const getMetaDirectory = (projectDir) => {
     return `./folder/${projectDir}/build/json/metadata.json`
+}
+
+const getImageDirectory = (projectDir) => {
+    return `./folder/${projectDir}/build/image`
 }
 
 
@@ -70,17 +75,17 @@ const deleteMeta = async({projectDir=null ,edition=null}) => {
             const metadata =  await loadMetaJson({projectDir})
             const newMetadata = filter(metadata , (item) => item.edition != edition )
             let result = [] 
+           // let rawImage = null
             for( const [idx ,metaItem ] of newMetadata.entries()){
                      result.push({...metaItem , edition:idx+1})
             }
             
+            //TODO update meta json file
             writeMetaData(JSON.stringify(result ,null, 2) ,getJsonDir(projectDir))
 
-            //TODO update meta json file
-
-
             //TODO : delete image
-            
+            const removeImagePath = getImageDirectory(projectDir)+edition+".png"
+            await fsx.remove(removeImagePath)
 
 
 

@@ -486,7 +486,7 @@ const controller = {
     const { status } = body
 
     try {
-      const res = await Collection.updateStatus(id, status);
+      const res = await Collection.updateStatus({id, status});
 
       return new APIResponse(201, res);
     } catch (ex) {

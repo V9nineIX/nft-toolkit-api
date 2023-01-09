@@ -102,6 +102,7 @@ const grapQLServer = new ApolloServer({
 
       type CustomToken {
         totalImage:Int,
+        totalAllImage:Int,
         meta:[Meta]
       }
 
@@ -229,7 +230,7 @@ const grapQLServer = new ApolloServer({
         const { id, limit = null, offset = 0 } = args
 
         const res = await Collection.findByCollectionId(id);
-
+ 
         const { projectDir } = res[0]
         const json = getJsonDir(projectDir)
 
@@ -238,14 +239,18 @@ const grapQLServer = new ApolloServer({
           // check file already exist
           if (fs.existsSync(`${json}/metadata.json`)) {
             const metadata = await loadMetaJson({ projectDir })
+        
 
             if (!isEmpty(metadata)) {
-              result.totalImage = metadata.length
+
+              let  filterMeta = metadata.filter(item => item.tokenType == "custom")
+              result.totalImage = filterMeta.length
+              result.totalAllImage = metadata.length
 
               if (limit) {
-                result.meta = [...metadata].slice(offset, limit)
+                result.meta = [...filterMeta].slice(offset, limit)
               } else {
-                result.meta = [...metadata]
+                result.meta = [...filterMeta]
               }
 
             }
@@ -258,7 +263,7 @@ const grapQLServer = new ApolloServer({
           console.log("error", ex)
           result.totalImage = 0
         }
-
+     
         return result
       }
     },

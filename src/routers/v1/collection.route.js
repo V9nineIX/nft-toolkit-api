@@ -327,4 +327,32 @@ router.route("/uploadToIPFS/:id").post(handle(controller.uploadIPFS));
 router.route("/uploadCustomToken").post(upload.array('files', MAX_FILE_UPLOAD), handle(controller.uploadCustomToken));
 
 
+
+/**
+ * @swagger
+ * /v1/collection/updateCollectionStatus/{id}:
+ *   put:
+ *     tags: [Collection]
+ *     summary: update status
+*     parameters:
+ *       - in: path
+ *         name: id
+ *         description: Collection Id
+ *         schema:
+ *           type: string
+ *           example: 63a4332da1d63ea7cc31327a
+ *       - in: body
+ *         name: body
+ *         description: Collection's information
+ *         schema:
+ *           type: object
+ *     responses:
+ *       201:
+ *         description: Return status create collection
+ *         schema:
+ *           type: object
+ */
+router.route("/updateCollectionStatus/:id").put(handle(controller.updateCollectionStatus));
+
+
 export default router;

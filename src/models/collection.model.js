@@ -130,11 +130,14 @@ collectionSchema.statics = {
         );
         return doc;
     },
-    async updateStatus({ id, status }) {
+
+    async updateStatus( id, status ) {
         const doc = await this.findOneAndUpdate({ '_id': id }, { "status": status }, {
             new: true,
             upsert: true // Make this update into an upsert
         });
+
+        return doc
     }
 }
 

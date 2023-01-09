@@ -479,20 +479,20 @@ const controller = {
      }
 
   },
-  updateNftType: async ({ body, params }) => {
+
+
+  updateCollectionStatus: async ({ params, body }) => {
+    const { id } = params;
+    const { status } = body
 
     try {
-      const { id } = params
-      let paramCollection = { ...body }
-      paramCollection.status = "active"
-      const res = await Collection.updateById(id, paramCollection)
+      const res = await Collection.updateStatus(id, status);
 
       return new APIResponse(201, res);
     } catch (ex) {
-      console.log(ex)
       throw new APIError({
         status: httpStatus.INTERNAL_SERVER_ERROR,
-        message: "Cannot update collection",
+        message: "Cannot update status",
       });
     }
   },

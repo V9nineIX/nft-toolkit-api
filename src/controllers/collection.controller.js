@@ -444,8 +444,7 @@ const controller = {
           rawImage: imageDir.substring(1) + '/' + lastedFileIndex + ".png",
           tokenType: "custom",
           customAttributes:[],
-          qty: 1,
-          type:"ERC721"
+          qty: 1
         };
 
         metadataCustomTokenList.push(tempMetadata)
@@ -479,7 +478,24 @@ const controller = {
    
      }
 
-  }
+  },
+  updateNftType: async ({ body, params }) => {
+
+    try {
+      const { id } = params
+      let paramCollection = { ...body }
+      paramCollection.status = "active"
+      const res = await Collection.updateById(id, paramCollection)
+
+      return new APIResponse(201, res);
+    } catch (ex) {
+      console.log(ex)
+      throw new APIError({
+        status: httpStatus.INTERNAL_SERVER_ERROR,
+        message: "Cannot update collection",
+      });
+    }
+  },
 
 
 

@@ -79,11 +79,17 @@ const collectionSchema = new mongoose.Schema({
         type: [LayerSchema]
     },
     ipfsJsonHash: {
-        type:String
+        type:String,
+        default: null,
     },
     ipfsImageHash: {
-        type:String
-    }
+        type:String,
+        default: null,
+    },
+    nftType:{
+        type:String , // ERC721 ,ERC1155
+        default: "ERC721",
+    } 
 },
     { timestamps: true }
 )
@@ -130,7 +136,6 @@ collectionSchema.statics = {
             upsert: true // Make this update into an upsert
         });
     }
-
 }
 
 export default mongoose.model('Collection', collectionSchema)

@@ -120,7 +120,11 @@ collectionSchema.statics = {
     },
 
     async updateStatus( id, status ) {
-        const doc = await this.findByIdAndUpdate({ '_id': id }, { "status": status });
+        const doc = await this.findOneAndUpdate({ '_id': id }, { "status": status }, {
+            new: true,
+            upsert: true // Make this update into an upsert
+        });
+
         return doc
     }
 

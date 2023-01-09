@@ -136,10 +136,36 @@ const deleteMeta = async({projectDir=null ,edition=null}) => {
 
  }
 
+ const updateMetaQty = ({ projectDir=null , metaParam=[] }) => {
+    return new Promise( async (resolve ,reject) => { 
+     
+    try {
+
+        const metadata   =  await loadMetaJson({projectDir})
+        for (const [index, meta] of metaParam.entries() ) {
+            
+         let  metaIndex =  findIndex(metadata , {'edition' : meta.edition} )
+          metadata[metaIndex] = { ...metadata[metaIndex] , qty:meta.qty}
+        } // end for
+
+       writeMetaData(JSON.stringify(metadata ,null, 2) ,getJsonDir(projectDir))
+       resolve(true)
+       
+    }catch(ex){
+        console.log("ex",ex)
+        reject(new Error("Can not update metadata"))
+    }
+
+
+
+    })
+}
+
 module.exports = {
     updateMeta,
     loadMetaJson,
     deleteMeta,
-    writeMetaForIPFS
+    writeMetaForIPFS,
+    updateMetaQty
 
 }

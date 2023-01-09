@@ -21,7 +21,7 @@ import queueListeners from "./queues/queueListeners";
 import { API_POST_SIZE_LIMIT } from "./constants"
 const fs = require('fs');
 import Collection from "./models/collection.model";
-import { updateMeta, deleteMeta } from "./libs/metaHandler"
+import { updateMeta, deleteMeta , updateMetaQty } from "./libs/metaHandler"
 import { getJsonDir } from './utils/directoryHelper'
 import { loadMetaJson } from './libs/metaHandler'
 
@@ -53,6 +53,12 @@ const grapQLServer = new ApolloServer({
         attributes:[AttributesParam],
         customAttributes:[AttributesParam]
       }
+
+      input MetaQtyParam {
+        edition: Int,
+        qty: Int
+      }
+
 
  
 
@@ -116,7 +122,8 @@ const grapQLServer = new ApolloServer({
 
       type Mutation {
           deleteMeta(id: String , edition: Int):Boolean,
-          updateMeta(id: String , meta:MetaParam ):Boolean
+          updateMeta(id: String , meta:MetaParam ):Boolean,
+          updateMetaQty(id:String ,metaQtyParam:[MetaQtyParam] ):Boolean
       }
  
     `,
@@ -294,6 +301,18 @@ const grapQLServer = new ApolloServer({
           throw new Error("Error can not update meta")
         }
 
+      },
+      updateMetaQty: async (_,{id , metaQtyParam}) => {
+        //TODO update meta qty
+        try {
+            const res = await Collection.findByCollectionId(id)
+            const { projectDir } = res[0]
+            const updateStatus = await updateMetaQty({projectDir , metaParam:metaQtyParam }) 
+           return updateStatus
+           
+        }catch(ex){
+            throw new Error(ex)
+        }
       }
     }
   }

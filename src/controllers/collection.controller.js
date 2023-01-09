@@ -479,7 +479,24 @@ const controller = {
    
      }
 
-  }
+  },
+
+
+  updateCollectionStatus: async ({ params, body }) => {
+    const { id } = params;
+    const { status } = body
+
+    try {
+      const res = await Collection.updateStatus(id, status);
+
+      return new APIResponse(201, res);
+    } catch (ex) {
+      throw new APIError({
+        status: httpStatus.INTERNAL_SERVER_ERROR,
+        message: "Cannot update status",
+      });
+    }
+  },
 
 
 

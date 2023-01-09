@@ -89,6 +89,7 @@ const grapQLServer = new ApolloServer({
          defaultPrice:Float,
          imagePath:String,
          totalImage:Int,
+         nftType:String,
          layers:[Layer],
          meta:[Meta]
       }

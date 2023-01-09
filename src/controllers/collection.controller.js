@@ -482,11 +482,12 @@ const controller = {
   },
 
 
-  updateCollectionStatus: async ({ params }) => {
+  updateCollectionStatus: async ({ params, body }) => {
     const { id } = params;
+    const { status } = body
 
     try {
-      const res = await Collection.updateStatus(id, 'completed');
+      const res = await Collection.updateStatus(id, status);
 
       return new APIResponse(201, res);
     } catch (ex) {

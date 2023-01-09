@@ -77,6 +77,12 @@ const collectionSchema = new mongoose.Schema({
     },
     layers: {
         type: [LayerSchema]
+    },
+    ipfsJsonHash: {
+        type:String
+    },
+    ipfsImageHash: {
+        type:String
     }
 },
     { timestamps: true }

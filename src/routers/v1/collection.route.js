@@ -226,7 +226,7 @@ router.route("/generateCollection/:id").put(handle(controller.generateCollection
 /**
  * @swagger
  * /v1/collection/{id}:
- *   put:
+ *   patch:
  *     tags: [Collection]
  *     summary: update collection by id
  *     parameters:
@@ -247,7 +247,7 @@ router.route("/generateCollection/:id").put(handle(controller.generateCollection
  *         schema:
  *           type: object
  */
-router.route("/:id").put(handle(controller.updateCollectionById));
+router.route("/:id").patch(handle(controller.updateCollectionById));
 
 
 /**
@@ -331,7 +331,7 @@ router.route("/uploadCustomToken").post(upload.array('files', MAX_FILE_UPLOAD), 
 /**
  * @swagger
  * /v1/collection/updateCollectionStatus/{id}:
- *   put:
+ *   patch:
  *     tags: [Collection]
  *     summary: update status
 *     parameters:
@@ -352,7 +352,7 @@ router.route("/uploadCustomToken").post(upload.array('files', MAX_FILE_UPLOAD), 
  *         schema:
  *           type: object
  */
-router.route("/updateCollectionStatus/:id").put(handle(controller.updateCollectionStatus));
+router.route("/updateCollectionStatus/:id").patch(handle(controller.updateCollectionStatus));
 
 
 export default router;

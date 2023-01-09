@@ -444,8 +444,7 @@ const controller = {
           rawImage: imageDir.substring(1) + '/' + lastedFileIndex + ".png",
           tokenType: "custom",
           customAttributes:[],
-          qty: 1,
-          type:"ERC721"
+          qty: 1
         };
 
         metadataCustomTokenList.push(tempMetadata)

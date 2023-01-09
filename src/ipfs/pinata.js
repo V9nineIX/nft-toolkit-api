@@ -6,6 +6,7 @@ const basePath = process.cwd();
 import {   addMetadata } from "../libs/genarate"
 import config from "../../config";
 const { pinataKey } = config
+import { writeMetaForIPFS } from "../libs/metaHandler" 
 
 
 const connectPinata = async () => {
@@ -93,24 +94,26 @@ const uploadToPinata = async ({
         // console.log(sourcePath)
         const { IpfsHash}  = await pinata.pinFromFS(sourcePath, options)
      
-         let editionCount = 1
+     
+
+         await writeMetaForIPFS({ projectDir:projectDir , IpfsHash:IpfsHash})
 
 
-         const metadata = JSON.parse(fs.readFileSync(`./folder/${projectDir}/build/json/metadata.json`, 'utf-8'));
+        //  const metadata = JSON.parse(fs.readFileSync(`./folder/${projectDir}/build/json/metadata.json`, 'utf-8'));
          
-         for (const [index, meta] of  metadata.entries() ) {
+        //  for (const [index, meta] of  metadata.entries() ) {
 
-           await addMetadata(
-                        null, 
-                        index+1 ,
-                        jsonFolder,
-                        meta,
-                        IpfsHash,
-                        [],
-                        "json"
-                     )
+        //    await addMetadata(
+        //                 null, 
+        //                 index+1 ,
+        //                 jsonFolder,
+        //                 meta,
+        //                 IpfsHash,
+        //                 [],
+        //                 "json"
+        //              )
 
-         } // end loop
+        //  } // end loop
 
         //TODO upload json to IPFS
 

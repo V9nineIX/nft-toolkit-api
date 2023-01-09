@@ -54,6 +54,7 @@ var attributesList = [];
 const DNA_DELIMITER = "-";
 const HashlipsGiffer = require(`./HashlipsGiffer.js`);
 const { resolve } = require("path");
+const { isEmpty } = require("lodash");
 
 let hashlipsGiffer = null;
 
@@ -189,6 +190,13 @@ const addMetadata = (_dna,
   return new Promise(async (resolve, reject) => {
 
     let dateTime = Date.now();
+    //TOOD  merge custom attribute
+    let  attributes = metaData?.attributes || []
+
+    if(!isEmpty(metaData.customAttributes)){ 
+        attributes = [...attributes , ...metaData.customAttributes]
+    }
+
     let tempMetadata = {
       name: `${metaData?.name}`,
       description: metaData?.description || "",
@@ -197,7 +205,7 @@ const addMetadata = (_dna,
       edition: _edition,
       date: dateTime,
       // ...extraMetadata,
-      attributes: metaData.attributes
+      attributes: attributes
     };
     //   if (network == NETWORK.sol) {
     //     tempMetadata = {

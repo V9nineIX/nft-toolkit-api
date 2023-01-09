@@ -77,7 +77,19 @@ const collectionSchema = new mongoose.Schema({
     },
     layers: {
         type: [LayerSchema]
-    }
+    },
+    ipfsJsonHash: {
+        type:String,
+        default: null,
+    },
+    ipfsImageHash: {
+        type:String,
+        default: null,
+    },
+    nftType:{
+        type:String , // ERC721 ,ERC1155
+        default: "ERC721",
+    } 
 },
     { timestamps: true }
 )
@@ -127,7 +139,6 @@ collectionSchema.statics = {
 
         return doc
     }
-
 }
 
 export default mongoose.model('Collection', collectionSchema)

@@ -124,7 +124,7 @@ const grapQLServer = new ApolloServer({
       type Mutation {
           deleteMeta(id: String , edition: Int):Boolean,
           updateMeta(id: String , meta:MetaParam ):Boolean,
-          updateMetaQty(id:String ,metaQtyParam:[MetaQtyParam] ):Boolean
+          updateMetaQty(id:String ,metaQtyParam:[MetaQtyParam], nftType: String ):Boolean
       }
  
     `,
@@ -307,12 +307,20 @@ const grapQLServer = new ApolloServer({
         }
 
       },
-      updateMetaQty: async (_,{id , metaQtyParam}) => {
+      updateMetaQty: async (_,{id , metaQtyParam, nftType}) => {
         //TODO update meta qty
         try {
             const res = await Collection.findByCollectionId(id)
             const { projectDir } = res[0]
-            const updateStatus = await updateMetaQty({projectDir , metaParam:metaQtyParam }) 
+
+            let updateStatus = false
+            
+            if(nftType == 'ERC1155') {
+               updateStatus = await updateMetaQty({projectDir , metaParam:metaQtyParam }) 
+            }
+
+            const result = await Collection.updateById(id, {"nftType": nftType});
+
            return updateStatus
            
         }catch(ex){

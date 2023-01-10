@@ -191,10 +191,10 @@ const addMetadata = (_dna,
 
     let dateTime = Date.now();
     //TOOD  merge custom attribute
-    let  attributes = metaData?.attributes || []
+    let attributes = metaData?.attributes || []
 
-    if(!isEmpty(metaData.customAttributes)){ 
-        attributes = [...attributes , ...metaData.customAttributes]
+    if (!isEmpty(metaData.customAttributes)) {
+      attributes = [...attributes, ...metaData.customAttributes]
     }
 
     let tempMetadata = {
@@ -240,7 +240,7 @@ const addMetadata = (_dna,
       rawImage: `${jsonFolder.replace("json", "image").substring(1)}/${_edition}.png`,
       tokenType: "generate",
       qty: 1,
-      type:"ERC721"
+      type: "ERC721"
     }
 
     metadataList.push(rawMetaData);
@@ -421,30 +421,30 @@ const writeMetaData = (_data, buildDir = buildDir) => {
 
 
 const writeMergeMeta = async (data, buildDir = buildDir) => {
-    return new Promise( async (resolve ,reject) => { 
+  return new Promise(async (resolve, reject) => {
 
     const metaDataPath = `${buildDir}/metadata.json`
 
     try {
 
-        if (fs.existsSync(metaDataPath )) {
-        
-            const metadata = JSON.parse(fs.readFileSync(metaDataPath, 'utf-8'));
-            const filterMeta = metadata.filter(item => item.tokenType == "custom")
-            const mergeMeta = [...data , ...filterMeta]
-            fs.writeFileSync(metaDataPath , JSON.stringify(mergeMeta, null, 2));
-        }else{
-            fs.writeFileSync(metaDataPath , JSON.stringify(data, null, 2));
-        }
-        resolve(true)
+      if (fs.existsSync(metaDataPath)) {
 
-    }catch(ex){
-        reject(new Error("Can not write metadata"))
+        const metadata = JSON.parse(fs.readFileSync(metaDataPath, 'utf-8'));
+        const filterMeta = metadata.filter(item => item.tokenType == "custom")
+        const mergeMeta = [...data, ...filterMeta]
+        fs.writeFileSync(metaDataPath, JSON.stringify(mergeMeta, null, 2));
+      } else {
+        fs.writeFileSync(metaDataPath, JSON.stringify(data, null, 2));
+      }
+      resolve(true)
+
+    } catch (ex) {
+      reject(new Error("Can not write metadata"))
     }
 
-    })
-  
-  };
+  })
+
+};
 
 const saveMetaDataSingleFile = (_editionCount) => {
   try {
@@ -684,8 +684,8 @@ const generateCollection = async ({
             // }
           })
 
-          saveImage(editionCount, buildFolder);
-          addMetadata(dna, editionCount, jsonFolder, metaData, null, metadataList, "json", false);
+          saveImage(metaData.edition, buildFolder);
+          addMetadata(dna, metaData.edition, jsonFolder, metaData, null, metadataList, "json", false);
 
           console.log(
             `Created edition: ${editionCount}, with DNA: `
@@ -708,8 +708,8 @@ const generateCollection = async ({
       } //end while gowEdition
 
 
-     // writeMetaData(JSON.stringify(metadataList, null, 2), jsonFolder);
-      await writeMergeMeta(metadataList,jsonFolder)
+      // writeMetaData(JSON.stringify(metadataList, null, 2), jsonFolder);
+      await writeMergeMeta(metadataList, jsonFolder)
 
       // console.log("end loop")
       resolve("Finsish")

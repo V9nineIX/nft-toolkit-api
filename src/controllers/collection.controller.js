@@ -369,6 +369,7 @@ const controller = {
       const jsonFolder = `./folder/` + projectDir + '/build/json/'
 
       const res = await uploadToPinata({
+        collectionId: id,
         buildFolder: imageFolder,
         projectName: name,
         projectDir: projectDir,

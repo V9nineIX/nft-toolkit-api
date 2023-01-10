@@ -7,6 +7,7 @@ import {   addMetadata } from "../libs/genarate"
 import config from "../../config";
 const { pinataKey } = config
 import { writeMetaForIPFS } from "../libs/metaHandler" 
+import  Collection  from "../models/collection.model"
 
 
 const connectPinata = async () => {
@@ -53,6 +54,7 @@ const uploadJson = async(jsonFolder ,projectName , JWTKey=null) => {
 
 
 const uploadToPinata = async ({
+   collectionId,
    layersElement,
    totalSupply,
    projectName,
@@ -66,7 +68,7 @@ const uploadToPinata = async ({
       
     let  pinata = null
      if(JWTKey) {
-        console.log(JWTKey)
+       // console.log(JWTKey)
         pinata = new pinataSDK({ pinataJWTKey:  JWTKey});
      }else{
         const { apiKey ,apiSecretKey } =  pinataKey 
@@ -99,21 +101,9 @@ const uploadToPinata = async ({
          await writeMetaForIPFS({ projectDir:projectDir , IpfsHash:IpfsHash})
 
 
-        //  const metadata = JSON.parse(fs.readFileSync(`./folder/${projectDir}/build/json/metadata.json`, 'utf-8'));
-         
-        //  for (const [index, meta] of  metadata.entries() ) {
+   
 
-        //    await addMetadata(
-        //                 null, 
-        //                 index+1 ,
-        //                 jsonFolder,
-        //                 meta,
-        //                 IpfsHash,
-        //                 [],
-        //                 "json"
-        //              )
 
-        //  } // end loop
 
         //TODO upload json to IPFS
 
@@ -126,9 +116,18 @@ const uploadToPinata = async ({
             }
         };
 
-        const jsonIpfsHash  = await pinata.pinFromFS(jsonFolder, optionsForJson)
+        const { IpfsHash: ipfsJsonHash}  = await pinata.pinFromFS(jsonFolder, optionsForJson)
          
-        resolve({ IpfsHash  ,jsonIpfsHash })
+
+
+              //TODO: update hash to database
+
+        await Collection.updateById(collectionId , {
+                ipfsImageHash:IpfsHash, 
+                ipfsJsonHash: ipfsJsonHash
+        })
+
+        resolve({ IpfsHash  , ipfsJsonHash })
 
        // console.log(resultJson)
         }catch(ex){

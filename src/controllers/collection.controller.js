@@ -434,7 +434,7 @@ const controller = {
         //TODO create json file
 
         let tempMetadata = {
-          name: "",
+          name: res?.name + '#' + lastedFileIndex,
           description: "",
           symbol: "",
           image: "",

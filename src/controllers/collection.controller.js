@@ -9,7 +9,7 @@ import { last, map } from "lodash";
 import { addGenerateImageQueue } from "../queues/generate-image-queue";
 import { GENERATE_COLLECTION, GENERATE_IMAGE } from "../constants";
 import { uploadToPinata } from '../ipfs/pinata'
-import {  countFilesInDir  , renameFile} from '../utils/fileHelper'
+import { countFilesInDir, renameFile } from '../utils/fileHelper'
 import { createDirectory } from '../utils/directoryHelper'
 
 
@@ -276,7 +276,7 @@ const controller = {
     try {
       const { id } = params
       let paramCollection = { ...body }
-      paramCollection.status = "active"
+      // paramCollection.status = "active"
       const res = await Collection.updateById(id, paramCollection)
 
       return new APIResponse(201, res);
@@ -444,7 +444,7 @@ const controller = {
           dna: "",
           rawImage: imageDir.substring(1) + '/' + lastedFileIndex + ".png",
           tokenType: "custom",
-          customAttributes:[],
+          customAttributes: [],
           qty: 1
         };
 
@@ -453,8 +453,8 @@ const controller = {
 
       } // end loop
 
-        // fsx.ensureDir(jsonDir) // mkdir
-        await createDirectory(jsonDir)
+      // fsx.ensureDir(jsonDir) // mkdir
+      await createDirectory(jsonDir)
 
 
       let metadata = []
@@ -468,16 +468,16 @@ const controller = {
 
       writeMetaData(JSON.stringify(metadata, null, 2), jsonDir);
 
-     return new APIResponse(201, "upload ok");
+      return new APIResponse(201, "upload ok");
 
-     }catch(ex){
-         console.log(ex)
-         throw new APIError({
-            status: httpStatus.INTERNAL_SERVER_ERROR,
-            message: "Cannot upload to image",
-          });
-   
-     }
+    } catch (ex) {
+      console.log(ex)
+      throw new APIError({
+        status: httpStatus.INTERNAL_SERVER_ERROR,
+        message: "Cannot upload to image",
+      });
+
+    }
 
   },
 
@@ -487,7 +487,7 @@ const controller = {
     const { status } = body
 
     try {
-      const res = await Collection.updateStatus({id, status});
+      const res = await Collection.updateStatus({ id, status });
 
       return new APIResponse(201, res);
     } catch (ex) {

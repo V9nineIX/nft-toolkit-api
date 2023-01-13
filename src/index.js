@@ -102,6 +102,7 @@ const grapQLServer = new ApolloServer({
          ipfsImageHash:String,
          maxPublicSupply:Int,
          maxTokensPerAddress:Int,
+         smartContractAddress: String
       }
 
       type CustomToken {

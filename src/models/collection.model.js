@@ -79,17 +79,25 @@ const collectionSchema = new mongoose.Schema({
         type: [LayerSchema]
     },
     ipfsJsonHash: {
-        type:String,
+        type: String,
         default: null,
     },
     ipfsImageHash: {
-        type:String,
+        type: String,
         default: null,
     },
-    nftType:{
-        type:String , // ERC721 ,ERC1155
+    nftType: {
+        type: String, // ERC721 ,ERC1155
         default: "ERC721",
-    } 
+    },
+    maxPublicSupply: {
+        type: Number,
+        default: 0,
+    },
+    maxTokensPerAddress: {
+        type: Number,
+        default: 0,
+    },
 },
     { timestamps: true }
 )
@@ -131,7 +139,7 @@ collectionSchema.statics = {
         return doc;
     },
 
-    async updateStatus( {id, status }) {
+    async updateStatus({ id, status }) {
         const doc = await this.findOneAndUpdate({ '_id': id }, { "status": status }, {
             new: true,
             upsert: true // Make this update into an upsert

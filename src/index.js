@@ -21,7 +21,7 @@ import queueListeners from "./queues/queueListeners";
 import { API_POST_SIZE_LIMIT } from "./constants"
 const fs = require('fs');
 import Collection from "./models/collection.model";
-import { updateMeta, deleteMeta , updateMetaQty } from "./libs/metaHandler"
+import { updateMeta, deleteMeta, updateMetaQty } from "./libs/metaHandler"
 import { getJsonDir } from './utils/directoryHelper'
 import { loadMetaJson } from './libs/metaHandler'
 
@@ -97,7 +97,11 @@ const grapQLServer = new ApolloServer({
          totalImage:Int,
          nftType:String,
          layers:[Layer],
-         meta:[Meta]
+         meta:[Meta],
+         ipfsJsonHash:String,
+         ipfsImageHash:String,
+         maxPublicSupply:Int,
+         maxTokensPerAddress:Int,
       }
 
       type CustomToken {
@@ -230,7 +234,7 @@ const grapQLServer = new ApolloServer({
         const { id, limit = null, offset = 0 } = args
 
         const res = await Collection.findByCollectionId(id);
- 
+
         const { projectDir } = res[0]
         const json = getJsonDir(projectDir)
 
@@ -239,11 +243,11 @@ const grapQLServer = new ApolloServer({
           // check file already exist
           if (fs.existsSync(`${json}/metadata.json`)) {
             const metadata = await loadMetaJson({ projectDir })
-        
+
 
             if (!isEmpty(metadata)) {
 
-              let  filterMeta = metadata.filter(item => item.tokenType == "custom")
+              let filterMeta = metadata.filter(item => item.tokenType == "custom")
               result.totalImage = filterMeta.length
               result.totalAllImage = metadata.length
 
@@ -263,7 +267,7 @@ const grapQLServer = new ApolloServer({
           console.log("error", ex)
           result.totalImage = 0
         }
-     
+
         return result
       }
     },
@@ -278,7 +282,7 @@ const grapQLServer = new ApolloServer({
           const result = await deleteMeta({ projectDir, edition })
 
 
-          if(result) {
+          if (result) {
             status = true
           }
 
@@ -296,9 +300,9 @@ const grapQLServer = new ApolloServer({
           const res = await Collection.findByCollectionId(id);
 
           const { projectDir } = res[0]
-          const { edition = null, attributes = [] ,customAttributes=[] } = meta
+          const { edition = null, attributes = [], customAttributes = [] } = meta
 
-          const metadata = await updateMeta({ projectDir, edition, attributes ,customAttributes })
+          const metadata = await updateMeta({ projectDir, edition, attributes, customAttributes })
 
           return true
 
@@ -307,24 +311,24 @@ const grapQLServer = new ApolloServer({
         }
 
       },
-      updateMetaQty: async (_,{id , metaQtyParam, nftType}) => {
+      updateMetaQty: async (_, { id, metaQtyParam, nftType }) => {
         //TODO update meta qty
         try {
-            const res = await Collection.findByCollectionId(id)
-            const { projectDir } = res[0]
+          const res = await Collection.findByCollectionId(id)
+          const { projectDir } = res[0]
 
-            let updateStatus = false
-            
-            if(nftType == 'ERC1155') {
-               updateStatus = await updateMetaQty({projectDir , metaParam:metaQtyParam }) 
-            }
+          let updateStatus = false
 
-            const result = await Collection.updateById(id, {"nftType": nftType});
+          if (nftType == 'ERC1155') {
+            updateStatus = await updateMetaQty({ projectDir, metaParam: metaQtyParam })
+          }
 
-           return updateStatus
-           
-        }catch(ex){
-            throw new Error(ex)
+          const result = await Collection.updateById(id, { "nftType": nftType });
+
+          return updateStatus
+
+        } catch (ex) {
+          throw new Error(ex)
         }
       }
     }

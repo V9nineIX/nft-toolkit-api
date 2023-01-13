@@ -98,6 +98,10 @@ const collectionSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
+    smartContractAddress: {
+        type: String,
+        default: "",
+    },
 },
     { timestamps: true }
 )

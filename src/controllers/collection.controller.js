@@ -9,7 +9,7 @@ import { last, map } from "lodash";
 import { addGenerateImageQueue } from "../queues/generate-image-queue";
 import { GENERATE_COLLECTION, GENERATE_IMAGE } from "../constants";
 import { uploadToPinata } from '../ipfs/pinata'
-import { countFilesInDir, renameFile } from '../utils/fileHelper'
+import { countFilesInDir, renameFile } from '../utils/filesHelper'
 import { createDirectory } from '../utils/directoryHelper'
 
 

@@ -44,7 +44,8 @@ const generateImageProcess = async (job, done) => {
   let returnData = {
     id,
     ownerId,
-    "status": "Completed"
+    "status": "Completed",
+    projectDir
   }
 
 

@@ -1,6 +1,7 @@
 // import { orderQueue } from "./order-queue"
 import { generateImageQueue } from "./generate-image-queue";
 import Collection from "../models/collection.model";
+import { countFilesInDir, renameFile } from '../utils/filesHelper'
 
 const queueListeners = (io = null) => {
 
@@ -30,6 +31,7 @@ const queueListeners = (io = null) => {
 
         // TODO emit  to client
         const res = JSON.parse(result)
+
         const data = {
             message: 'Generate image completed',
             status: res.status,
@@ -38,10 +40,12 @@ const queueListeners = (io = null) => {
             projectDir: res.projectDir
         }
 
+        //TODO: update image max supply
 
-        //UPDATE collection status
-        const collectionRes = await Collection.updateStatus({ "id": res.id, "status": "completed" })
 
+        const imageDir =  res.projectDir+"/build/image"
+        const maxSupply = await countFilesInDir(imageDir)
+        const collectionRes =  Collection.updateById(res.id ,{"status": "completed" ,"totalSupply":maxSupply })
 
         io.emit("generateCompleted", data);
     })

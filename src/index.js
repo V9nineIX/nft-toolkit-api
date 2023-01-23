@@ -34,6 +34,7 @@ const grapQLServer = new ApolloServer({
         hello: String,
         meta: Meta,
         nft(id: String ,offset: Int, limit: Int , filter: [FilterParam] ):NFT,
+        nftBySmartContractAddress(smartContractAddress: String ):NFT,
         customToken(id: String ,offset: Int, limit: Int): CustomToken
       }
 
@@ -228,6 +229,13 @@ const grapQLServer = new ApolloServer({
 
         return res[0]
       },
+
+      nftBySmartContractAddress: async (_, args) => {
+        const { smartContractAddress } = args
+        const res = await Collection.findBySmartContractAddress(smartContractAddress);
+        return res[0]
+      },
+
 
       customToken: async (_, args) => {
 

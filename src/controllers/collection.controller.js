@@ -214,6 +214,19 @@ const controller = {
     }
   },
 
+  findBySmartContractAddress: async ({ params }) => {
+    const { smartContractAddress } = params;
+    try {
+      const res = await Collection.findBySmartContractAddress(smartContractAddress);
+      return new APIResponse(201, res);
+    } catch (ex) {
+      throw new APIError({
+        status: httpStatus.INTERNAL_SERVER_ERROR,
+        message: "Cannot find collection by id",
+      });
+    }
+  },
+
 
   generateImage: async ({ body, params }) => {
 

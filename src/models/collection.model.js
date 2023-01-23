@@ -127,6 +127,11 @@ collectionSchema.statics = {
         return doc;
     },
 
+    async findBySmartContractAddress(smartContractAddress) {
+        const doc = await this.find({ smartContractAddress: smartContractAddress });
+        return doc;
+    },
+
     async updateById(id, body) {
         const doc = await this.findByIdAndUpdate(id, body, { new: true });
         return doc;

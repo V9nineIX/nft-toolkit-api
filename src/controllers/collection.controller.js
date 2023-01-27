@@ -11,6 +11,7 @@ import { GENERATE_COLLECTION, GENERATE_IMAGE } from "../constants";
 import { uploadToPinata } from '../ipfs/pinata'
 import { countFilesInDir, renameFile } from '../utils/filesHelper'
 import { createDirectory } from '../utils/directoryHelper'
+import { uploadToNftStorage  } from '../ipfs/nftStorage'
 
 
 const controller = {
@@ -371,7 +372,7 @@ const controller = {
     try {
       //TODO: upload collection to IPFS
       const { id } = params
-      const { jwtToken = null, provider = "pinata" } = body
+      const { jwtToken = null, provider = "nftstorage" } = body
 
 
       const collectionResult = await Collection.findByCollectionId(id)
@@ -380,15 +381,41 @@ const controller = {
       const { projectDir, name } = collectionResult[0]
       const imageFolder = `./folder/` + projectDir + '/build/image/'
       const jsonFolder = `./folder/` + projectDir + '/build/json/'
+      let uploadResult = null
 
-      const res = await uploadToPinata({
+     if(provider == "pinata") {
+        uploadResult  = await uploadToPinata({
+            collectionId: id,
+            buildFolder: imageFolder,
+            projectName: name,
+            projectDir: projectDir,
+            jsonFolder: jsonFolder,
+            JWTKey: jwtToken
+          })
+      }else{
+       // nft  storage
+   
+        uploadResult  = await uploadToNftStorage({
         collectionId: id,
         buildFolder: imageFolder,
         projectName: name,
         projectDir: projectDir,
         jsonFolder: jsonFolder,
-        JWTKey: jwtToken
-      })
+        })
+
+      }
+    
+
+     if( uploadResult ) {
+        const {ipfsImageHash=null , ipfsJsonHash=null} =  uploadResult 
+        await Collection.updateById(id , {
+            ipfsImageHash,
+            ipfsJsonHash
+        })
+    }
+
+
+      
 
       // console.log("res" ,res)
 

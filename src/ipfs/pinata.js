@@ -61,7 +61,6 @@ const uploadToPinata = async ({
    projectDir,
    buildFolder,
    jsonFolder,
-   job,
    JWTKey = null
 }) => {
     return new Promise( async (resolve ,reject) => {
@@ -120,14 +119,7 @@ const uploadToPinata = async ({
          
 
 
-              //TODO: update hash to database
-
-        await Collection.updateById(collectionId , {
-                ipfsImageHash:IpfsHash, 
-                ipfsJsonHash: ipfsJsonHash
-        })
-
-        resolve({ IpfsHash  , ipfsJsonHash })
+        resolve({  ipfsImageHash:IpfsHash , ipfsJsonHash:ipfsJsonHash })
 
        // console.log(resultJson)
         }catch(ex){

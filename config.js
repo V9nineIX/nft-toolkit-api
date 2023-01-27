@@ -26,7 +26,10 @@ const config = {
   pinataKey:{
     apiKey: process.env.PINNATA_API_KEY,
     apiSecretKey: process.env.PINNATA_SECRECT_KEY
-  }
+  },
+  nftStorageKey:{
+    apiKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweEJkNjkxMjY0NDEyMDA0YzM0RUZCN0M5RjliMEE5OEE4ZDFiRTY3QUEiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY3NDgwOTAzNzM3OCwibmFtZSI6Im5mdCJ9.0QshVOyQjjTY0-9fiKpp0DG-MfTwpcXBL1JAEDhGIZo"
+  } 
 };
 
 // if (process.env.NODE_ENV === "production") {

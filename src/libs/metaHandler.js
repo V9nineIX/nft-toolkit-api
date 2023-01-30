@@ -161,11 +161,104 @@ const deleteMeta = async({projectDir=null ,edition=null}) => {
     })
 }
 
+const fetchMeta = ({
+    projectDir =null,
+    offset = 0,
+    limit = null
+
+}) => {
+    return new Promise( async (resolve ,reject) => { 
+    let returnData = {
+            totalImage : 0 ,
+            meta : []
+        }
+
+    try {
+
+        // const metadata = JSON.parse(fs.readFileSync(`./folder/${projectDir}/build/json/metadata.json`, 'utf-8'));
+
+        const metadata  =  await loadMetaJson({projectDir})
+   
+        ///Filter
+        if (!isEmpty(filter)) {
+
+          let filterMetaData = []
+
+
+          for (const [index, meta] of metadata.entries()) {
+         
+
+            let isMatch = false
+
+            for (const filterObject of filter) {
+
+              const filterValue = mapValues(filterObject.value, method('toLowerCase')); //value:["body magic","bacgord"]
+
+
+              for (const attr of meta.attributes) {
+
+                if (toLower(attr.trait_type) == toLower(filterObject.key)) {
+                  if (!isEmpty(filterValue)) {
+                    if (includes(filterValue, toLower(attr.value))) {
+
+                      filterMetaData.push(meta)
+                      isMatch = true
+
+                    }
+                  }
+                }
+                if (isMatch) { // exit loop
+                  break
+                }
+              }
+              if (isMatch) { // exit loop
+                break
+              }
+
+            } // end loop filter
+
+          } // end loop
+
+          returnData.totalImage = filterMetaData.length
+          if (limit) {
+            returnData.meta = [...filterMetaData].slice(offset, limit)
+          } else {
+            returnData.meta = [...filterMetaData]
+          }
+
+
+        } // end if
+        else {
+            returnData.totalImage = metadata.length
+          if (limit) {
+            returnData.meta = [...metadata].slice(offset, limit)
+          } else {
+            returnData.meta = [...metadata]
+          }
+        }
+
+      } catch (ex) {
+        console.log("error", ex)
+        returnData.totalImage = 0
+        resolve(returnData)
+      }
+  
+      resolve(returnData)
+
+    })
+    
+}
+
+
+
+
+
 module.exports = {
     updateMeta,
     loadMetaJson,
     deleteMeta,
     writeMetaForIPFS,
-    updateMetaQty
+    updateMetaQty,
+    fetchMeta 
 
 }

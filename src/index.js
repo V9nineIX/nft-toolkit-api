@@ -23,7 +23,7 @@ const fs = require('fs');
 import Collection from "./models/collection.model";
 import { updateMeta, deleteMeta, updateMetaQty } from "./libs/metaHandler"
 import { getJsonDir } from './utils/directoryHelper'
-import { loadMetaJson } from './libs/metaHandler'
+import { loadMetaJson , fetchMeta  } from './libs/metaHandler'
 
 
 
@@ -152,80 +152,20 @@ const grapQLServer = new ApolloServer({
         const { projectDir } = res[0]
         res[0].imagePath = `/folder/${projectDir}/build/image/`
         //TODO: get meta from json file
+
         try {
+            const mataData = await fetchMeta({
+                projectDir,
+                offset,
+                limit
+            })
 
-          const metadata = JSON.parse(fs.readFileSync(`./folder/${projectDir}/build/json/metadata.json`, 'utf-8'));
-          //res[0].totalImage = metadata.length
+            res[0].totalImage   =  mataData.totalImage 
+            res[0].meta         =  mataData.meta
 
-          ///Filter
-          if (!isEmpty(filter)) {
-
-            let filterMetaData = []
-
-
-
-            for (const [index, meta] of metadata.entries()) {
-              //    if(limit && index == limit){
-              //         break
-              //    }
-
-              //    if(limit && index < offset){ // skip index less then offest
-              //       continue
-              //    }
-
-
-              let isMatch = false
-
-              for (const filterObject of filter) {
-
-                const filterValue = mapValues(filterObject.value, method('toLowerCase')); //value:["body magic","bacgord"]
-
-
-                for (const attr of meta.attributes) {
-
-                  if (toLower(attr.trait_type) == toLower(filterObject.key)) {
-                    if (!isEmpty(filterValue)) {
-                      if (includes(filterValue, toLower(attr.value))) {
-
-                        filterMetaData.push(meta)
-                        isMatch = true
-
-                      }
-                    }
-                  }
-                  if (isMatch) { // exit loop
-                    break
-                  }
-                }
-                if (isMatch) { // exit loop
-                  break
-                }
-
-              } // end loop filter
-
-            } // end loop
-
-            res[0].totalImage = filterMetaData.length
-            if (limit) {
-              res[0].meta = [...filterMetaData].slice(offset, limit)
-            } else {
-              res[0].meta = [...filterMetaData]
-            }
-
-
-          } // end if
-          else {
-            res[0].totalImage = metadata.length
-            if (limit) {
-              res[0].meta = [...metadata].slice(offset, limit)
-            } else {
-              res[0].meta = [...metadata]
-            }
-          }
-
-        } catch (ex) {
-          console.log("error", ex)
-          res[0].totalImage = 0
+        }catch(ex){
+            console.log("error",ex)
+            return res[0]
         }
         return res[0]
       },
@@ -240,80 +180,26 @@ const grapQLServer = new ApolloServer({
         res[0].imagePath = `/folder/${projectDir}/build/image/`
         //TODO: get meta from json file
         try {
+            const mataData = await fetchMeta({
+                projectDir,
+                offset,
+                limit
+            })
 
-          const metadata = JSON.parse(fs.readFileSync(`./folder/${projectDir}/build/json/metadata.json`, 'utf-8'));
+            res[0].totalImage   =  mataData.totalImage 
+            res[0].meta         =  mataData.meta
 
-          ///Filter
-          if (!isEmpty(filter)) {
-
-            let filterMetaData = []
-
-
-
-            for (const [index, meta] of metadata.entries()) {
-              //    if(limit && index == limit){
-              //         break
-              //    }
-
-              //    if(limit && index < offset){ // skip index less then offest
-              //       continue
-              //    }
-
-
-              let isMatch = false
-
-              for (const filterObject of filter) {
-
-                const filterValue = mapValues(filterObject.value, method('toLowerCase')); //value:["body magic","bacgord"]
-
-
-                for (const attr of meta.attributes) {
-
-                  if (toLower(attr.trait_type) == toLower(filterObject.key)) {
-                    if (!isEmpty(filterValue)) {
-                      if (includes(filterValue, toLower(attr.value))) {
-
-                        filterMetaData.push(meta)
-                        isMatch = true
-
-                      }
-                    }
-                  }
-                  if (isMatch) { // exit loop
-                    break
-                  }
-                }
-                if (isMatch) { // exit loop
-                  break
-                }
-
-              } // end loop filter
-
-            } // end loop
-
-            res[0].totalImage = filterMetaData.length
-            if (limit) {
-              res[0].meta = [...filterMetaData].slice(offset, limit)
-            } else {
-              res[0].meta = [...filterMetaData]
-            }
-
-
-          } // end if
-          else {
-            res[0].totalImage = metadata.length
-            if (limit) {
-              res[0].meta = [...metadata].slice(offset, limit)
-            } else {
-              res[0].meta = [...metadata]
-            }
-          }
-
-        } catch (ex) {
-          console.log("error", ex)
-          res[0].totalImage = 0
+        }catch(ex){
+            console.log("error",ex)
+            return res[0]
         }
+      
+
+
         return res[0]
+
+
+
       }
 
       ,

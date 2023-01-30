@@ -36,7 +36,8 @@ const grapQLServer = new ApolloServer({
         nft(id: String ,offset: Int, limit: Int , filter: [FilterParam] ):NFT,
         nftBySmartContractAddress(smartContractAddress: String ,offset: Int, limit: Int , filter: [FilterParam] ):NFT,
         #nftBySmartContractAddress(smartContractAddress: String ):NFT,
-        customToken(id: String ,offset: Int, limit: Int): CustomToken
+        customToken(id: String ,offset: Int, limit: Int): CustomToken,
+        metas(smartContractAddress: String): [LayerFilter],
       }
 
       type Attributes {
@@ -133,7 +134,14 @@ const grapQLServer = new ApolloServer({
           updateMeta(id: String , meta:MetaParam ):Boolean,
           updateMetaQty(id:String ,metaQtyParam:[MetaQtyParam], nftType: String ):Boolean
       }
- 
+
+      type LayerFilter {
+        id: String,
+        traitType: String,
+        value: String,
+        useCount: Int,
+      }
+
     `,
   resolvers: {
     Query: {
@@ -232,7 +240,6 @@ const grapQLServer = new ApolloServer({
 
       nftBySmartContractAddress: async (_, args) => {
 
-        //get collection info
         const { smartContractAddress, limit = null, offset = 0, filter = [] } = args
         const res = await Collection.findBySmartContractAddress(smartContractAddress);
 
@@ -314,7 +321,7 @@ const grapQLServer = new ApolloServer({
           res[0].totalImage = 0
         }
         return res[0]
-      }
+      },
 
 
       customToken: async (_, args) => {
@@ -358,7 +365,35 @@ const grapQLServer = new ApolloServer({
         }
 
         return result
-      }
+      },
+
+      metas: async (_, args) => {
+        const { smartContractAddress } = args
+        const res = await Collection.findBySmartContractAddress(smartContractAddress);
+
+        const result = []
+        try {
+          if (res[0]?.layers) {
+            res[0]?.layers.forEach((element, index) => {
+              element?.images.forEach((elementImage, indexImage) => {
+                const resStructure = {
+                  id: `${element?.name}.${elementImage?.name}`,
+                  traitType: element?.name,
+                  value: elementImage?.name,
+                  useCount: 0,
+                }
+                result.push(resStructure)
+              })
+            });
+
+          }
+        } catch (error) {
+          console.log('error', error)
+        }
+
+        return result
+      },
+
     },
     Mutation: {
       deleteMeta: async (_, { id, edition }) => {
@@ -420,7 +455,7 @@ const grapQLServer = new ApolloServer({
           throw new Error(ex)
         }
       }
-    }
+    },
   }
 })
 

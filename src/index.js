@@ -316,7 +316,7 @@ const grapQLServer = new ApolloServer({
         return res[0]
       }
 
-
+      ,
       customToken: async (_, args) => {
 
         //get collection info

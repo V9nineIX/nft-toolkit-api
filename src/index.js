@@ -253,18 +253,18 @@ const grapQLServer = new ApolloServer({
         const result = []
         try {
           if (res[0]?.layers) {
-            res[0]?.layers.forEach((element, index) => {
-              element?.images.forEach((elementImage, indexImage) => {
+            for (const element of res[0]?.layers) {
+
+              for (const elementImage of element?.images) {
                 const resStructure = {
-                  id: `${element?.name}.${elementImage?.name}`,
+                  id: `${element?.name}.${elementImage?.name.replaceAll(' ', '_')}`,
                   traitType: element?.name,
                   value: elementImage?.name,
                   useCount: 0,
                 }
                 result.push(resStructure)
-              })
-            });
-
+              }
+            }
           }
         } catch (error) {
           console.log('error', error)

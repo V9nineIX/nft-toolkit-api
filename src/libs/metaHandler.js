@@ -175,7 +175,6 @@ const fetchMeta = ({
 
     try {
 
-        // const metadata = JSON.parse(fs.readFileSync(`./folder/${projectDir}/build/json/metadata.json`, 'utf-8'));
 
         const metadata  =  await loadMetaJson({projectDir})
    
@@ -251,6 +250,144 @@ const fetchMeta = ({
 
 
 
+const fetchToken = ({
+    projectDir =null,
+    offset = 0,
+    limit = null,
+    filter = []
+
+}) => {
+    return new Promise( async (resolve ,reject) => { 
+    let returnData = {
+            totalImage : 0 ,
+            meta : []
+        }
+
+    try {
+
+     
+        const metadata  =  await loadMetaJson({projectDir})
+   
+
+          let filterMetaData = []
+
+
+          for (const [index, meta] of metadata.entries()) {
+         
+
+          let isMatch = false
+
+          if (!isEmpty(filter)) {
+             for (const filterObject of filter) {
+
+              const filterValue = mapValues(filterObject.value, method('toLowerCase')); //value:["body magic","bacgord"]
+
+
+              for (const attr of meta.attributes) {
+
+               
+
+                if (toLower(attr.trait_type) == toLower(filterObject.key)) {
+                  if (!isEmpty(filterValue)) {
+                    if (includes(filterValue, toLower(attr.value))) {
+
+                        const metaAttr = await convertAttrToTrait(meta)
+                        filterMetaData.push(convertToToken(meta, metaAttr))
+          
+
+                      isMatch = true
+
+                    }
+                  }
+                }
+                if (isMatch) { // exit loop
+                  break
+                }
+              }
+
+              if (isMatch) { // exit loop
+                break
+              }
+             } // if filter
+          }else{
+
+            const metaAttr = await convertAttrToTrait(meta)
+            filterMetaData.push(convertToToken(meta, metaAttr))
+          
+          }
+
+
+        } // end loop meta
+
+          returnData.totalImage = filterMetaData.length
+          if (limit) {
+            returnData.meta = [...filterMetaData].slice(offset, limit)
+          } else {
+            returnData.meta = [...filterMetaData]
+          }
+
+      } catch (ex) {
+        console.log("error", ex)
+        returnData.totalImage = 0
+        resolve(returnData)
+      }
+  
+      resolve(returnData)
+
+    })
+    
+}
+
+
+
+const convertToToken = (meta, metaAttr) => {
+    return {
+        id:  meta.edition,
+        tokenID: meta.edition,
+        tokenURI: "",
+        ipfsURI: "",
+        image: meta.rawImage,
+        name: meta.name,
+        description: meta.description,
+        updatedAtTimestamp: meta.date,
+        owner: {id:"" ,tokens:[] },
+        metas:  metaAttr
+
+    }
+}
+
+
+const convertAttrToTrait = (meta) => {
+
+    return new Promise( async (resolve ,reject) => { 
+      
+        let metaAttr = []
+        try {
+
+            for (const attr of meta.attributes) {
+
+                const trait_type =   attr.trait_type.replaceAll(' ', '_')
+                const value      =   attr.value.replaceAll(' ', '_')   
+    
+                metaAttr.push({
+                    "id": `${meta.edition}.${trait_type}.${value}`,
+                    "traitType": trait_type ,
+                    "value": value 
+                })
+    
+            }
+            resolve(metaAttr)
+
+        }catch(ex){
+            reject(ex)
+
+        }
+
+    })
+    
+} 
+
+
 
 
 module.exports = {
@@ -259,6 +396,7 @@ module.exports = {
     deleteMeta,
     writeMetaForIPFS,
     updateMetaQty,
-    fetchMeta 
+    fetchMeta ,
+    fetchToken
 
 }

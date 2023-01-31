@@ -128,6 +128,27 @@ const grapQLServer = new ApolloServer({
          count:String
       }
 
+
+      type Token  {
+            id: String,
+            tokenID: Int
+            tokenURI: String
+            ipfsURI: String
+            image: String
+            name: String
+            description: String
+            updatedAtTimestamp: Int!
+            owner: User!
+            metas: [Meta]
+      }
+
+      type User {
+        id: String,
+        tokens: [Token!]
+      }
+
+
+
       type Mutation {
           deleteMeta(id: String , edition: Int):Boolean,
           updateMeta(id: String , meta:MetaParam ):Boolean,

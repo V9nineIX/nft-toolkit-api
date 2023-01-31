@@ -23,7 +23,7 @@ const fs = require('fs');
 import Collection from "./models/collection.model";
 import { updateMeta, deleteMeta, updateMetaQty } from "./libs/metaHandler"
 import { getJsonDir } from './utils/directoryHelper'
-import { loadMetaJson , fetchMeta  } from './libs/metaHandler'
+import { loadMetaJson , fetchMeta  ,fetchToken } from './libs/metaHandler'
 
 
 
@@ -36,7 +36,9 @@ const grapQLServer = new ApolloServer({
         nft(id: String ,offset: Int, limit: Int , filter: [FilterParam] ):NFT,
         nftBySmartContractAddress(smartContractAddress: String ,offset: Int, limit: Int , filter: [FilterParam] ):NFT,
         #nftBySmartContractAddress(smartContractAddress: String ):NFT,
-        customToken(id: String ,offset: Int, limit: Int): CustomToken
+        customToken(id: String ,offset: Int, limit: Int): CustomToken,
+        metas(contractAddress: String): [LayerFilter],
+        tokens(contractAddress: String  , first:Int , skip:Int, filter: [FilterParam]  ):[Token]
       }
 
       type Attributes {
@@ -130,7 +132,7 @@ const grapQLServer = new ApolloServer({
 
 
       type Token  {
-            id: String,
+            id: Int,
             tokenID: Int
             tokenURI: String
             ipfsURI: String
@@ -139,12 +141,18 @@ const grapQLServer = new ApolloServer({
             description: String
             updatedAtTimestamp: Int!
             owner: User!
-            metas: [Meta]
+            metas: [Triat]
       }
 
       type User {
         id: String,
         tokens: [Token!]
+      }
+
+      type Triat {
+          id:String,
+          traitType: String,
+          value: String
       }
 
 
@@ -154,7 +162,14 @@ const grapQLServer = new ApolloServer({
           updateMeta(id: String , meta:MetaParam ):Boolean,
           updateMetaQty(id:String ,metaQtyParam:[MetaQtyParam], nftType: String ):Boolean
       }
- 
+
+      type LayerFilter {
+        id: String,
+        traitType: String,
+        value: String,
+        useCount: Int,
+      }
+
     `,
   resolvers: {
     Query: {
@@ -193,7 +208,6 @@ const grapQLServer = new ApolloServer({
 
       nftBySmartContractAddress: async (_, args) => {
 
-        //get collection info
         const { smartContractAddress, limit = null, offset = 0, filter = [] } = args
         const res = await Collection.findBySmartContractAddress(smartContractAddress);
 
@@ -214,16 +228,9 @@ const grapQLServer = new ApolloServer({
             console.log("error",ex)
             return res[0]
         }
-      
-
-
         return res[0]
+      },
 
-
-
-      }
-
-      ,
       customToken: async (_, args) => {
 
         //get collection info
@@ -265,35 +272,67 @@ const grapQLServer = new ApolloServer({
         }
 
         return result
-      }
-      ,tokens: async(_, args) => {
+      },
+      metas: async (_, args) => {
+        const { contractAddress } = args
+        const res = await Collection.findBySmartContractAddress(contractAddress);
+       
 
-        const { smartContractAddress, skip = null, first = 0 , orderBy="id"  } = args
+        const result = []
+        try {
+          if (res[0]?.layers) {
+            for (const element of res[0]?.layers) {
+
+              for (const elementImage of element?.images) {
+                const resStructure = {
+                  id: `${element?.name}.${elementImage?.name.replaceAll(' ', '_')}`,
+                  traitType: element?.name,
+                  value: elementImage?.name,
+                  useCount: 0,
+                }
+                result.push(resStructure)
+              }
+            }
+          }
+        } catch (error) {
+          console.log('error', error)
+        }
+
+        return result
+      },
+      tokens: async(_, args) => {
+
+         const { contractAddress, skip = null, first = 0 , filter=[] } = args
+        // const { smartContractAddress  } = args
 
         //TODO
-        const res = await Collection.findBySmartContractAddress(smartContractAddress);
+        const res = await Collection.findBySmartContractAddress(contractAddress);
 
         const { projectDir } = res[0]
         res[0].imagePath = `/folder/${projectDir}/build/image/`
+        
+        let  tokens = []
+        
 
         try {
-            const mataData = await fetchMeta({
+            const mataData = await fetchToken({
                 projectDir,
-                first,
-                skip
+                offset:first,
+                limit:skip
             })
-
-            res[0].totalImage   =  mataData.totalImage 
-            res[0].meta         =  mataData.meta
+            tokens = [...mataData.meta]
 
         }catch(ex){
             console.log("error",ex)
-            return res[0]
+            //return res[0]
+            return  tokens 
         }
-        return res[0]
+        return  tokens 
 
 
       } //  end tokens
+      
+
     },
     Mutation: {
       deleteMeta: async (_, { id, edition }) => {
@@ -355,7 +394,7 @@ const grapQLServer = new ApolloServer({
           throw new Error(ex)
         }
       }
-    }
+    },
   }
 })
 

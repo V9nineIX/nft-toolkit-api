@@ -318,7 +318,9 @@ const grapQLServer = new ApolloServer({
             const mataData = await fetchToken({
                 projectDir,
                 offset:first,
-                limit:skip
+                limit:skip ,
+                filter:filter 
+                 
             })
             tokens = [...mataData.meta]
 

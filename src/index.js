@@ -266,6 +266,34 @@ const grapQLServer = new ApolloServer({
 
         return result
       }
+      ,tokens: async(_, args) => {
+
+        const { smartContractAddress, skip = null, first = 0 , orderBy="id"  } = args
+
+        //TODO
+        const res = await Collection.findBySmartContractAddress(smartContractAddress);
+
+        const { projectDir } = res[0]
+        res[0].imagePath = `/folder/${projectDir}/build/image/`
+
+        try {
+            const mataData = await fetchMeta({
+                projectDir,
+                first,
+                skip
+            })
+
+            res[0].totalImage   =  mataData.totalImage 
+            res[0].meta         =  mataData.meta
+
+        }catch(ex){
+            console.log("error",ex)
+            return res[0]
+        }
+        return res[0]
+
+
+      } //  end tokens
     },
     Mutation: {
       deleteMeta: async (_, { id, edition }) => {

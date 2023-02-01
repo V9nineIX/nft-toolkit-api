@@ -38,7 +38,8 @@ const grapQLServer = new ApolloServer({
         #nftBySmartContractAddress(smartContractAddress: String ):NFT,
         customToken(id: String ,offset: Int, limit: Int): CustomToken,
         metas(contractAddress: String): [LayerFilter],
-        tokens(contractAddress: String  , first:Int , skip:Int, filter: [FilterParam]  ):[Token]
+        tokens(contractAddress: String  , first:Int , skip:Int, filter: [FilterParam]  ):[Token],
+        totalTokens(contractAddress: String):Int
       }
 
       type Attributes {
@@ -302,6 +303,7 @@ const grapQLServer = new ApolloServer({
       },
       tokens: async(_, args) => {
 
+
          const { contractAddress, skip = null, first = 0 , filter=[] } = args
         // const { smartContractAddress  } = args
 
@@ -332,8 +334,25 @@ const grapQLServer = new ApolloServer({
         return  tokens 
 
 
-      } //  end tokens
-      
+      }, //  end tokens
+      totalTokens : async(_, args) => {
+        const { contractAddress } = args
+
+        const res = await Collection.findBySmartContractAddress(contractAddress);
+        const { projectDir } = res[0]
+        let  countMeta = 0
+
+        //TODO 
+        try{
+           const metaData  =  await loadMetaJson({ projectDir})
+           countMeta = metaData.length
+
+        }catch(ex){
+            return countMeta
+        }
+        return countMeta
+
+      }
 
     },
     Mutation: {

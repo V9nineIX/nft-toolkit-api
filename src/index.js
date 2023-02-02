@@ -220,7 +220,8 @@ const grapQLServer = new ApolloServer({
             const mataData = await fetchMeta({
                 projectDir,
                 offset,
-                limit
+                limit,
+                filter
             })
 
             res[0].totalImage   =  mataData.totalImage 

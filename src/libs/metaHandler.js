@@ -164,7 +164,8 @@ const deleteMeta = async({projectDir=null ,edition=null}) => {
 const fetchMeta = ({
     projectDir =null,
     offset = 0,
-    limit = null
+    limit = null,
+    filter =[]
 
 }) => {
     return new Promise( async (resolve ,reject) => { 
@@ -174,7 +175,6 @@ const fetchMeta = ({
         }
 
     try {
-
 
         const metadata  =  await loadMetaJson({projectDir})
    
@@ -188,6 +188,7 @@ const fetchMeta = ({
          
 
             let isMatch = false
+            let matchCount = 0
 
             for (const filterObject of filter) {
 
@@ -198,23 +199,30 @@ const fetchMeta = ({
 
                 if (toLower(attr.trait_type) == toLower(filterObject.key)) {
                   if (!isEmpty(filterValue)) {
-                    if (includes(filterValue, toLower(attr.value))) {
+                    if (includes(filterValue, toLower(attr.value))) { // []
 
-                      filterMetaData.push(meta)
-                      isMatch = true
+                    //   filterMetaData.push(meta)
+                         matchCount++
+                    //  isMatch = true
 
                     }
                   }
                 }
-                if (isMatch) { // exit loop
-                  break
-                }
+                // if (isMatch) { // exit loop
+                //   break
+                // }
               }
-              if (isMatch) { // exit loop
-                break
-              }
+            //   if (isMatch) { // exit loop
+            //     break
+            //   }
 
             } // end loop filter
+        
+         
+
+            if( matchCount == filter.length){
+                 filterMetaData.push(meta)
+             }
 
           } // end loop
 
@@ -276,6 +284,7 @@ const fetchToken = ({
          
 
           let isMatch = false
+          let matchCount = 0
 
           if (!isEmpty(filter)) {
              for (const filterObject of filter) {
@@ -291,11 +300,11 @@ const fetchToken = ({
                   if (!isEmpty(filterValue)) {
                     if (includes(filterValue, toLower(attr.value))) {
 
-                        const metaAttr = await convertAttrToTrait(meta)
-                        filterMetaData.push(convertToToken(meta, metaAttr))
-          
+                        // const metaAttr = await convertAttrToTrait(meta)
+                        // filterMetaData.push(convertToToken(meta, metaAttr))
+                        // isMatch = true
 
-                      isMatch = true
+                        matchCount++
 
                     }
                   }
@@ -305,9 +314,15 @@ const fetchToken = ({
                 }
               }
 
-              if (isMatch) { // exit loop
-                break
-              }
+            //   if (isMatch) { // exit loop
+            //     break
+            //   }
+
+               if( matchCount == filter.length){
+                   const metaAttr = await convertAttrToTrait(meta)
+                   filterMetaData.push(convertToToken(meta, metaAttr))
+                }
+
              } // if filter
           }else{
 

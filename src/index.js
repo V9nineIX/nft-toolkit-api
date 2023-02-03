@@ -7,7 +7,7 @@ import bodyParser from "body-parser";
 const path = require('path')
 import cors from "cors"
 import { ApolloServer, gql } from "apollo-server-express";
-import { includes, isEmpty, toLower, method, mapValues, find, findIndex } from "lodash";
+import { includes, isEmpty, toLower, method, mapValues, find, findIndex , orderBy } from "lodash";
 
 // import { graphqlHTTP } from 'express-graphql'
 // import { buildSchema } from 'graphql'
@@ -21,9 +21,9 @@ import queueListeners from "./queues/queueListeners";
 import { API_POST_SIZE_LIMIT } from "./constants"
 const fs = require('fs');
 import Collection from "./models/collection.model";
-import { updateMeta, deleteMeta, updateMetaQty } from "./libs/metaHandler"
+import { updateMeta, deleteMeta, updateMetaQty  ,loadMetaJson , fetchMeta  ,fetchToken } from "./libs/metaHandler"
 import { getJsonDir } from './utils/directoryHelper'
-import { loadMetaJson , fetchMeta  ,fetchToken } from './libs/metaHandler'
+
 
 
 
@@ -283,8 +283,12 @@ const grapQLServer = new ApolloServer({
 
         const result = []
         try {
-          if (res[0]?.layers) {
-            for (const element of res[0]?.layers) {
+
+
+          const traitList = orderBy(res[0]?.layers ,["name"] ,['desc'])
+
+          if (traitList && traitList.length) {
+            for (const element of traitList) {
 
               for (const elementImage of element?.images) {
                 const resStructure = {
@@ -293,7 +297,7 @@ const grapQLServer = new ApolloServer({
                   value: elementImage?.name,
                   useCount: 0,
                 }
-                result.push(resStructure)
+                result.unshift(resStructure)
               }
             }
           }

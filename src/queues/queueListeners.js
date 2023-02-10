@@ -27,7 +27,7 @@ const queueListeners = (io = null) => {
 
 
     generateImageQueue.on('global:completed', async (job, result) => {
-        // console.log("Job Completed: ", "Result: ", result);
+         console.log("Job Completed: ", "Result: ", result);
 
         // TODO emit  to client
         const res = JSON.parse(result)
@@ -45,13 +45,13 @@ const queueListeners = (io = null) => {
 
         const imageDir =  res.projectDir+"/build/image"
         const maxSupply = await countFilesInDir(imageDir)
-        const collectionRes =  Collection.updateById(res.id ,{"status": "completed" ,"totalSupply":maxSupply })
+        // const collectionRes =  Collection.updateById(res.id ,{"status": "completed" ,"totalSupply":maxSupply })
 
         io.emit("generateCompleted", data);
     })
 
     generateImageQueue.on('global:failed', async (job, errorMsg) => {
-        // console.log("Job failed: ", "errorMsg: ", errorMsg);
+         console.log("Job failed: ", "errorMsg: ", errorMsg);
 
         const jobDetail = await generateImageQueue.getJob(job)
         handleFaild(jobDetail,io)
@@ -60,8 +60,9 @@ const queueListeners = (io = null) => {
 
     generateImageQueue.on('global:stalled', async (job) => {
          //CPU stalled
-
+         console.log("Job stalled");
         const jobDetail = await generateImageQueue.getJob(job)
+        console.log("jobDetail" , jobDetail)
       /// TODO  on stalled
        handleFaild(jobDetail,io)
 

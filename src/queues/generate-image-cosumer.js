@@ -31,6 +31,8 @@ const generateImageProcess = async (job, done) => {
 
   // TODO Set parameter
 
+return new Promise( async (resolve ,reject) => {  
+
   const { layerConfigurations = null,
     projectDir = null,
     id = null,
@@ -84,26 +86,12 @@ const generateImageProcess = async (job, done) => {
     if( res == "Error"){
       returnData.status = "Failed"
       done(new Error("Can not generate because total supply more than layer"), returnData)
+      reject(new Error("Can not generate because total supply more than layer"))
     } else {
-      //TODO upload to IPFS
-//       const result =  await uploadToPinata({
-//         layersElement,
-//         totalSupply,
-//         projectName,
-//         projectDir,
-//         buildFolder,
-//         jsonFolder,
-//         job
-//       })
-//     console.log(result)
-//      const jsonRes =  await uploadJson(jsonFolder ,projectName)
-
-//    console.log(jsonRes)
-    //   console.log("result",  result)
-
-      //TODO update ipfs hash to database
+    
      console.log("done")
       done(null, returnData)
+      resolve(returnData)
 
 
     }
@@ -112,8 +100,11 @@ const generateImageProcess = async (job, done) => {
     console.log(ex)
     returnData.status = "Failed"
     done(new Error("can not genImage"), returnData)
+    reject(new Error("can not genImage"))
   }
 
+
+}) // end promise
 
 
 

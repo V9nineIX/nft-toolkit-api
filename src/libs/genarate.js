@@ -630,18 +630,18 @@ const generateCollection = async ({
   return new Promise(async (resolve, reject) => {
     try {
 
-      let editionCount = 1
+      let editionCount = 0
       let progress = 0
       let metadataList = []
 
 
 
-      while (editionCount <= totalSupply) {
+      while (editionCount < totalSupply) {
 
         // console.log(" layersElement", layersElement)
         //TODO
         let loadedElements = [];
-        let { dna = null, layers, metaData } = layersElement[editionCount - 1]
+        let { dna = null, layers, metaData } = layersElement[editionCount]
         /// revers layer for genreate
         layers = _.reverse(layers)
 
@@ -684,8 +684,8 @@ const generateCollection = async ({
             // }
           })
 
-          saveImage(metaData.edition, buildFolder);
-          addMetadata(dna, metaData.edition, jsonFolder, metaData, null, metadataList, "json", false);
+          saveImage(editionCount, buildFolder);
+          addMetadata(dna, editionCount, jsonFolder, metaData, null, metadataList, "json", false);
 
           console.log(
             `Created edition: ${editionCount}, with DNA: `
@@ -695,7 +695,7 @@ const generateCollection = async ({
 
 
 
-        progress = ((editionCount / totalSupply) * 100).toFixed()
+        progress = (((editionCount+1)/ totalSupply) * 100).toFixed()
         console.log("progress ...", progress + "%");
         //TODO update progress
         if (job) {
@@ -708,7 +708,7 @@ const generateCollection = async ({
       } //end while gowEdition
 
 
-      // writeMetaData(JSON.stringify(metadataList, null, 2), jsonFolder);
+    //   writeMetaData(JSON.stringify(metadataList, null, 2), jsonFolder);
       await writeMergeMeta(metadataList, jsonFolder)
 
       // console.log("end loop")

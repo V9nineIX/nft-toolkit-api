@@ -23,15 +23,12 @@ function start() {
    console.log("worker start")
 //    orderQueue.process(orderProcess)
 
-   generateImageQueue.process(maxJobsPerWorker,(job ,done) => {
+   generateImageQueue.process(maxJobsPerWorker,async (job ,done) => {
 
      try {
-         generateImageProcess(job,done).then((result)=>{
-            console.log("worker result", result)
-            // done(result)
-        })
-
-      
+   
+      const  result =  await  generateImageProcess(job,done)
+      console.log("worker result", result)
     
      }catch(ex){
          console.log(ex)

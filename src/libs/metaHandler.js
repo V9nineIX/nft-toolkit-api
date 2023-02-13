@@ -115,7 +115,7 @@ const deleteMeta = async({projectDir=null ,edition=null}) => {
 
                 await addMetadata(
                              null, 
-                             index+1 ,
+                             index ,
                              jsonFolder,
                              meta,
                              IpfsHash,

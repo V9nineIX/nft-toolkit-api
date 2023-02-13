@@ -45,7 +45,7 @@ const queueListeners = (io = null) => {
 
         const imageDir =  res.projectDir+"/build/image"
         const maxSupply = await countFilesInDir(imageDir)
-        // const collectionRes =  Collection.updateById(res.id ,{"status": "completed" ,"totalSupply":maxSupply })
+         const collectionRes =  Collection.updateById(res.id ,{"status": "completed" ,"totalSupply":maxSupply })
 
         io.emit("generateCompleted", data);
     })

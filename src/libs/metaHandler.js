@@ -277,6 +277,7 @@ const fetchToken = ({
 
     try {
 
+
      
         const metadata  =  await loadMetaJson({projectDir})
    

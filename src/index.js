@@ -38,7 +38,7 @@ const grapQLServer = new ApolloServer({
         #nftBySmartContractAddress(smartContractAddress: String ):NFT,
         customToken(id: String ,offset: Int, limit: Int): CustomToken,
         metas(contractAddress: String): [LayerFilter],
-        tokens(contractAddress: String  , first:Int , skip:Int, filter: [FilterParam]  ):[Token],
+        tokens(contractAddress: String  , first:Int , skip:Int, filter: [FilterParam] ,  filterId:[Int]  ):[Token],
         totalTokens(contractAddress: String):Int
       }
 
@@ -310,7 +310,7 @@ const grapQLServer = new ApolloServer({
       tokens: async(_, args) => {
 
 
-         const { contractAddress, skip = null, first = 0 , filter=[] } = args
+         const { contractAddress, skip = null, first = 0 , filter=[] ,filterId=[] } = args
         // const { smartContractAddress  } = args
 
         //TODO
@@ -327,7 +327,8 @@ const grapQLServer = new ApolloServer({
                 projectDir,
                 offset:first,
                 limit:skip ,
-                filter:filter 
+                filter:filter ,
+                filterId:filterId
                  
             })
             tokens = [...mataData.meta]

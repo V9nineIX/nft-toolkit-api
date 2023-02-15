@@ -7,7 +7,8 @@ import { includes,
          mapValues ,
          find ,
          findIndex,
-         filter
+         filter ,
+         pull
         } from "lodash";
 import { writeMetaData ,addMetadata } from './genarate'
 import { getJsonDir } from '../utils/directoryHelper'
@@ -177,6 +178,8 @@ const fetchMeta = ({
     try {
 
         const metadata  =  await loadMetaJson({projectDir})
+
+
    
         ///Filter
         if (!isEmpty(filter)) {
@@ -262,7 +265,8 @@ const fetchToken = ({
     projectDir =null,
     offset = 0,
     limit = null,
-    filter = []
+    filter = [],
+    filterId = []
 
 }) => {
     return new Promise( async (resolve ,reject) => { 
@@ -278,10 +282,10 @@ const fetchToken = ({
    
 
           let filterMetaData = []
+          let filterIdArray = [...filterId]
 
 
           for (const [index, meta] of metadata.entries()) {
-         
 
           let isMatch = false
           let matchCount = 0
@@ -326,13 +330,37 @@ const fetchToken = ({
              } // if filter
           }else{
 
-            const metaAttr = await convertAttrToTrait(meta)
-            filterMetaData.push(convertToToken(meta, metaAttr))
+
+            if(!isEmpty(filterId)){ // if has filterId
+
+                if(isEmpty(filterIdArray)){
+                    break; // exit if filter comlplete
+                }
+                
+                if(filterIdArray.includes(parseInt(meta.edition))){
+                   
+                    const metaAttr = await convertAttrToTrait(meta)
+                    filterMetaData.push(convertToToken(meta, metaAttr))
+
+                    filterIdArray = pull(filterIdArray ,parseInt(meta.edition) )  // pop out if match 
+                   
+                }
+
+
+
+            }else{
+
+                 const metaAttr = await convertAttrToTrait(meta)
+                 filterMetaData.push(convertToToken(meta, metaAttr))
+            }
+
+
           
           }
 
 
         } // end loop meta
+        // console.log("  filterMetaData",  filterMetaData)
 
           returnData.totalImage = filterMetaData.length
           if (limit) {

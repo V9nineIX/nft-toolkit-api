@@ -310,7 +310,7 @@ const grapQLServer = new ApolloServer({
       tokens: async(_, args) => {
 
 
-         const { contractAddress, skip = null, first = 0 , filter=[] ,filterId=[] } = args
+         const { contractAddress, skip = 0, first = 10 , filter=[] ,filterId=[] } = args
         // const { smartContractAddress  } = args
 
         //TODO
@@ -325,8 +325,8 @@ const grapQLServer = new ApolloServer({
         try {
             const mataData = await fetchToken({
                 projectDir,
-                offset:first,
-                limit:skip ,
+                offset:skip,
+                limit:first,
                 filter:filter ,
                 filterId:filterId
                  

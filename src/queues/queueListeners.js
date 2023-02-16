@@ -21,8 +21,10 @@ const queueListeners = (io = null) => {
             ownerId: ownerId,
             projectDir: projectDir
         }
-
-        io.emit("generateProgress", data);
+   
+        if(io){
+          io.emit("generateProgress", data);
+        }
     })
 
 
@@ -47,7 +49,9 @@ const queueListeners = (io = null) => {
         const maxSupply = await countFilesInDir(imageDir)
          const collectionRes =  Collection.updateById(res.id ,{"status": "completed" ,"totalSupply":maxSupply })
 
-        io.emit("generateCompleted", data);
+        if(io) {
+         io.emit("generateCompleted", data);
+        }
     })
 
     generateImageQueue.on('global:failed', async (job, errorMsg) => {
@@ -86,8 +90,9 @@ const  handleFaild = async (job ,io , message=null) => {
 
     const collectionRes = await Collection.updateStatus({ "id": id, "status": "failed" })
     
-
-    io.emit("generateFailed", data);
+    if(io){
+     io.emit("generateFailed", data);
+    }
 }
 
 export default queueListeners

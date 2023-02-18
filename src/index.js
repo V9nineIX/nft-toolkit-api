@@ -8,7 +8,7 @@ const path = require('path')
 import cors from "cors"
 import { ApolloServer, gql } from "apollo-server-express";
 import { includes, isEmpty, toLower, method, mapValues, find, findIndex , orderBy } from "lodash";
-
+import resize from  "./libs/resize"
 // import { graphqlHTTP } from 'express-graphql'
 // import { buildSchema } from 'graphql'
 const http = require('http');
@@ -461,6 +461,41 @@ app.use('/uploads', express.static('uploads'));
 app.use('/folder', express.static('folder'));
 
 app.use("/bull", serverAdapter.getRouter())
+
+
+
+app.get('/image/:path/:tokenId', (req, res) => {
+    // res.type('image/png');
+
+    // const  img =  "folder/8b90bb55-f0a1-4b80-b17f-a11582421cfe-NFT-happy/build/image/0.png"
+
+      // Extract the query-parameter
+    const widthString = req.query.w
+    const heightString = req.query.h
+    const format = req.query.format
+    const { path  ,tokenId } = req.params
+
+    const  img =  `folder/${path}/build/image/${tokenId}.png`
+
+      // Parse to integer if possible
+    let width, height
+    if (widthString) {
+        width = parseInt(widthString)
+    }
+    if (heightString) {
+        height = parseInt(heightString)
+    }
+
+
+    res.type(`image/${format || 'png'}`)
+
+     const basePath = process.cwd();
+     const imagePath = basePath+"/"+img
+    resize(imagePath ,format, width, height).pipe(res);
+})
+
+
+
 
 
 

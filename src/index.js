@@ -23,6 +23,9 @@ const fs = require('fs');
 import Collection from "./models/collection.model";
 import { updateMeta, deleteMeta, updateMetaQty  ,loadMetaJson , fetchMeta  ,fetchToken } from "./libs/metaHandler"
 import { getJsonDir } from './utils/directoryHelper'
+import httpStatus from "http-status";
+import APIError from './utils/api-error'
+import APIResponse from './utils/api-response'
 
 
 
@@ -465,9 +468,6 @@ app.use("/bull", serverAdapter.getRouter())
 
 
 app.get('/image/:path/:tokenId', (req, res) => {
-    // res.type('image/png');
-
-    // const  img =  "folder/8b90bb55-f0a1-4b80-b17f-a11582421cfe-NFT-happy/build/image/0.png"
 
       // Extract the query-parameter
     const widthString = req.query.w
@@ -475,23 +475,40 @@ app.get('/image/:path/:tokenId', (req, res) => {
     const format = req.query.format
     const { path  ,tokenId } = req.params
 
-    const  img =  `folder/${path}/build/image/${tokenId}.png`
+    try {
+   
+        const  img =  `folder/${path}/build/image/${tokenId}.png`
 
-      // Parse to integer if possible
-    let width, height
-    if (widthString) {
-        width = parseInt(widthString)
-    }
-    if (heightString) {
-        height = parseInt(heightString)
-    }
+        // Parse to integer if possible
+        let width, height
+        if (widthString) {
+            width = parseInt(widthString)
+        }
+        if (heightString) {
+            height = parseInt(heightString)
+        }
 
 
-    res.type(`image/${format || 'png'}`)
+        res.type(`image/${format || 'png'}`)
 
-     const basePath = process.cwd();
-     const imagePath = basePath+"/"+img
-    resize(imagePath ,format, width, height).pipe(res);
+        const basePath = process.cwd();
+        const imagePath = basePath+"/"+img
+
+        fs.access(imagePath , fs.constants.F_OK, (err) => {
+            if(err){
+                res.status(httpStatus.NOT_FOUND).send({ message: "Image not found" })
+            }else{
+                resize(imagePath ,format, width, height).pipe(res);
+            }
+        })
+
+
+   }catch(ex){
+
+    console.log("error",ex)
+   res.status(httpStatus.NOT_FOUND).send({ message: "Image not found" })
+
+   }
 })
 
 

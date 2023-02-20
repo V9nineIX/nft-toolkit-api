@@ -11,7 +11,7 @@ import { GENERATE_COLLECTION, GENERATE_IMAGE } from "../constants";
 import { uploadToPinata } from '../ipfs/pinata'
 import { countFilesInDir, renameFile } from '../utils/filesHelper'
 import { createDirectory } from '../utils/directoryHelper'
-import { uploadToNftStorage  } from '../ipfs/nftStorage'
+import { uploadToNftStorage } from '../ipfs/nftStorage'
 
 
 const controller = {
@@ -383,39 +383,39 @@ const controller = {
       const jsonFolder = `./folder/` + projectDir + '/build/json/'
       let uploadResult = null
 
-     if(provider == "pinata") {
-        uploadResult  = await uploadToPinata({
-            collectionId: id,
-            buildFolder: imageFolder,
-            projectName: name,
-            projectDir: projectDir,
-            jsonFolder: jsonFolder,
-            JWTKey: jwtToken
-          })
-      }else{
-       // nft  storage
-   
-        uploadResult  = await uploadToNftStorage({
-        collectionId: id,
-        buildFolder: imageFolder,
-        projectName: name,
-        projectDir: projectDir,
-        jsonFolder: jsonFolder,
+      if (provider == "pinata") {
+        uploadResult = await uploadToPinata({
+          collectionId: id,
+          buildFolder: imageFolder,
+          projectName: name,
+          projectDir: projectDir,
+          jsonFolder: jsonFolder,
+          JWTKey: jwtToken
+        })
+      } else {
+        // nft  storage
+
+        uploadResult = await uploadToNftStorage({
+          collectionId: id,
+          buildFolder: imageFolder,
+          projectName: name,
+          projectDir: projectDir,
+          jsonFolder: jsonFolder,
         })
 
       }
-    
 
-     if( uploadResult ) {
-        const {ipfsImageHash=null , ipfsJsonHash=null} =  uploadResult 
-        await Collection.updateById(id , {
-            ipfsImageHash,
-            ipfsJsonHash
+
+      if (uploadResult) {
+        const { ipfsImageHash = null, ipfsJsonHash = null } = uploadResult
+        await Collection.updateById(id, {
+          ipfsImageHash,
+          ipfsJsonHash
         })
-    }
+      }
 
 
-      
+
 
       // console.log("res" ,res)
 
@@ -466,7 +466,6 @@ const controller = {
 
       for (let i = 0; i < files.length; i++) {
         const fileName = files[i].filename;
-        lastedFileIndex++
 
 
         await renameFile('./folder/' + fileName, imageDir + '/' + lastedFileIndex + ".png",)
@@ -490,6 +489,7 @@ const controller = {
 
         metadataCustomTokenList.push(tempMetadata)
 
+        lastedFileIndex++
 
       } // end loop
 

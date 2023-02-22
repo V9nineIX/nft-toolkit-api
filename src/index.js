@@ -26,6 +26,7 @@ import { getJsonDir } from './utils/directoryHelper'
 import httpStatus from "http-status";
 import APIError from './utils/api-error'
 import APIResponse from './utils/api-response'
+import { createDirectory } from './utils/directoryHelper'
 
 
 
@@ -467,7 +468,7 @@ app.use("/bull", serverAdapter.getRouter())
 
 
 
-app.get('/image/:path/:tokenId', (req, res) => {
+app.get('/image/:path/:tokenId', async (req, res) => {
 
       // Extract the query-parameter
     const widthString = req.query.w
@@ -478,6 +479,13 @@ app.get('/image/:path/:tokenId', (req, res) => {
     try {
    
         const  img =  `folder/${path}/build/image/${tokenId}.png`
+        const  smallSizeFolder = `folder/${path}/build/imageW${widthString || "0" }/`
+        const  returnImage =  `${smallSizeFolder}${tokenId}.png`
+
+        const basePath = process.cwd();
+
+
+         await createDirectory(smallSizeFolder)
 
         // Parse to integer if possible
         let width, height
@@ -489,18 +497,30 @@ app.get('/image/:path/:tokenId', (req, res) => {
         }
 
 
-        res.type(`image/${format || 'png'}`)
 
-        const basePath = process.cwd();
+
         const imagePath = basePath+"/"+img
 
-        fs.access(imagePath , fs.constants.F_OK, (err) => {
+        fs.access(imagePath , fs.constants.F_OK, async (err) => {
             if(err){
                 res.status(httpStatus.NOT_FOUND).send({ message: "Image not found" })
             }else{
-                resize(imagePath ,format, width, height).pipe(res);
+
+                //todo  smallSize 
+              const stream  = await  resize(imagePath ,format, width, height , `${smallSizeFolder}${tokenId}.png`)
+
+               return stream.pipe(res)
             }
         })
+
+    
+
+
+
+
+
+
+    // }) //  end  read file
 
 
    }catch(ex){

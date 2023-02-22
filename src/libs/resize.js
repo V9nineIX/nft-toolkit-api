@@ -1,9 +1,19 @@
 const fs = require('fs')
 const sharp = require('sharp')
 
-module.exports = function resize(path, format, width, height) {
+module.exports = function resize(path, format, width, height,  smallSizeFolder) {
+
+
+   // Check if the file already exists in the smallSizeFolder directory
+  if (fs.existsSync(smallSizeFolder)) {
+    // If it does, return a readable stream to the existing file
+     return fs.createReadStream(smallSizeFolder);
+  }
+
+
   const readStream = fs.createReadStream(path)
   let transform = sharp()
+
 
   if (format) {
     transform = transform.toFormat(format)
@@ -13,5 +23,10 @@ module.exports = function resize(path, format, width, height) {
     transform = transform.resize(width, height)
   }
 
-  return readStream.pipe(transform)
+     const writeStream = fs.createWriteStream(smallSizeFolder);
+     readStream.pipe(transform).pipe(writeStream);
+
+     return readStream
+   //  return  readStream
+
 }

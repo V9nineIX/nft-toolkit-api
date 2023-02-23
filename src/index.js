@@ -7,7 +7,7 @@ import bodyParser from "body-parser";
 const path = require('path')
 import cors from "cors"
 import { ApolloServer, gql } from "apollo-server-express";
-import { includes, isEmpty, toLower, method, mapValues, find, findIndex , orderBy } from "lodash";
+import { includes, isEmpty, toLower, method, mapValues, find, findIndex , orderBy, uniqBy } from "lodash";
 import resize from  "./libs/resize"
 // import { graphqlHTTP } from 'express-graphql'
 // import { buildSchema } from 'graphql'
@@ -23,12 +23,10 @@ const fs = require('fs');
 import Collection from "./models/collection.model";
 import { updateMeta, deleteMeta, updateMetaQty  ,loadMetaJson , fetchMeta  ,fetchToken } from "./libs/metaHandler"
 import { getJsonDir } from './utils/directoryHelper'
-import { valueFromAST } from "graphql";
 import httpStatus from "http-status";
 import APIError from './utils/api-error'
 import APIResponse from './utils/api-response'
 import { createDirectory } from './utils/directoryHelper'
-
 
 
 
@@ -285,29 +283,48 @@ const grapQLServer = new ApolloServer({
         const { contractAddress } = args
         const res = await Collection.findBySmartContractAddress(contractAddress);
         const { projectDir } = res[0]
-        console.log('projectDir', projectDir);
 
-        const result = []
+        let result = []
+        let custom_token = []
         try {
           const metaData  =  await loadMetaJson({ projectDir })
-          const customToken = metaData.filter((item) => item.tokenType == "custom") // 5 items
-          let custom_token = customToken.map((item) => item.attributes)
+          const customToken = metaData.filter((item) => item.tokenType == "custom")
+          
+          if(!isEmpty(customToken)) {
+            for(const customValue of customToken){
+             
+              // custom token add arrtibute
+              if(!isEmpty(customValue.attributes)) {
+                for (const attrValue of customValue.attributes) {
+                  if(attrValue.value && attrValue.trait_type) {
+                    const resStructure = {
+                      id: `${attrValue?.trait_type}.${attrValue?.value.replaceAll(' ', '_')}`,
+                      traitType: attrValue?.trait_type,
+                      value: attrValue?.value,
+                      useCount: 0,
+                    }
+                    custom_token.push(resStructure)
+                  }
+                }
+              }
 
-          console.log('custom_token', custom_token);
 
-         
-          // for(const customValue of customToken ){
-          //   for (const attrValue of customValue.attributes) {
-          //     const resStructure = {
-          //       id: `${attrValue?.trait_type}.${attrValue?.value.replaceAll(' ', '_')}`,
-          //       traitType: attrValue?.trait_type,
-          //       value: attrValue?.value,
-          //       useCount: 0,
-          //     }
-
-          //     console.log(resStructure);
-          //   }
-          // }
+               // custom token add custom attributes
+               if(!isEmpty(customValue.customAttributes)){
+                for(const customAttr of customValue.customAttributes) {
+                  if(customAttr.value && customAttr.trait_type) {
+                    const resStructure = {
+                      id: `${customAttr?.trait_type}.${customAttr?.value.replaceAll(' ', '_')}`,
+                      traitType: customAttr?.trait_type,
+                      value: customAttr?.value,
+                      useCount: 0,
+                    }
+                    custom_token.push(resStructure)
+                  }
+                }
+              }
+            }
+          }
 
 
           const traitList = orderBy(res[0]?.layers ,["name"] ,['desc'])
@@ -329,6 +346,12 @@ const grapQLServer = new ApolloServer({
         } catch (error) {
           console.log('error', error)
         }
+
+        if(!isEmpty(custom_token)) {
+          const mergeArr = [...result, ...custom_token]
+          result = uniqBy(mergeArr, 'id')
+        }
+
 
         return result
       },

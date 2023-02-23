@@ -23,6 +23,7 @@ const fs = require('fs');
 import Collection from "./models/collection.model";
 import { updateMeta, deleteMeta, updateMetaQty  ,loadMetaJson , fetchMeta  ,fetchToken } from "./libs/metaHandler"
 import { getJsonDir } from './utils/directoryHelper'
+import { valueFromAST } from "graphql";
 
 
 
@@ -279,17 +280,37 @@ const grapQLServer = new ApolloServer({
       metas: async (_, args) => {
         const { contractAddress } = args
         const res = await Collection.findBySmartContractAddress(contractAddress);
-       
+        const { projectDir } = res[0]
+        console.log('projectDir', projectDir);
 
         const result = []
         try {
+          const metaData  =  await loadMetaJson({ projectDir })
+          const customToken = metaData.filter((item) => item.tokenType == "custom") // 5 items
+          let custom_token = customToken.map((item) => item.attributes)
+
+          console.log('custom_token', custom_token);
+
+         
+          // for(const customValue of customToken ){
+          //   for (const attrValue of customValue.attributes) {
+          //     const resStructure = {
+          //       id: `${attrValue?.trait_type}.${attrValue?.value.replaceAll(' ', '_')}`,
+          //       traitType: attrValue?.trait_type,
+          //       value: attrValue?.value,
+          //       useCount: 0,
+          //     }
+
+          //     console.log(resStructure);
+          //   }
+          // }
 
 
           const traitList = orderBy(res[0]?.layers ,["name"] ,['desc'])
-
+          
           if (traitList && traitList.length) {
             for (const element of traitList) {
-
+              
               for (const elementImage of element?.images) {
                 const resStructure = {
                   id: `${element?.name}.${elementImage?.name.replaceAll(' ', '_')}`,
@@ -390,8 +411,13 @@ const grapQLServer = new ApolloServer({
         try {
           const res = await Collection.findByCollectionId(id);
 
+
           const { projectDir } = res[0]
           const { edition = null, attributes = [], customAttributes = [] } = meta
+          // const metaData  =  await loadMetaJson({ projectDir })
+          // console.log('====', metaData);
+
+
 
           const metadata = await updateMeta({ projectDir, edition, attributes, customAttributes })
 

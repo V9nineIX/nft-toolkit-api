@@ -441,8 +441,6 @@ const grapQLServer = new ApolloServer({
 
           const { projectDir } = res[0]
           const { edition = null, attributes = [], customAttributes = [] } = meta
-          // const metaData  =  await loadMetaJson({ projectDir })
-          // console.log('====', metaData);
 
 
 

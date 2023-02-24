@@ -603,39 +603,39 @@ app.get('/image/:path/:tokenId', async (req, res) => {
 
 
 const httpServer = http.createServer(app);
-const io = socketIo(httpServer, { cors: { origin: "*" } });
+// const io = socketIo(httpServer, { cors: { origin: "*" } });
 
-app.use((req, res, next) => {
-  req.io = io;
-  return next();
-});
-
-
-io.on('connection', (socket) => {
-  // const { ownerId = null } = socket.handshake.query
-  // console.log('user connected', socket.handshake.query.ownerId);
-
-  // socket.on('disconnect', function () {
-  //   console.log('user disconnected');
-  // });
-
-  // console.log('====================================');
-  // console.log('connection server socket');
-  // console.log('====================================');
-
-})
+// app.use((req, res, next) => {
+//   req.io = io;
+//   return next();
+// });
 
 
-io.use((socket, next) => {
-  // if (!isEmpty(socket.handshake.query.ownerId)) {
-  //   next();
-  // } else {
-  //   next(new Error("invalid"));
-  // }
+// io.on('connection', (socket) => {
+//   // const { ownerId = null } = socket.handshake.query
+//   // console.log('user connected', socket.handshake.query.ownerId);
 
-  next();
+//   // socket.on('disconnect', function () {
+//   //   console.log('user disconnected');
+//   // });
 
-});
+//   // console.log('====================================');
+//   // console.log('connection server socket');
+//   // console.log('====================================');
+
+// })
+
+
+// io.use((socket, next) => {
+//   // if (!isEmpty(socket.handshake.query.ownerId)) {
+//   //   next();
+//   // } else {
+//   //   next(new Error("invalid"));
+//   // }
+
+//   next();
+
+// });
 
 
 // queueListeners(io)

@@ -7,8 +7,8 @@ import bodyParser from "body-parser";
 const path = require('path')
 import cors from "cors"
 import { ApolloServer, gql } from "apollo-server-express";
-import { includes, isEmpty, toLower, method, mapValues, find, findIndex , orderBy } from "lodash";
-import resize from  "./libs/resize"
+import { includes, isEmpty, toLower, method, mapValues, find, findIndex, orderBy } from "lodash";
+import resize from "./libs/resize"
 // import { graphqlHTTP } from 'express-graphql'
 // import { buildSchema } from 'graphql'
 const http = require('http');
@@ -21,13 +21,12 @@ import queueListeners from "./queues/queueListeners";
 import { API_POST_SIZE_LIMIT } from "./constants"
 const fs = require('fs');
 import Collection from "./models/collection.model";
-import { updateMeta, deleteMeta, updateMetaQty  ,loadMetaJson , fetchMeta  ,fetchToken } from "./libs/metaHandler"
+import { updateMeta, deleteMeta, updateMetaQty, loadMetaJson, fetchMeta, fetchToken } from "./libs/metaHandler"
 import { getJsonDir } from './utils/directoryHelper'
 import httpStatus from "http-status";
 import APIError from './utils/api-error'
 import APIResponse from './utils/api-response'
 import { createDirectory } from './utils/directoryHelper'
-
 
 
 
@@ -195,19 +194,19 @@ const grapQLServer = new ApolloServer({
         //TODO: get meta from json file
 
         try {
-            const mataData = await fetchMeta({
-                projectDir,
-                offset,
-                limit,
-                filter
-            })
+          const mataData = await fetchMeta({
+            projectDir,
+            offset,
+            limit,
+            filter
+          })
 
-            res[0].totalImage   =  mataData.totalImage 
-            res[0].meta         =  mataData.meta
+          res[0].totalImage = mataData.totalImage
+          res[0].meta = mataData.meta
 
-        }catch(ex){
-            console.log("error",ex)
-            return res[0]
+        } catch (ex) {
+          console.log("error", ex)
+          return res[0]
         }
         return res[0]
       },
@@ -221,19 +220,19 @@ const grapQLServer = new ApolloServer({
         res[0].imagePath = `/folder/${projectDir}/build/image/`
         //TODO: get meta from json file
         try {
-            const mataData = await fetchMeta({
-                projectDir,
-                offset,
-                limit,
-                filter
-            })
+          const mataData = await fetchMeta({
+            projectDir,
+            offset,
+            limit,
+            filter
+          })
 
-            res[0].totalImage   =  mataData.totalImage 
-            res[0].meta         =  mataData.meta
+          res[0].totalImage = mataData.totalImage
+          res[0].meta = mataData.meta
 
-        }catch(ex){
-            console.log("error",ex)
-            return res[0]
+        } catch (ex) {
+          console.log("error", ex)
+          return res[0]
         }
         return res[0]
       },
@@ -283,13 +282,13 @@ const grapQLServer = new ApolloServer({
       metas: async (_, args) => {
         const { contractAddress } = args
         const res = await Collection.findBySmartContractAddress(contractAddress);
-       
+
 
         const result = []
         try {
 
 
-          const traitList = orderBy(res[0]?.layers ,["name"] ,['desc'])
+          const traitList = orderBy(res[0]?.layers, ["name"], ['desc'])
 
           if (traitList && traitList.length) {
             for (const element of traitList) {
@@ -311,10 +310,10 @@ const grapQLServer = new ApolloServer({
 
         return result
       },
-      tokens: async(_, args) => {
+      tokens: async (_, args) => {
 
 
-         const { contractAddress, skip = 0, first = 10 , filter=[] ,filterId=[] } = args
+        const { contractAddress, skip = 0, first = 10, filter = [], filterId = [] } = args
         // const { smartContractAddress  } = args
 
         //TODO
@@ -322,44 +321,44 @@ const grapQLServer = new ApolloServer({
 
         const { projectDir } = res[0]
         res[0].imagePath = `/folder/${projectDir}/build/image/`
-        
-        let  tokens = []
-        
+
+        let tokens = []
+
 
         try {
-            const mataData = await fetchToken({
-                projectDir,
-                offset:skip,
-                limit:first,
-                filter:filter ,
-                filterId:filterId
-                 
-            })
-            tokens = [...mataData.meta]
+          const mataData = await fetchToken({
+            projectDir,
+            offset: skip,
+            limit: first,
+            filter: filter,
+            filterId: filterId
 
-        }catch(ex){
-            console.log("error",ex)
-            //return res[0]
-            return  tokens 
+          })
+          tokens = [...mataData.meta]
+
+        } catch (ex) {
+          console.log("error", ex)
+          //return res[0]
+          return tokens
         }
-        return  tokens 
+        return tokens
 
 
       }, //  end tokens
-      totalTokens : async(_, args) => {
+      totalTokens: async (_, args) => {
         const { contractAddress } = args
 
         const res = await Collection.findBySmartContractAddress(contractAddress);
         const { projectDir } = res[0]
-        let  countMeta = 0
+        let countMeta = 0
 
         //TODO 
-        try{
-           const metaData  =  await loadMetaJson({ projectDir})
-           countMeta = metaData.length
+        try {
+          const metaData = await loadMetaJson({ projectDir })
+          countMeta = metaData.length
 
-        }catch(ex){
-            return countMeta
+        } catch (ex) {
+          return countMeta
         }
         return countMeta
 
@@ -468,52 +467,71 @@ app.use("/bull", serverAdapter.getRouter())
 
 
 
+/* Sever sent events */
+app.get('/progressGenerateImageSSE', (req, res) => {
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive'
+  });
+
+  const time = (new Date()).toLocaleTimeString('en-GB', { timezone: 'asia/bangkok' });
+
+  res.write(`connection sever sent events ========= ${time} =========\n\n`);
+
+  queueListeners(null, res)
+
+});
+/* Sever sent events */
+
+
+
 app.get('/image/:path/:tokenId', async (req, res) => {
 
-      // Extract the query-parameter
-    const widthString = req.query.w
-    const heightString = req.query.h
-    const format = req.query.format
-    const { path  ,tokenId } = req.params
+  // Extract the query-parameter
+  const widthString = req.query.w
+  const heightString = req.query.h
+  const format = req.query.format
+  const { path, tokenId } = req.params
 
-    try {
-   
-        const  img =  `folder/${path}/build/image/${tokenId}.png`
-        const  smallSizeFolder = `folder/${path}/build/imageW${widthString || "0" }/`
-        const  returnImage =  `${smallSizeFolder}${tokenId}.png`
+  try {
 
-        const basePath = process.cwd();
+    const img = `folder/${path}/build/image/${tokenId}.png`
+    const smallSizeFolder = `folder/${path}/build/imageW${widthString || "0"}/`
+    const returnImage = `${smallSizeFolder}${tokenId}.png`
 
-
-         await createDirectory(smallSizeFolder)
-
-        // Parse to integer if possible
-        let width, height
-        if (widthString) {
-            width = parseInt(widthString)
-        }
-        if (heightString) {
-            height = parseInt(heightString)
-        }
+    const basePath = process.cwd();
 
 
+    await createDirectory(smallSizeFolder)
+
+    // Parse to integer if possible
+    let width, height
+    if (widthString) {
+      width = parseInt(widthString)
+    }
+    if (heightString) {
+      height = parseInt(heightString)
+    }
 
 
-        const imagePath = basePath+"/"+img
 
-        fs.access(imagePath , fs.constants.F_OK, async (err) => {
-            if(err){
-                res.status(httpStatus.NOT_FOUND).send({ message: "Image not found" })
-            }else{
 
-                //todo  smallSize 
-              const stream  = await  resize(imagePath ,format, width, height , `${smallSizeFolder}${tokenId}.png`)
+    const imagePath = basePath + "/" + img
 
-               return stream.pipe(res)
-            }
-        })
+    fs.access(imagePath, fs.constants.F_OK, async (err) => {
+      if (err) {
+        res.status(httpStatus.NOT_FOUND).send({ message: "Image not found" })
+      } else {
 
-    
+        //todo  smallSize 
+        const stream = await resize(imagePath, format, width, height, `${smallSizeFolder}${tokenId}.png`)
+
+        return stream.pipe(res)
+      }
+    })
+
+
 
 
 
@@ -523,12 +541,12 @@ app.get('/image/:path/:tokenId', async (req, res) => {
     // }) //  end  read file
 
 
-   }catch(ex){
+  } catch (ex) {
 
-    console.log("error",ex)
-   res.status(httpStatus.NOT_FOUND).send({ message: "Image not found" })
+    console.log("error", ex)
+    res.status(httpStatus.NOT_FOUND).send({ message: "Image not found" })
 
-   }
+  }
 })
 
 
@@ -553,11 +571,9 @@ io.on('connection', (socket) => {
   //   console.log('user disconnected');
   // });
 
-
-  console.log('====================================');
-  console.log('connection server');
-  console.log('====================================');
-
+  // console.log('====================================');
+  // console.log('connection server socket');
+  // console.log('====================================');
 
 })
 
@@ -574,7 +590,7 @@ io.use((socket, next) => {
 });
 
 
-queueListeners(io)
+// queueListeners(io)
 
 // queuelistener()
 //  

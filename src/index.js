@@ -7,8 +7,8 @@ import bodyParser from "body-parser";
 const path = require('path')
 import cors from "cors"
 import { ApolloServer, gql } from "apollo-server-express";
-import { includes, isEmpty, toLower, method, mapValues, find, findIndex , orderBy, uniqBy } from "lodash";
-import resize from  "./libs/resize"
+import { includes, isEmpty, toLower, method, mapValues, find, findIndex, orderBy, uniqBy } from "lodash";
+import resize from "./libs/resize"
 // import { graphqlHTTP } from 'express-graphql'
 // import { buildSchema } from 'graphql'
 const http = require('http');
@@ -21,7 +21,7 @@ import queueListeners from "./queues/queueListeners";
 import { API_POST_SIZE_LIMIT } from "./constants"
 const fs = require('fs');
 import Collection from "./models/collection.model";
-import { updateMeta, deleteMeta, updateMetaQty  ,loadMetaJson , fetchMeta  ,fetchToken } from "./libs/metaHandler"
+import { updateMeta, deleteMeta, updateMetaQty, loadMetaJson, fetchMeta, fetchToken } from "./libs/metaHandler"
 import { getJsonDir } from './utils/directoryHelper'
 import httpStatus from "http-status";
 import APIError from './utils/api-error'
@@ -194,19 +194,19 @@ const grapQLServer = new ApolloServer({
         //TODO: get meta from json file
 
         try {
-            const mataData = await fetchMeta({
-                projectDir,
-                offset,
-                limit,
-                filter
-            })
+          const mataData = await fetchMeta({
+            projectDir,
+            offset,
+            limit,
+            filter
+          })
 
-            res[0].totalImage   =  mataData.totalImage 
-            res[0].meta         =  mataData.meta
+          res[0].totalImage = mataData.totalImage
+          res[0].meta = mataData.meta
 
-        }catch(ex){
-            console.log("error",ex)
-            return res[0]
+        } catch (ex) {
+          console.log("error", ex)
+          return res[0]
         }
         return res[0]
       },
@@ -220,19 +220,19 @@ const grapQLServer = new ApolloServer({
         res[0].imagePath = `/folder/${projectDir}/build/image/`
         //TODO: get meta from json file
         try {
-            const mataData = await fetchMeta({
-                projectDir,
-                offset,
-                limit,
-                filter
-            })
+          const mataData = await fetchMeta({
+            projectDir,
+            offset,
+            limit,
+            filter
+          })
 
-            res[0].totalImage   =  mataData.totalImage 
-            res[0].meta         =  mataData.meta
+          res[0].totalImage = mataData.totalImage
+          res[0].meta = mataData.meta
 
-        }catch(ex){
-            console.log("error",ex)
-            return res[0]
+        } catch (ex) {
+          console.log("error", ex)
+          return res[0]
         }
         return res[0]
       },
@@ -287,16 +287,16 @@ const grapQLServer = new ApolloServer({
         let result = []
         let custom_token = []
         try {
-          const metaData  =  await loadMetaJson({ projectDir })
+          const metaData = await loadMetaJson({ projectDir })
           const customToken = metaData.filter((item) => item.tokenType == "custom")
-          
-          if(!isEmpty(customToken)) {
-            for(const customValue of customToken){
-             
+
+          if (!isEmpty(customToken)) {
+            for (const customValue of customToken) {
+
               // custom token add arrtibute
-              if(!isEmpty(customValue.attributes)) {
+              if (!isEmpty(customValue.attributes)) {
                 for (const attrValue of customValue.attributes) {
-                  if(attrValue.value && attrValue.trait_type) {
+                  if (attrValue.value && attrValue.trait_type) {
                     const resStructure = {
                       id: `${attrValue?.trait_type}.${attrValue?.value.replaceAll(' ', '_')}`,
                       traitType: attrValue?.trait_type,
@@ -309,10 +309,10 @@ const grapQLServer = new ApolloServer({
               }
 
 
-               // custom token add custom attributes
-               if(!isEmpty(customValue.customAttributes)){
-                for(const customAttr of customValue.customAttributes) {
-                  if(customAttr.value && customAttr.trait_type) {
+              // custom token add custom attributes
+              if (!isEmpty(customValue.customAttributes)) {
+                for (const customAttr of customValue.customAttributes) {
+                  if (customAttr.value && customAttr.trait_type) {
                     const resStructure = {
                       id: `${customAttr?.trait_type}.${customAttr?.value.replaceAll(' ', '_')}`,
                       traitType: customAttr?.trait_type,
@@ -327,11 +327,11 @@ const grapQLServer = new ApolloServer({
           }
 
 
-          const traitList = orderBy(res[0]?.layers ,["name"] ,['desc'])
-          
+          const traitList = orderBy(res[0]?.layers, ["name"], ['desc'])
+
           if (traitList && traitList.length) {
             for (const element of traitList) {
-              
+
               for (const elementImage of element?.images) {
                 const resStructure = {
                   id: `${element?.name}.${elementImage?.name.replaceAll(' ', '_')}`,
@@ -347,7 +347,7 @@ const grapQLServer = new ApolloServer({
           console.log('error', error)
         }
 
-        if(!isEmpty(custom_token)) {
+        if (!isEmpty(custom_token)) {
           const mergeArr = [...result, ...custom_token]
           result = uniqBy(mergeArr, 'id')
         }
@@ -355,10 +355,10 @@ const grapQLServer = new ApolloServer({
 
         return result
       },
-      tokens: async(_, args) => {
+      tokens: async (_, args) => {
 
 
-         const { contractAddress, skip = 0, first = 10 , filter=[] ,filterId=[] } = args
+        const { contractAddress, skip = 0, first = 10, filter = [], filterId = [] } = args
         // const { smartContractAddress  } = args
 
         //TODO
@@ -366,44 +366,44 @@ const grapQLServer = new ApolloServer({
 
         const { projectDir } = res[0]
         res[0].imagePath = `/folder/${projectDir}/build/image/`
-        
-        let  tokens = []
-        
+
+        let tokens = []
+
 
         try {
-            const mataData = await fetchToken({
-                projectDir,
-                offset:skip,
-                limit:first,
-                filter:filter ,
-                filterId:filterId
-                 
-            })
-            tokens = [...mataData.meta]
+          const mataData = await fetchToken({
+            projectDir,
+            offset: skip,
+            limit: first,
+            filter: filter,
+            filterId: filterId
 
-        }catch(ex){
-            console.log("error",ex)
-            //return res[0]
-            return  tokens 
+          })
+          tokens = [...mataData.meta]
+
+        } catch (ex) {
+          console.log("error", ex)
+          //return res[0]
+          return tokens
         }
-        return  tokens 
+        return tokens
 
 
       }, //  end tokens
-      totalTokens : async(_, args) => {
+      totalTokens: async (_, args) => {
         const { contractAddress } = args
 
         const res = await Collection.findBySmartContractAddress(contractAddress);
         const { projectDir } = res[0]
-        let  countMeta = 0
+        let countMeta = 0
 
         //TODO 
-        try{
-           const metaData  =  await loadMetaJson({ projectDir})
-           countMeta = metaData.length
+        try {
+          const metaData = await loadMetaJson({ projectDir })
+          countMeta = metaData.length
 
-        }catch(ex){
-            return countMeta
+        } catch (ex) {
+          return countMeta
         }
         return countMeta
 
@@ -515,52 +515,71 @@ app.use("/bull", serverAdapter.getRouter())
 
 
 
+/* Sever sent events */
+app.get('/progressGenerateImageSSE', (req, res) => {
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive'
+  });
+
+  const time = (new Date()).toLocaleTimeString('en-GB', { timezone: 'asia/bangkok' });
+
+  res.write(`connection sever sent events ========= ${time} =========\n\n`);
+
+  queueListeners(null, res)
+
+});
+/* Sever sent events */
+
+
+
 app.get('/image/:path/:tokenId', async (req, res) => {
 
-      // Extract the query-parameter
-    const widthString = req.query.w
-    const heightString = req.query.h
-    const format = req.query.format
-    const { path  ,tokenId } = req.params
+  // Extract the query-parameter
+  const widthString = req.query.w
+  const heightString = req.query.h
+  const format = req.query.format
+  const { path, tokenId } = req.params
 
-    try {
-   
-        const  img =  `folder/${path}/build/image/${tokenId}.png`
-        const  smallSizeFolder = `folder/${path}/build/imageW${widthString || "0" }/`
-        const  returnImage =  `${smallSizeFolder}${tokenId}.png`
+  try {
 
-        const basePath = process.cwd();
+    const img = `folder/${path}/build/image/${tokenId}.png`
+    const smallSizeFolder = `folder/${path}/build/imageW${widthString || "0"}/`
+    const returnImage = `${smallSizeFolder}${tokenId}.png`
 
-
-         await createDirectory(smallSizeFolder)
-
-        // Parse to integer if possible
-        let width, height
-        if (widthString) {
-            width = parseInt(widthString)
-        }
-        if (heightString) {
-            height = parseInt(heightString)
-        }
+    const basePath = process.cwd();
 
 
+    await createDirectory(smallSizeFolder)
+
+    // Parse to integer if possible
+    let width, height
+    if (widthString) {
+      width = parseInt(widthString)
+    }
+    if (heightString) {
+      height = parseInt(heightString)
+    }
 
 
-        const imagePath = basePath+"/"+img
 
-        fs.access(imagePath , fs.constants.F_OK, async (err) => {
-            if(err){
-                res.status(httpStatus.NOT_FOUND).send({ message: "Image not found" })
-            }else{
 
-                //todo  smallSize 
-              const stream  = await  resize(imagePath ,format, width, height , `${smallSizeFolder}${tokenId}.png`)
+    const imagePath = basePath + "/" + img
 
-               return stream.pipe(res)
-            }
-        })
+    fs.access(imagePath, fs.constants.F_OK, async (err) => {
+      if (err) {
+        res.status(httpStatus.NOT_FOUND).send({ message: "Image not found" })
+      } else {
 
-    
+        //todo  smallSize 
+        const stream = await resize(imagePath, format, width, height, `${smallSizeFolder}${tokenId}.png`)
+
+        return stream.pipe(res)
+      }
+    })
+
+
 
 
 
@@ -570,12 +589,12 @@ app.get('/image/:path/:tokenId', async (req, res) => {
     // }) //  end  read file
 
 
-   }catch(ex){
+  } catch (ex) {
 
-    console.log("error",ex)
-   res.status(httpStatus.NOT_FOUND).send({ message: "Image not found" })
+    console.log("error", ex)
+    res.status(httpStatus.NOT_FOUND).send({ message: "Image not found" })
 
-   }
+  }
 })
 
 
@@ -584,44 +603,42 @@ app.get('/image/:path/:tokenId', async (req, res) => {
 
 
 const httpServer = http.createServer(app);
-const io = socketIo(httpServer, { cors: { origin: "*" } });
+// const io = socketIo(httpServer, { cors: { origin: "*" } });
 
-app.use((req, res, next) => {
-  req.io = io;
-  return next();
-});
-
-
-io.on('connection', (socket) => {
-  // const { ownerId = null } = socket.handshake.query
-  // console.log('user connected', socket.handshake.query.ownerId);
-
-  // socket.on('disconnect', function () {
-  //   console.log('user disconnected');
-  // });
+// app.use((req, res, next) => {
+//   req.io = io;
+//   return next();
+// });
 
 
-  console.log('====================================');
-  console.log('connection server');
-  console.log('====================================');
+// io.on('connection', (socket) => {
+//   // const { ownerId = null } = socket.handshake.query
+//   // console.log('user connected', socket.handshake.query.ownerId);
+
+//   // socket.on('disconnect', function () {
+//   //   console.log('user disconnected');
+//   // });
+
+//   // console.log('====================================');
+//   // console.log('connection server socket');
+//   // console.log('====================================');
+
+// })
 
 
-})
+// io.use((socket, next) => {
+//   // if (!isEmpty(socket.handshake.query.ownerId)) {
+//   //   next();
+//   // } else {
+//   //   next(new Error("invalid"));
+//   // }
+
+//   next();
+
+// });
 
 
-io.use((socket, next) => {
-  // if (!isEmpty(socket.handshake.query.ownerId)) {
-  //   next();
-  // } else {
-  //   next(new Error("invalid"));
-  // }
-
-  next();
-
-});
-
-
-queueListeners(io)
+// queueListeners(io)
 
 // queuelistener()
 //  

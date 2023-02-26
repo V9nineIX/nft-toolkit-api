@@ -19,7 +19,7 @@ import { deleteFileInDir,
         renameFile
      } from  '../utils/filesHelper' 
 import { COLECTION_ROOT_FOLDER } from "../constants"
-
+import { uploadToNftStorage } from '../ipfs/nftStorage'
 
 
 const getMetaDirectory = (projectDir) => {
@@ -118,6 +118,8 @@ const deleteMeta = async({projectDir=null ,edition=null}) => {
 
 
  const deleteBulkMeta = async({
+    id=null
+    name="",
     projectDir=null ,
     removeNumber=0 ,
     totalMint=10,   
@@ -222,9 +224,19 @@ const deleteMeta = async({projectDir=null ,edition=null}) => {
     //TODO : save new meta
     fs.writeFileSync( `${jsonFolder}/metadata.json`, JSON.stringify(newMetaData, null, 2));
 
+
+
     //TODO: upload ipfs reupload
 
+    const uploadResult = await uploadToNftStorage({
+        collectionId: id,
+        buildFolder: imageFolder,
+        projectName: name,
+        projectDir: projectDir,
+        jsonFolder: jsonFolder,
+      })
 
+   console.log("uploadResult",uploadResult)
 
 
 

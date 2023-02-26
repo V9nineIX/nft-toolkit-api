@@ -446,11 +446,13 @@ const grapQLServer = new ApolloServer({
 
         try {
           const res = await Collection.findByCollectionId(id);
-          const { projectDir } = res[0]
+          const { projectDir ,name } = res[0]
 
           console.log(res)
 
           const result = await  deleteBulkMeta({
+             id,
+             name,
              projectDir, 
              removeNumber,
              totalMint,
@@ -566,7 +568,7 @@ app.get('/progressGenerateImageSSE', (req, res) => {
 
   res.write(`connection sever sent events ========= ${time} =========\n\n`);
 
-  queueListeners(null, res)
+//   queueListeners(null, res)
 
 });
 /* Sever sent events */
@@ -677,7 +679,7 @@ const httpServer = http.createServer(app);
 // });
 
 
-// queueListeners(io)
+ queueListeners(null,null)
 
 // queuelistener()
 //  

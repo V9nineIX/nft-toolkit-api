@@ -33,10 +33,11 @@ const uploadToNftStorage = async ({
 
 
             const IpfsHash = await storage.storeDirectory( nftImageFiles )
+            console.log("IpfsHash ",IpfsHash )
 
             await writeMetaForIPFS({ projectDir:projectDir , IpfsHash:IpfsHash})
 
-
+  
             const jsonfiles = filesFromPath(jsonFolder, {
                 pathPrefix: path.resolve(jsonFolder), // see the note about pathPrefix below
                 hidden: true, // use the default of false if you want to ignore files that start with '.'

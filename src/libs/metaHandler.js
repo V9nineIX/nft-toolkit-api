@@ -118,7 +118,7 @@ const deleteMeta = async({projectDir=null ,edition=null}) => {
 
 
  const deleteBulkMeta = async({
-    id=null
+    id=null,
     name="",
     projectDir=null ,
     removeNumber=0 ,
@@ -228,19 +228,21 @@ const deleteMeta = async({projectDir=null ,edition=null}) => {
 
     //TODO: upload ipfs reupload
 
-    const uploadResult = await uploadToNftStorage({
-        collectionId: id,
-        buildFolder: imageFolder,
-        projectName: name,
-        projectDir: projectDir,
-        jsonFolder: jsonFolder,
-      })
+    // const uploadResult = await uploadToNftStorage({
+    //     collectionId: id,
+    //     buildFolder: imageFolder,
+    //     projectName: name,
+    //     projectDir: projectDir,
+    //     jsonFolder: jsonFolder,
+    //   })
 
-   console.log("uploadResult",uploadResult)
+//    console.log("uploadResult",uploadResult)
 
 
 
-     resolve(true)
+     resolve({
+        maxSupply : newMetaData.length
+     })
 
     } catch(ex){
         console.log("ex" ,ex)
@@ -587,14 +589,14 @@ const convertAttrToTrait = (meta) => {
 
 
 
-module.exports = {
+export {
     updateMeta,
     loadMetaJson,
     deleteMeta,
-    writeMetaForIPFS,
     updateMetaQty,
     fetchMeta ,
     fetchToken,
-    deleteBulkMeta
+    deleteBulkMeta,
+    writeMetaForIPFS
 
 }

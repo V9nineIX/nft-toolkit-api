@@ -450,7 +450,7 @@ const grapQLServer = new ApolloServer({
 
           console.log(res)
 
-          const result = await  deleteBulkMeta({
+          const resultDeleteBlukMeta = await  deleteBulkMeta({
              id,
              name,
              projectDir, 
@@ -459,7 +459,9 @@ const grapQLServer = new ApolloServer({
              excludedNumber
              })
 
-          console.log(result)
+          const { maxSupply } = resultDeleteBlukMeta 
+
+          const result = await Collection.updateById(id, { "totalSupply":  maxSupply , "status":"change"});
 
 
           if (result) {

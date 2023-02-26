@@ -9,7 +9,9 @@
     "test": "NODE_ENV=test mocha tests/**/*.test.js --require @babel/register --exit",
     "prod": "NODE_ENV=production  env-cmd -f .env.production  babel-node src/index.js",
     "worker": "babel-node src/worker.js",
-    "worker:dev": "nodemon --exec babel-node src/worker.js"
+    "worker:dev": "nodemon --exec babel-node src/worker.js",
+    "nodemon:wk": "nodemon --exec babel-node src/worker.js env-cmd -f .env.development --ignore ./folder/",
+    "nodemon": "nodemon --exec babel-node src/index.js env-cmd -f .env.development --ignore ./folder/"
   },
   "author": "",
   "license": "MIT",

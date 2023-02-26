@@ -21,7 +21,14 @@ import queueListeners from "./queues/queueListeners";
 import { API_POST_SIZE_LIMIT } from "./constants"
 const fs = require('fs');
 import Collection from "./models/collection.model";
-import { updateMeta, deleteMeta, updateMetaQty  ,loadMetaJson , fetchMeta  ,fetchToken } from "./libs/metaHandler"
+import { updateMeta,
+         deleteMeta, 
+         updateMetaQty  ,
+         loadMetaJson ,
+         fetchMeta  ,
+         fetchToken ,
+         deleteBulkMeta
+        } from "./libs/metaHandler"
 import { getJsonDir } from './utils/directoryHelper'
 import httpStatus from "http-status";
 import APIError from './utils/api-error'
@@ -163,6 +170,7 @@ const grapQLServer = new ApolloServer({
 
       type Mutation {
           deleteMeta(id: String , edition: Int):Boolean,
+          deleteBulkMeta(id:String , removeNumber:Int ,totalMint:Int , excludedNumber:Int):Boolean,
           updateMeta(id: String , meta:MetaParam ):Boolean,
           updateMetaQty(id:String ,metaQtyParam:[MetaQtyParam], nftType: String ):Boolean
       }
@@ -419,6 +427,37 @@ const grapQLServer = new ApolloServer({
           const { projectDir } = res[0]
 
           const result = await deleteMeta({ projectDir, edition })
+
+
+          if (result) {
+            status = true
+          }
+
+        } catch (ex) {
+          console.log(ex)
+        }
+
+        return status
+
+
+      },
+      deleteBulkMeta: async (_, { id, removeNumber ,totalMint , excludedNumber }) => {
+        let status = false
+
+        try {
+          const res = await Collection.findByCollectionId(id);
+          const { projectDir } = res[0]
+
+          console.log(res)
+
+          const result = await  deleteBulkMeta({
+             projectDir, 
+             removeNumber,
+             totalMint,
+             excludedNumber
+             })
+
+          console.log(result)
 
 
           if (result) {

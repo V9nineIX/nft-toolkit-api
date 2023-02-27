@@ -461,7 +461,7 @@ const grapQLServer = new ApolloServer({
 
           const { maxSupply } = resultDeleteBlukMeta 
 
-          const result = await Collection.updateById(id, { "totalSupply":  maxSupply , "status":"change"});
+          const result = await Collection.updateById(id, { "totalSupply":  maxSupply , "isHasUpdate": true});
 
 
           if (result) {

@@ -559,6 +559,8 @@ app.use("/bull", serverAdapter.getRouter())
 
 
 /* Sever sent events */
+
+app.setMaxListeners(0);
 app.get('/progressGenerateImageSSE', (req, res) => {
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
@@ -570,7 +572,7 @@ app.get('/progressGenerateImageSSE', (req, res) => {
 
   res.write(`connection sever sent events ========= ${time} =========\n\n`);
 
-//   queueListeners(null, res)
+  queueListeners(null, res)
 
 });
 /* Sever sent events */
@@ -681,7 +683,7 @@ const httpServer = http.createServer(app);
 // });
 
 
- queueListeners(null,null)
+//  queueListeners(null,null)
 
 // queuelistener()
 //  

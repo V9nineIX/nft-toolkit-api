@@ -102,6 +102,10 @@ const collectionSchema = new mongoose.Schema({
         type: String,
         default: "",
     },
+    isHasUpdate:{
+        type: Boolean,
+        default: false,
+    }
 },
     { timestamps: true }
 )

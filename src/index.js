@@ -21,7 +21,14 @@ import queueListeners from "./queues/queueListeners";
 import { API_POST_SIZE_LIMIT } from "./constants"
 const fs = require('fs');
 import Collection from "./models/collection.model";
-import { updateMeta, deleteMeta, updateMetaQty, loadMetaJson, fetchMeta, fetchToken } from "./libs/metaHandler"
+import { updateMeta,
+         deleteMeta, 
+         updateMetaQty  ,
+         loadMetaJson ,
+         fetchMeta  ,
+         fetchToken ,
+         deleteBulkMeta
+        } from "./libs/metaHandler"
 import { getJsonDir } from './utils/directoryHelper'
 import httpStatus from "http-status";
 import APIError from './utils/api-error'
@@ -163,6 +170,7 @@ const grapQLServer = new ApolloServer({
 
       type Mutation {
           deleteMeta(id: String , edition: Int):Boolean,
+          deleteBulkMeta(id:String , removeNumber:Int ,totalMint:Int , excludedNumber:Int):Boolean,
           updateMeta(id: String , meta:MetaParam ):Boolean,
           updateMetaQty(id:String ,metaQtyParam:[MetaQtyParam], nftType: String ):Boolean
       }
@@ -433,6 +441,41 @@ const grapQLServer = new ApolloServer({
 
 
       },
+      deleteBulkMeta: async (_, { id, removeNumber ,totalMint , excludedNumber }) => {
+        let status = false
+
+        try {
+          const res = await Collection.findByCollectionId(id);
+          const { projectDir ,name } = res[0]
+
+          console.log(res)
+
+          const resultDeleteBlukMeta = await  deleteBulkMeta({
+             id,
+             name,
+             projectDir, 
+             removeNumber,
+             totalMint,
+             excludedNumber
+             })
+
+          const { maxSupply } = resultDeleteBlukMeta 
+
+          const result = await Collection.updateById(id, { "totalSupply":  maxSupply , "isHasUpdate": true});
+
+
+          if (result) {
+            status = true
+          }
+
+        } catch (ex) {
+          console.log(ex)
+        }
+
+        return status
+
+
+      },
       updateMeta: async (_, { id, meta }) => {
         // console.log(meta)
         try {
@@ -516,6 +559,8 @@ app.use("/bull", serverAdapter.getRouter())
 
 
 /* Sever sent events */
+
+app.setMaxListeners(0);
 app.get('/progressGenerateImageSSE', (req, res) => {
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
@@ -638,7 +683,7 @@ const httpServer = http.createServer(app);
 // });
 
 
-// queueListeners(io)
+//  queueListeners(null,null)
 
 // queuelistener()
 //  

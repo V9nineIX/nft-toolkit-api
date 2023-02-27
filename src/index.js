@@ -34,6 +34,7 @@ import httpStatus from "http-status";
 import APIError from './utils/api-error'
 import APIResponse from './utils/api-response'
 import { createDirectory } from './utils/directoryHelper'
+const fse = require('fs-extra');
 
 
 
@@ -429,7 +430,8 @@ const grapQLServer = new ApolloServer({
             const sourceFolder = `./${COLECTION_ROOT_FOLDER}/${projectDir}/build`
             const destinationFolder = `./${COLECTION_ROOT_FOLDER}/${projectDir}/build-v1`
 
-            const copyStatus = await copyDirectory(destinationFolder, sourceFolder)
+            await fse.emptyDir(sourceFolder);
+            await copyDirectory(destinationFolder, sourceFolder)
             return true
           }
         } catch (ex) {

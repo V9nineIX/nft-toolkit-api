@@ -18,7 +18,7 @@ const { createBullBoard } = require('@bull-board/api')
 const { BullAdapter } = require('@bull-board/api/bullAdapter')
 import { generateImageQueue } from "./queues/generate-image-queue";
 import queueListeners from "./queues/queueListeners";
-import { API_POST_SIZE_LIMIT } from "./constants"
+import { API_POST_SIZE_LIMIT, COLECTION_ROOT_FOLDER } from "./constants"
 const fs = require('fs');
 import Collection from "./models/collection.model";
 import { updateMeta,
@@ -29,11 +29,12 @@ import { updateMeta,
          fetchToken ,
          deleteBulkMeta
         } from "./libs/metaHandler"
-import { getJsonDir } from './utils/directoryHelper'
+import { getJsonDir, copyDirectory } from './utils/directoryHelper'
 import httpStatus from "http-status";
 import APIError from './utils/api-error'
 import APIResponse from './utils/api-response'
 import { createDirectory } from './utils/directoryHelper'
+
 
 
 
@@ -49,7 +50,8 @@ const grapQLServer = new ApolloServer({
         customToken(id: String ,offset: Int, limit: Int): CustomToken,
         metas(contractAddress: String): [LayerFilter],
         tokens(contractAddress: String  , first:Int , skip:Int, filter: [FilterParam] ,  filterId:[Int]  ):[Token],
-        totalTokens(contractAddress: String):Int
+        totalTokens(contractAddress: String):Int,
+        restoreCollection(contractAddress: String): Boolean
       }
 
       type Attributes {
@@ -415,6 +417,24 @@ const grapQLServer = new ApolloServer({
         }
         return countMeta
 
+      },
+      restoreCollection: async (_, args) => {
+        const { contractAddress } = args
+
+        try {
+          const res = await Collection.findBySmartContractAddress(contractAddress);
+          const { projectDir } = res[0]
+
+          if(fs.existsSync(`./folder/${projectDir}/build-v1`)) {
+            const sourceFolder = `./${COLECTION_ROOT_FOLDER}/${projectDir}/build`
+            const destinationFolder = `./${COLECTION_ROOT_FOLDER}/${projectDir}/build-v1`
+
+            const copyStatus = await copyDirectory(destinationFolder, sourceFolder)
+            return true
+          }
+        } catch (ex) {
+          throw new Error(ex)
+        }
       }
 
     },

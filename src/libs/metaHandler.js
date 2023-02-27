@@ -421,8 +421,8 @@ const fetchToken = ({
     offset = 0,
     limit = null,
     filter = [],
-    filterId = []
-
+    filterId = [],
+    startIndex = 0
 }) => {
     return new Promise( async (resolve ,reject) => { 
     let returnData = {
@@ -445,6 +445,11 @@ const fetchToken = ({
 
           let isMatch = false
           let matchCount = 0
+
+
+          if(index < startIndex) {
+            continue
+          }
 
           if (!isEmpty(filter)) {
              for (const filterObject of filter) {

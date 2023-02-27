@@ -156,18 +156,17 @@ const deleteMeta = async({projectDir=null ,edition=null}) => {
     const removeCount = removeNumber;
     const rareCount =  excludedNumber
     const sliceItemIndex = removeCount+rareCount
-    const rareItemArray = metaData.slice(-rareCount) 
-
     const commonItemArray = metaData.slice(0, (-sliceItemIndex)) // remove from tail
-
-
-
-
-    let rareStartIndex = commonItemArray.length
-
+    
     const rarefileNames = [];
-    let rareStartEdition = rareItemArray[0].edition
-    const  newRaraItemArray  = rareItemArray.map( (item ,idx) => {
+    let rareStartEdition = 0
+    let newMetaData = []
+    
+    if(rareCount > 0) {
+      const rareItemArray = metaData.slice(-rareCount) 
+      let rareStartIndex = commonItemArray.length
+
+        const  newRaraItemArray  = rareItemArray.map( (item ,idx) => {
                
                 const edition =  rareStartIndex+idx
                 let name = item.name
@@ -177,7 +176,6 @@ const deleteMeta = async({projectDir=null ,edition=null}) => {
 
                 }
                 
-
                 rarefileNames.push(
                     { oldName: `${imageFolder}/${item.edition}.png` , newName: `${imageFolder}/${edition}.png` }
                 )
@@ -191,29 +189,30 @@ const deleteMeta = async({projectDir=null ,edition=null}) => {
                 return  item
             
             }
-    )
+      )
+
+     newMetaData =   [...commonItemArray ,...newRaraItemArray]
+     
+    } else {
+      newMetaData = [...commonItemArray]
+    }
 
 
-
-    const newMetaData =   [...commonItemArray ,...newRaraItemArray]
-    
-    
     // //  //TODO : delete image
-     const startDeleteNumber = rareStartEdition-removeCount
+     const startDeleteNumber = rareCount > 0 ? rareStartEdition-removeCount : commonItemArray.length  // 5
      const imageDeleteArray = Array(removeCount).fill().map((_, i) =>  `${ startDeleteNumber  + i}.png`);
-    //  console.log("imageDeleteArray start - end",imageDeleteArray[0] , imageDeleteArray[imageDeleteArray.length-1] )
-
 
     const  resultDeleteImage  =  await deleteImages(imageDeleteArray ,imageFolder)
 
-     console.log( resultDeleteImage )
 
+    if(rareCount > 0) {
      for( const [idx ,fileItem ] of  rarefileNames.entries()){
          await renameFile( fileItem.oldName , fileItem.newName)
      }
+    }
 
 
-    //  //TODO : delete json 
+     //TODO : delete json 
     const  jsonFolder         = getJsonDirectory(projectDir)
     const  resultDeleteJson   =  await deleteFileInDir({
                                      directoryPath:jsonFolder ,

@@ -26,10 +26,43 @@ function renameFile(original , dest) {
     })
 }
 
+ async function  deleteFileInDir({
+    directoryPath=null,
+    excludedFiles=[]}
+){
+    return new Promise( async  (resolve, reject) => {
+        const fsPromises = fs.promises;
+        console.log("directoryPath",directoryPath)
+        fs.readdir(directoryPath, async (err, files) => {
+            if (err) {
+                console.log("err",err)
+                throw err;
+            }
+
+            // Filter out excluded files
+            const filesToDelete = files.filter(file => !excludedFiles.includes(file));
+
+
+            const promises = filesToDelete.map(file =>
+                fsPromises.unlink(directoryPath+"/"+file)
+                .then(() => console.log(`Deleted file: ${file}`))
+            )
+
+            await Promise.all(promises)
+
+            resolve(true)
+
+        }); //  end read dir
+    })
+
+
+}
+
 
 
   module.exports = { 
     countFilesInDir: countFilesInDir,
-    renameFile:  renameFile
+    renameFile:  renameFile,
+    deleteFileInDir:  deleteFileInDir
 
   }

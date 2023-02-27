@@ -11,7 +11,15 @@ import { includes,
          pull
         } from "lodash";
 import { writeMetaData ,addMetadata } from './genarate'
-import { getJsonDir } from '../utils/directoryHelper'
+import { getJsonDir,
+       copyDirectory 
+} from '../utils/directoryHelper'
+import { deleteImages  } from  '../utils/imageHelper'
+import { deleteFileInDir,
+        renameFile
+     } from  '../utils/filesHelper' 
+import { COLECTION_ROOT_FOLDER } from "../constants"
+import { uploadToNftStorage } from '../ipfs/nftStorage'
 
 
 const getMetaDirectory = (projectDir) => {
@@ -105,6 +113,153 @@ const deleteMeta = async({projectDir=null ,edition=null}) => {
 
     })
  }
+
+
+
+
+ const deleteBulkMeta = async({
+    id=null,
+    name="",
+    projectDir=null ,
+    removeNumber=0 ,
+    totalMint=10,   
+    excludedNumber=10,
+    editions=[]}) => {
+    return new Promise( async (resolve ,reject) => { 
+
+        const sourceFolder      =   `./${COLECTION_ROOT_FOLDER}/${projectDir}/build`
+        const destinationFolder  =  `./${COLECTION_ROOT_FOLDER}/${projectDir}/build-v1`
+    
+
+    try {
+     //TODO delete bulk image
+
+     if( removeNumber <= 0){
+        reject(false)
+        throw new Error("removeNumber require")
+     }
+       
+
+    const imageFolder  = getImageDirectory(projectDir)
+
+
+    //copy backup dir
+
+    const  copyStatus =    await copyDirectory(sourceFolder   , destinationFolder )
+ 
+
+    // fetch meata json
+    const meta  =  await loadMetaJson({projectDir})
+    const metaData = [...meta]
+
+
+    const removeCount = removeNumber;
+    const rareCount =  excludedNumber
+    const sliceItemIndex = removeCount+rareCount
+    const rareItemArray = metaData.slice(-rareCount) 
+
+    const commonItemArray = metaData.slice(0, (-sliceItemIndex)) // remove from tail
+
+
+
+
+    let rareStartIndex = commonItemArray.length
+
+    const rarefileNames = [];
+    let rareStartEdition = rareItemArray[0].edition
+    const  newRaraItemArray  = rareItemArray.map( (item ,idx) => {
+               
+                const edition =  rareStartIndex+idx
+                let name = item.name
+                try {
+                   name =  item.name.split("#")[0]
+                }catch(ex){
+
+                }
+                
+
+                rarefileNames.push(
+                    { oldName: `${imageFolder}/${item.edition}.png` , newName: `${imageFolder}/${edition}.png` }
+                )
+            
+                item.edition =  edition  ,
+                item.name =  `${name}#${edition}` 
+                item.image =  `${edition}.png`
+                item.rawImage =  `${imageFolder}/${edition}.png`
+                
+
+                return  item
+            
+            }
+    )
+
+
+
+    const newMetaData =   [...commonItemArray ,...newRaraItemArray]
+    
+    
+    // //  //TODO : delete image
+     const startDeleteNumber = rareStartEdition-removeCount
+     const imageDeleteArray = Array(removeCount).fill().map((_, i) =>  `${ startDeleteNumber  + i}.png`);
+    //  console.log("imageDeleteArray start - end",imageDeleteArray[0] , imageDeleteArray[imageDeleteArray.length-1] )
+
+
+    const  resultDeleteImage  =  await deleteImages(imageDeleteArray ,imageFolder)
+
+     console.log( resultDeleteImage )
+
+     for( const [idx ,fileItem ] of  rarefileNames.entries()){
+         await renameFile( fileItem.oldName , fileItem.newName)
+     }
+
+
+    //  //TODO : delete json 
+    const  jsonFolder         = getJsonDirectory(projectDir)
+    const  resultDeleteJson   =  await deleteFileInDir({
+                                     directoryPath:jsonFolder ,
+                                     excludedFiles: ["metadata.json"]
+                                 })
+
+
+    //TODO : save new meta
+    fs.writeFileSync( `${jsonFolder}/metadata.json`, JSON.stringify(newMetaData, null, 2));
+
+
+
+    //TODO: upload ipfs reupload
+
+    // const uploadResult = await uploadToNftStorage({
+    //     collectionId: id,
+    //     buildFolder: imageFolder,
+    //     projectName: name,
+    //     projectDir: projectDir,
+    //     jsonFolder: jsonFolder,
+    //   })
+
+//    console.log("uploadResult",uploadResult)
+
+
+
+     resolve({
+        maxSupply : newMetaData.length
+     })
+
+    } catch(ex){
+        console.log("ex" ,ex)
+
+        //restore file
+        const  copyStatus =  await copyDirectory(destinationFolder   , sourceFolder )
+ 
+
+        reject(ex)
+
+    }
+      
+
+    })
+ }
+
+
 
  const writeMetaForIPFS = ({ projectDir=null , IpfsHash=null }) => {
     return new Promise( async (resolve ,reject) => { 
@@ -439,13 +594,14 @@ const convertAttrToTrait = (meta) => {
 
 
 
-module.exports = {
+export {
     updateMeta,
     loadMetaJson,
     deleteMeta,
-    writeMetaForIPFS,
     updateMetaQty,
     fetchMeta ,
-    fetchToken
+    fetchToken,
+    deleteBulkMeta,
+    writeMetaForIPFS
 
 }

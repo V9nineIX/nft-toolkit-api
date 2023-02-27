@@ -1,4 +1,5 @@
 import fs from 'fs'
+import fsextra  from 'fs-extra'
 
 const getJsonDir = (projectDir) => {
     return `./folder/${projectDir}/build/json`
@@ -24,10 +25,28 @@ const createDirectory =  async(directory) => {
         }
 
     })
-} 
+}
+
+const copyDirectory =  async(sourceFolder ,destinationFolder) => {
+    return new Promise( async (resolve ,reject) => {  
+       console.log(" destinationFolder", destinationFolder)
+           
+        fsextra.copy(sourceFolder, destinationFolder, (err) => {
+            if (err) {
+            console.error(err);
+            reject(err)
+            } else {
+            resolve(true)
+            console.log(`Successfully copied ${sourceFolder} to ${destinationFolder}`);
+            }
+        });
+    })
+
+}
 
 
 module.exports = {
     getJsonDir, 
-    createDirectory 
+    createDirectory,
+    copyDirectory 
 }

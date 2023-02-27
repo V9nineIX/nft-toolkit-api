@@ -51,7 +51,7 @@ const grapQLServer = new ApolloServer({
         metas(contractAddress: String): [LayerFilter],
         tokens(contractAddress: String  , first:Int , skip:Int, filter: [FilterParam] ,  filterId:[Int]  ):[Token],
         totalTokens(contractAddress: String):Int,
-        resetToken(contractAddress: String): Boolean
+        restoreCollection(contractAddress: String): Boolean
       }
 
       type Attributes {
@@ -418,7 +418,7 @@ const grapQLServer = new ApolloServer({
         return countMeta
 
       },
-      resetToken: async (_, args) => {
+      restoreCollection: async (_, args) => {
         const { contractAddress } = args
 
         try {

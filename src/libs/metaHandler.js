@@ -160,7 +160,7 @@ const deleteMeta = async({projectDir=null ,edition=null}) => {
 
     const commonItemArray = metaData.slice(0, (-sliceItemIndex)) // remove from tail
 
-    console.log( "commonItemArray  length" ,  commonItemArray.length)
+
 
 
     let rareStartIndex = commonItemArray.length
@@ -201,7 +201,7 @@ const deleteMeta = async({projectDir=null ,edition=null}) => {
     // //  //TODO : delete image
      const startDeleteNumber = rareStartEdition-removeCount
      const imageDeleteArray = Array(removeCount).fill().map((_, i) =>  `${ startDeleteNumber  + i}.png`);
-     console.log("imageDeleteArray start - end",imageDeleteArray[0] , imageDeleteArray[imageDeleteArray.length-1] )
+    //  console.log("imageDeleteArray start - end",imageDeleteArray[0] , imageDeleteArray[imageDeleteArray.length-1] )
 
 
     const  resultDeleteImage  =  await deleteImages(imageDeleteArray ,imageFolder)

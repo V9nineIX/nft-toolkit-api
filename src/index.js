@@ -7,7 +7,7 @@ import bodyParser from "body-parser";
 const path = require('path')
 import cors from "cors"
 import { ApolloServer, gql } from "apollo-server-express";
-import { includes, isEmpty, toLower, method, mapValues, find, findIndex, orderBy, uniqBy } from "lodash";
+import { includes, isEmpty, toLower, method, mapValues, find, findIndex, orderBy, uniqBy, result } from "lodash";
 import resize from "./libs/resize"
 // import { graphqlHTTP } from 'express-graphql'
 // import { buildSchema } from 'graphql'
@@ -21,14 +21,15 @@ import queueListeners from "./queues/queueListeners";
 import { API_POST_SIZE_LIMIT, COLECTION_ROOT_FOLDER } from "./constants"
 const fs = require('fs');
 import Collection from "./models/collection.model";
-import { updateMeta,
-         deleteMeta, 
-         updateMetaQty  ,
-         loadMetaJson ,
-         fetchMeta  ,
-         fetchToken ,
-         deleteBulkMeta
-        } from "./libs/metaHandler"
+import {
+  updateMeta,
+  deleteMeta,
+  updateMetaQty,
+  loadMetaJson,
+  fetchMeta,
+  fetchToken,
+  deleteBulkMeta
+} from "./libs/metaHandler"
 import { getJsonDir, copyDirectory } from './utils/directoryHelper'
 import httpStatus from "http-status";
 import APIError from './utils/api-error'
@@ -107,7 +108,7 @@ const grapQLServer = new ApolloServer({
          status:String,
          symbol:String,
          description:String,
-         totalSupply:String,
+         totalSupply:Int,
          projectDir:String,
          royaltyFee:Float,
          defaultPrice:Float,
@@ -120,7 +121,8 @@ const grapQLServer = new ApolloServer({
          ipfsImageHash:String,
          maxPublicSupply:Int,
          maxTokensPerAddress:Int,
-         smartContractAddress: String
+         smartContractAddress: String,
+         isHasUpdate: Boolean,
       }
 
       type CustomToken {
@@ -169,11 +171,15 @@ const grapQLServer = new ApolloServer({
           value: String
       }
 
+      type BulkMeta {
+        status: String,
+        totalSupply: Int
+    }
 
 
       type Mutation {
           deleteMeta(id: String , edition: Int):Boolean,
-          deleteBulkMeta(id:String , removeNumber:Int ,totalMint:Int , excludedNumber:Int):Boolean,
+          deleteBulkMeta(id:String , removeNumber:Int ,totalMint:Int , excludedNumber:Int):BulkMeta,
           updateMeta(id: String , meta:MetaParam ):Boolean,
           updateMetaQty(id:String ,metaQtyParam:[MetaQtyParam], nftType: String ):Boolean
       }
@@ -370,7 +376,7 @@ const grapQLServer = new ApolloServer({
       tokens: async (_, args) => {
 
 
-         const { contractAddress, skip = 0, first = 10 , filter=[] ,filterId=[] } = args
+        const { contractAddress, skip = 0, first = 10, filter = [], filterId = [] } = args
         // const { smartContractAddress  } = args
 
         //TODO
@@ -383,19 +389,19 @@ const grapQLServer = new ApolloServer({
 
 
         try {
-            const mataData = await fetchToken({
-                projectDir,
-                offset:skip,
-                limit:first,
-                filter:filter ,
-                filterId:filterId,
-            })
-            tokens = [...mataData.meta]
+          const mataData = await fetchToken({
+            projectDir,
+            offset: skip,
+            limit: first,
+            filter: filter,
+            filterId: filterId,
+          })
+          tokens = [...mataData.meta]
 
-        }catch(ex){
-            console.log("error",ex)
-            //return res[0]
-            return  tokens 
+        } catch (ex) {
+          console.log("error", ex)
+          //return res[0]
+          return tokens
         }
         return tokens
 
@@ -426,7 +432,7 @@ const grapQLServer = new ApolloServer({
           const res = await Collection.findByCollectionId(id); // find by collection id
           const { projectDir } = res[0]
 
-          if(fs.existsSync(`./folder/${projectDir}/build-v1`)) {
+          if (fs.existsSync(`./folder/${projectDir}/build-v1`)) {
             const sourceFolder = `./${COLECTION_ROOT_FOLDER}/${projectDir}/build`
             const destinationFolder = `./${COLECTION_ROOT_FOLDER}/${projectDir}/build-v1`
 
@@ -463,38 +469,42 @@ const grapQLServer = new ApolloServer({
 
 
       },
-      deleteBulkMeta: async (_, { id, removeNumber ,totalMint , excludedNumber }) => {
+      deleteBulkMeta: async (_, { id, removeNumber, totalMint, excludedNumber }) => {
         let status = false
+        let totalSupplyByID = 0
+
 
         try {
           const res = await Collection.findByCollectionId(id);
-          const { projectDir ,name } = res[0]
+          const { projectDir, name, totalSupply } = res[0]
+          totalSupplyByID = totalSupply
 
-          console.log(res)
+          const resultDeleteBlukMeta = await deleteBulkMeta({
+            id,
+            name,
+            projectDir,
+            removeNumber,
+            totalMint,
+            excludedNumber
+          })
 
-          const resultDeleteBlukMeta = await  deleteBulkMeta({
-             id,
-             name,
-             projectDir, 
-             removeNumber,
-             totalMint,
-             excludedNumber
-             })
+          const { maxSupply } = resultDeleteBlukMeta
 
-          const { maxSupply } = resultDeleteBlukMeta 
-
-          const result = await Collection.updateById(id, { "totalSupply":  maxSupply , "isHasUpdate": true});
-
+          const result = await Collection.updateById(id, { "totalSupply": maxSupply, "isHasUpdate": true });
 
           if (result) {
             status = true
+            totalSupplyByID = result?.totalSupply
           }
 
         } catch (ex) {
           console.log(ex)
         }
 
-        return status
+        return {
+          status: status,
+          totalSupply: totalSupplyByID
+        }
 
 
       },

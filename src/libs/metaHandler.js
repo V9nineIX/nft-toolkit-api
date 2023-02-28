@@ -320,8 +320,8 @@ const fetchMeta = ({
     projectDir =null,
     offset = 0,
     limit = null,
-    filter =[]
-
+    filter =[],
+    startIndex = 0
 }) => {
     return new Promise( async (resolve ,reject) => { 
     let returnData = {
@@ -346,6 +346,10 @@ const fetchMeta = ({
 
             let isMatch = false
             let matchCount = 0
+
+            if(index < startIndex) {
+              continue
+            }
 
             for (const filterObject of filter) {
 
@@ -421,7 +425,6 @@ const fetchToken = ({
     limit = null,
     filter = [],
     filterId = [],
-    startIndex = 0
 }) => {
     return new Promise( async (resolve ,reject) => { 
     let returnData = {
@@ -445,10 +448,6 @@ const fetchToken = ({
           let isMatch = false
           let matchCount = 0
 
-
-          if(index < startIndex) {
-            continue
-          }
 
           if (!isEmpty(filter)) {
              for (const filterObject of filter) {

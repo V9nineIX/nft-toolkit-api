@@ -45,7 +45,7 @@ const grapQLServer = new ApolloServer({
       type Query {
         hello: String,
         meta: Meta,
-        nft(id: String ,offset: Int, limit: Int , filter: [FilterParam] ):NFT,
+        nft(id: String ,offset: Int, limit: Int , filter: [FilterParam], startIndex: Int):NFT,
         nftBySmartContractAddress(smartContractAddress: String ,offset: Int, limit: Int , filter: [FilterParam] ):NFT,
         #nftBySmartContractAddress(smartContractAddress: String ):NFT,
         customToken(id: String ,offset: Int, limit: Int): CustomToken,
@@ -196,7 +196,7 @@ const grapQLServer = new ApolloServer({
       nft: async (_, args) => {
 
         //get collection info
-        const { id, limit = null, offset = 0, filter = [] } = args
+        const { id, limit = null, offset = 0, filter = [], startIndex = 0 } = args
         const res = await Collection.findByCollectionId(id);
 
 
@@ -209,7 +209,8 @@ const grapQLServer = new ApolloServer({
             projectDir,
             offset,
             limit,
-            filter
+            filter,
+            startIndex
           })
 
           res[0].totalImage = mataData.totalImage
@@ -369,7 +370,7 @@ const grapQLServer = new ApolloServer({
       tokens: async (_, args) => {
 
 
-         const { contractAddress, skip = 0, first = 10 , filter=[] ,filterId=[], startIndex = 0 } = args
+         const { contractAddress, skip = 0, first = 10 , filter=[] ,filterId=[] } = args
         // const { smartContractAddress  } = args
 
         //TODO
@@ -388,7 +389,6 @@ const grapQLServer = new ApolloServer({
                 limit:first,
                 filter:filter ,
                 filterId:filterId,
-                startIndex: startIndex 
             })
             tokens = [...mataData.meta]
 
@@ -420,10 +420,10 @@ const grapQLServer = new ApolloServer({
 
       },
       restoreCollection: async (_, args) => {
-        const { contractAddress } = args
+        const { id } = args
 
         try {
-          const res = await Collection.findBySmartContractAddress(contractAddress);
+          const res = await Collection.findByCollectionId(id); // find by collection id
           const { projectDir } = res[0]
 
           if(fs.existsSync(`./folder/${projectDir}/build-v1`)) {

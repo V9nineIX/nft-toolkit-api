@@ -320,11 +320,11 @@ const updateMetaQty = ({ projectDir = null, metaParam = [] }) => {
 }
 
 const fetchMeta = ({
-  projectDir = null,
-  offset = 0,
-  limit = null,
-  filter = []
-
+    projectDir =null,
+    offset = 0,
+    limit = null,
+    filter =[],
+    startIndex = 0
 }) => {
   return new Promise(async (resolve, reject) => {
     let returnData = {
@@ -350,7 +350,11 @@ const fetchMeta = ({
           let isMatch = false
           let matchCount = 0
 
-          for (const filterObject of filter) {
+            if(index < startIndex) {
+              continue
+            }
+
+            for (const filterObject of filter) {
 
             const filterValue = mapValues(filterObject.value, method('toLowerCase')); //value:["body magic","bacgord"]
 
@@ -419,12 +423,11 @@ const fetchMeta = ({
 
 
 const fetchToken = ({
-  projectDir = null,
-  offset = 0,
-  limit = null,
-  filter = [],
-  filterId = [],
-  startIndex = 0
+    projectDir =null,
+    offset = 0,
+    limit = null,
+    filter = [],
+    filterId = [],
 }) => {
   return new Promise(async (resolve, reject) => {
     let returnData = {
@@ -448,10 +451,6 @@ const fetchToken = ({
         let isMatch = false
         let matchCount = 0
 
-
-        if (index < startIndex) {
-          continue
-        }
 
         if (!isEmpty(filter)) {
           for (const filterObject of filter) {

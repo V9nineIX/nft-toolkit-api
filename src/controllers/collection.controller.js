@@ -460,6 +460,8 @@ const controller = {
 
       // count lasted file index
       let lastedFileIndex = await countFilesInDir(imageDir)
+      lastedFileIndex = lastedFileIndex - 1
+
 
       let dateTime = Date.now();
       let metadataCustomTokenList = []
@@ -505,6 +507,9 @@ const controller = {
         metadata = [...metadataCustomTokenList]
 
       }
+
+
+      const result = await Collection.updateById(collectionId, { "maxPublicSupply":  metadata.length , "totalSupply": metadata.length});
 
       writeMetaData(JSON.stringify(metadata, null, 2), jsonDir);
 

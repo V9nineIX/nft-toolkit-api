@@ -52,7 +52,6 @@ const grapQLServer = new ApolloServer({
         metas(contractAddress: String): [LayerFilter],
         tokens(contractAddress: String  , first:Int , skip:Int, filter: [FilterParam] ,  filterId:[Int]  ):[Token],
         totalTokens(contractAddress: String):Int,
-        restoreCollection(contractAddress: String): Boolean
       }
 
       type Attributes {
@@ -176,6 +175,7 @@ const grapQLServer = new ApolloServer({
           deleteBulkMeta(id:String , removeNumber:Int ,totalMint:Int , excludedNumber:Int):Boolean,
           updateMeta(id: String , meta:MetaParam ):Boolean,
           updateMetaQty(id:String ,metaQtyParam:[MetaQtyParam], nftType: String ):Boolean
+          restoreCollection(id: String): Boolean
       }
 
       type LayerFilter {
@@ -418,25 +418,6 @@ const grapQLServer = new ApolloServer({
         }
         return countMeta
 
-      },
-      restoreCollection: async (_, args) => {
-        const { id } = args
-
-        try {
-          const res = await Collection.findByCollectionId(id); // find by collection id
-          const { projectDir } = res[0]
-
-          if(fs.existsSync(`./folder/${projectDir}/build-v1`)) {
-            const sourceFolder = `./${COLECTION_ROOT_FOLDER}/${projectDir}/build`
-            const destinationFolder = `./${COLECTION_ROOT_FOLDER}/${projectDir}/build-v1`
-
-            await fse.emptyDir(sourceFolder);
-            await copyDirectory(destinationFolder, sourceFolder)
-            return true
-          }
-        } catch (ex) {
-          throw new Error(ex)
-        }
       }
 
     },
@@ -534,6 +515,26 @@ const grapQLServer = new ApolloServer({
 
           return updateStatus
 
+        } catch (ex) {
+          throw new Error(ex)
+        }
+      },
+      
+      restoreCollection: async (_, args) => {
+        const { id } = args
+
+        try {
+          const res = await Collection.findByCollectionId(id); // find by collection id
+          const { projectDir } = res[0]
+
+          if(fs.existsSync(`./folder/${projectDir}/build-v1`)) {
+            const sourceFolder = `./${COLECTION_ROOT_FOLDER}/${projectDir}/build`
+            const destinationFolder = `./${COLECTION_ROOT_FOLDER}/${projectDir}/build-v1`
+
+            await fse.emptyDir(sourceFolder);
+            await copyDirectory(destinationFolder, sourceFolder)
+            return true
+          }
         } catch (ex) {
           throw new Error(ex)
         }

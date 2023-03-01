@@ -459,8 +459,9 @@ const controller = {
       await createDirectory(imageDir) // make directory
 
       // count lasted file index
-      let lastedFileIndex = await countFilesInDir(imageDir)
-      lastedFileIndex = lastedFileIndex - 1
+      let lastedFileIndex = await countFilesInDir(imageDir) // image
+      // lastedFileIndex = lastedFileIndex - 1
+
 
 
       let dateTime = Date.now();

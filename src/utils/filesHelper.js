@@ -1,4 +1,5 @@
 import fs from 'fs'
+const fse = require('fs-extra');
 
 function countFilesInDir(dir) {
     return new Promise((resolve, reject) => {
@@ -59,10 +60,22 @@ function renameFile(original , dest) {
 }
 
 
+async function deleteFolder(folderPath) {
+  try {
+    await fse.remove(folderPath);
+    console.log(`Folder ${folderPath} deleted successfully`);
+  } catch (err) {
+    console.error(`Error deleting folder ${folderPath}: ${err}`);
+  }
+}
+
+
 
   module.exports = { 
     countFilesInDir: countFilesInDir,
     renameFile:  renameFile,
-    deleteFileInDir:  deleteFileInDir
+    deleteFileInDir:  deleteFileInDir,
+    deleteFolder: deleteFolder
+    
 
   }

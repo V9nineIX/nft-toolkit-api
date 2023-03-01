@@ -36,6 +36,7 @@ import APIError from './utils/api-error'
 import APIResponse from './utils/api-response'
 import { createDirectory } from './utils/directoryHelper'
 const fse = require('fs-extra');
+import { deleteFolder } from './utils/filesHelper'
 
 
 
@@ -122,6 +123,7 @@ const grapQLServer = new ApolloServer({
          maxTokensPerAddress:Int,
          smartContractAddress: String,
          isHasUpdate: Boolean,
+         version: [Version]
       }
 
       type CustomToken {
@@ -175,13 +177,21 @@ const grapQLServer = new ApolloServer({
         totalSupply: Int
     }
 
+    type Version {
+      version: Int,
+      ipfsImageHash: String,
+      ipfsJsonHash: String,
+      buildFolder: String,
+      totalSupply: Int
+    }
+
 
       type Mutation {
           deleteMeta(id: String , edition: Int):Boolean,
           deleteBulkMeta(id:String , removeNumber:Int ,totalMint:Int , excludedNumber:Int):BulkMeta,
           updateMeta(id: String , meta:MetaParam ):Boolean,
           updateMetaQty(id:String ,metaQtyParam:[MetaQtyParam], nftType: String ):Boolean
-          restoreCollection(id: String): Boolean
+          restoreCollection(id: String, versionNumber: Int): Boolean
       }
 
       type LayerFilter {
@@ -457,7 +467,7 @@ const grapQLServer = new ApolloServer({
 
         try {
           const res = await Collection.findByCollectionId(id);
-          const { projectDir, name, totalSupply } = res[0]
+          const { projectDir, name, totalSupply, ipfsImageHash, ipfsJsonHash, version } = res[0]
           totalSupplyByID = totalSupply
 
           const resultDeleteBlukMeta = await deleteBulkMeta({
@@ -466,12 +476,26 @@ const grapQLServer = new ApolloServer({
             projectDir,
             removeNumber,
             totalMint,
-            excludedNumber
+            excludedNumber,
+            version
           })
 
           const { maxSupply } = resultDeleteBlukMeta
 
-          const result = await Collection.updateById(id, { "totalSupply": maxSupply, "isHasUpdate": true });
+          let versionList = [...version]
+          // const sourceFolder = `./${COLECTION_ROOT_FOLDER}/${projectDir}/build`
+          const destinationFolder = `./${COLECTION_ROOT_FOLDER}/${projectDir}/build-v${version.length + 1}`
+
+              versionList.push({
+                version: version.length + 1,
+                ipfsImageHash: ipfsImageHash,
+                ipfsJsonHash: ipfsJsonHash,
+                buildFolder: destinationFolder,
+                totalSupply: totalSupplyByID
+              })
+
+
+          const result = await Collection.updateById(id, { "totalSupply": maxSupply, "isHasUpdate": true, "version": versionList });
 
           if (result) {
             status = true
@@ -531,18 +555,33 @@ const grapQLServer = new ApolloServer({
       },
 
       restoreCollection: async (_, args) => {
-        const { id } = args
+        const { id, versionNumber } = args
 
         try {
-          const res = await Collection.findByCollectionId(id); // find by collection id
-          const { projectDir } = res[0]
+          const res = await Collection.findByCollectionId(id);
+          const { projectDir, version } = res[0]
 
-          if(fs.existsSync(`./folder/${projectDir}/build-v1`)) {
+          const folderVersion = version[versionNumber - 1]
+          const { ipfsImageHash, ipfsJsonHash, totalSupply, buildFolder } = folderVersion
+
+          if(fs.existsSync(buildFolder)) {
             const sourceFolder = `./${COLECTION_ROOT_FOLDER}/${projectDir}/build`
-            const destinationFolder = `./${COLECTION_ROOT_FOLDER}/${projectDir}/build-v1`
-
             await fse.emptyDir(sourceFolder);
-            await copyDirectory(destinationFolder, sourceFolder)
+            await copyDirectory(buildFolder, sourceFolder)
+
+
+            let cloneVersion = [...version]
+            const newVersion = cloneVersion.slice(0,versionNumber - 1) // delete version after versionNumber
+
+            for(const item of cloneVersion) {
+              if(item.version >= versionNumber){
+              await deleteFolder(item?.buildFolder)
+              }
+            }
+
+            await Collection.updateById(id, {"ipfsImageHash": ipfsImageHash, "ipfsJsonHash": ipfsJsonHash, "totalSupply": totalSupply, "version": newVersion });
+
+
             return true
           }
         } catch (ex) {

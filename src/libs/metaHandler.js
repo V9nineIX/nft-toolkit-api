@@ -127,11 +127,13 @@ const deleteBulkMeta = async ({
   removeNumber = 0,
   totalMint = 10,
   excludedNumber = 10,
+  version = [],
   editions = [] }) => {
   return new Promise(async (resolve, reject) => {
 
     const sourceFolder = `./${COLECTION_ROOT_FOLDER}/${projectDir}/build`
-    const destinationFolder = `./${COLECTION_ROOT_FOLDER}/${projectDir}/build-v1`
+    // const destinationFolder = `./${COLECTION_ROOT_FOLDER}/${projectDir}/build-v1`
+    const destinationFolder = `./${COLECTION_ROOT_FOLDER}/${projectDir}/build-v${version.length + 1}`
 
 
     try {

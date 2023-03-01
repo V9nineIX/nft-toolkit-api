@@ -33,6 +33,29 @@ const LayerSchema = new mongoose.Schema({
     images: [ImageSchema]
 })
 
+const VersionSchema = new mongoose.Schema({
+    version: {
+        type: Number,
+        default: 1,
+    },
+    ipfsImageHash: {
+        type: String,
+        default: "",
+    },
+    ipfsJsonHash: {
+        type: String,
+        default: "",
+    },
+    buildFolder: {
+        type: String,
+        default: "",
+    },
+    totalSupply: {
+        type: Number,
+        default: 0
+    }
+})
+
 
 const collectionSchema = new mongoose.Schema({
     name: {
@@ -105,6 +128,10 @@ const collectionSchema = new mongoose.Schema({
     isHasUpdate:{
         type: Boolean,
         default: false,
+    },
+    version: {
+        type: [VersionSchema],
+        default: []
     }
 },
     { timestamps: true }

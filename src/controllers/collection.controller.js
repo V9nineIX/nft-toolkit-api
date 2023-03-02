@@ -545,6 +545,29 @@ const controller = {
   },
 
 
+  updatePhase: async ({ params, body }) => {
+    const { id } = params
+    const { phaseNumber = "", merkleTree = "", whiteListAddress = [] } = body
+
+    try {
+      const res = await Collection.findByCollectionId(id)
+      const { phase = [] } = res[0]
+
+      let newPhase = [...phase]
+      newPhase.push({ phaseNumber: phaseNumber, merkleTree: merkleTree, whiteListAddress: whiteListAddress })
+
+      const result = await Collection.updateById(id, { "phase": newPhase })
+
+      return new APIResponse(201, result);
+    } catch (ex) {
+      throw new APIError({
+        status: httpStatus.INTERNAL_SERVER_ERROR,
+        message: "Cannot update phase",
+      });
+    }
+  },
+
+
 
 
 }; //  end controller

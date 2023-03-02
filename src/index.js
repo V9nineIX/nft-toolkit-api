@@ -123,7 +123,8 @@ const grapQLServer = new ApolloServer({
          maxTokensPerAddress:Int,
          smartContractAddress: String,
          isHasUpdate: Boolean,
-         version: [Version]
+         version: [Version],
+         phase: [Phase]
       }
 
       type CustomToken {
@@ -183,6 +184,12 @@ const grapQLServer = new ApolloServer({
       ipfsJsonHash: String,
       buildFolder: String,
       totalSupply: Int
+    }
+
+    type Phase {
+      phaseNumber: Int,
+      merkleTree: String,
+      whiteListAddress: [String]
     }
 
 

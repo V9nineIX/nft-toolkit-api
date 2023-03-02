@@ -355,4 +355,32 @@ router.route("/uploadCustomToken").post(upload.array('files', MAX_FILE_UPLOAD), 
 router.route("/updateCollectionStatus/:id").patch(handle(controller.updateCollectionStatus));
 
 
+/**
+ * @swagger
+ * /v1/collection/setPhase/{id}:
+ *   patch:
+ *     tags: [Collection]
+ *     summary: update phase
+*     parameters:
+ *       - in: path
+ *         name: id
+ *         description: Collection Id
+ *         schema:
+ *           type: string
+ *           example: 63a4332da1d63ea7cc31327a
+ *       - in: body
+ *         name: body
+ *         description: Collection's information
+ *         schema:
+ *           type: object
+ *     responses:
+ *       201:
+ *         description: Return status create collection
+ *         schema:
+ *           type: object
+ */
+router.route("/setPhase/:id").patch(handle(controller.updatePhase));
+
+
+
 export default router;

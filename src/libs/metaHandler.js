@@ -94,14 +94,15 @@ const deleteMeta = async ({ projectDir = null, edition = null, res = [] }) => {
       let result = []
       // let rawImage = null
 
-      const imageDir = './folder/' + projectDir + "/" + `build/image`;
+      const imageDir = getImageDirectory(projectDir)
 
        //TODO : delete image
-       const removeImagePath = getImageDirectory(projectDir) + '/' + edition + ".png"
+       const removeImagePath = imageDir + '/' + edition + ".png"
        await fsx.remove(removeImagePath)
 
       
       for (const [idx, metaItem] of newMetadata.entries()) {
+        // loop update json metadata
         result.push({ ...metaItem, 
           name: `${res[0]?.name}#${idx}`,
           edition: idx,
@@ -109,6 +110,7 @@ const deleteMeta = async ({ projectDir = null, edition = null, res = [] }) => {
         })
 
 
+        // rename imgae file
         if(metaItem.edition > edition) {
           await renameFile(imageDir + '/' + metaItem.edition + ".png", `${imageDir}/${metaItem.edition - 1}.png`)
         }

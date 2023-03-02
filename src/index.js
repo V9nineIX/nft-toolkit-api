@@ -445,7 +445,7 @@ const grapQLServer = new ApolloServer({
           const res = await Collection.findByCollectionId(id);
           const { projectDir } = res[0]
 
-          const result = await deleteMeta({ projectDir, edition })
+          const result = await deleteMeta({ projectDir, edition, res })
 
           await Collection.updateById(id, { "totalSupply": result?.length, "maxPublicSupply": result?.length });
 

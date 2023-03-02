@@ -56,6 +56,21 @@ const VersionSchema = new mongoose.Schema({
     }
 })
 
+const PhaseSchema = new mongoose.Schema({
+    phaseNumber: {
+        type: Number,
+        default: 0,
+    },
+    merkleTree: {
+        type: String,
+        default: "",
+    },
+    whiteListAddress: {
+        type: Array,
+        default: []
+    }
+})
+
 
 const collectionSchema = new mongoose.Schema({
     name: {
@@ -131,6 +146,10 @@ const collectionSchema = new mongoose.Schema({
     },
     version: {
         type: [VersionSchema],
+        default: []
+    },
+    phase: {
+        type: [PhaseSchema],
         default: []
     }
 },

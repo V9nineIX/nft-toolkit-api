@@ -81,7 +81,7 @@ const updateMeta = async ({ projectDir = null, edition = null, attributes = [], 
   })  // end promise
 }
 
-const deleteMeta = async ({ projectDir = null, edition = null }) => {
+const deleteMeta = async ({ projectDir = null, edition = null, res = [] }) => {
   return new Promise(async (resolve, reject) => {
 
     if (!edition) {
@@ -93,17 +93,34 @@ const deleteMeta = async ({ projectDir = null, edition = null }) => {
       const newMetadata = filter(metadata, (item) => item.edition != edition)
       let result = []
       // let rawImage = null
+
+      const imageDir = getImageDirectory(projectDir)
+
+       //TODO : delete image
+       const removeImagePath = imageDir + '/' + edition + ".png"
+       await fsx.remove(removeImagePath)
+
+      
       for (const [idx, metaItem] of newMetadata.entries()) {
-        result.push({ ...metaItem, edition: idx })
+        // loop update json metadata
+        result.push({ ...metaItem, 
+          name: `${res[0]?.name}#${idx}`,
+          edition: idx,
+          rawImage: `${imageDir.substring(1)}/${idx}.png`,
+        })
+
+
+        // rename imgae file
+        if(metaItem.edition > edition) {
+          await renameFile(imageDir + '/' + metaItem.edition + ".png", `${imageDir}/${metaItem.edition - 1}.png`)
+        }
       }
+
 
       //TODO update meta json file
       writeMetaData(JSON.stringify(result, null, 2), getJsonDir(projectDir))
 
-      //TODO : delete image
-      const removeImagePath = getImageDirectory(projectDir) + '/' + edition + ".png"
-      await fsx.remove(removeImagePath)
-
+       
 
 
       resolve(result)

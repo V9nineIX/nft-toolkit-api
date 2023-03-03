@@ -56,7 +56,7 @@ const grapQLServer = new ApolloServer({
         metas(contractAddress: String): [LayerFilter],
         tokens(contractAddress: String  , first:Int , skip:Int, filter: [FilterParam] ,  filterId:[Int]  ):[Token],
         totalTokens(contractAddress: String):Int,
-        getMerkleProof(id: String, phaseNumber: Int, address: String): MerkleProof
+        getMerkleProof(contractAddress: String, phaseNumber: Int, address: String): MerkleProof
       }
 
       type Attributes {
@@ -452,9 +452,9 @@ const grapQLServer = new ApolloServer({
       },
 
       getMerkleProof: async (_, args) => {
-        const { id, phaseNumber, address } = args
+        const { contractAddress, phaseNumber, address } = args
 
-        const res = await Collection.findByCollectionId(id);
+        const res = await Collection.findBySmartContractAddress(contractAddress);
         const { phase = [] } = res[0]
 
         const findPhase = phase.find((item) => item.phaseNumber == phaseNumber)

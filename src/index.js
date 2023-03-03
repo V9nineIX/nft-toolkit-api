@@ -191,7 +191,6 @@ const grapQLServer = new ApolloServer({
 
     type Phase {
       phaseNumber: Int,
-      merkleTree: String,
       whiteListAddress: [String]
     }
 

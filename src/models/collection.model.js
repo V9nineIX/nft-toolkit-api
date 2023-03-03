@@ -61,10 +61,6 @@ const PhaseSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
-    merkleTree: {
-        type: String,
-        default: "",
-    },
     whiteListAddress: {
         type: Array,
         default: []

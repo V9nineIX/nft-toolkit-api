@@ -37,6 +37,8 @@ import APIResponse from './utils/api-response'
 import { createDirectory } from './utils/directoryHelper'
 const fse = require('fs-extra');
 import { deleteFolder } from './utils/filesHelper'
+const { MerkleTree } = require('merkletreejs')
+const keccak256 = require('keccak256')
 
 
 
@@ -54,6 +56,7 @@ const grapQLServer = new ApolloServer({
         metas(contractAddress: String): [LayerFilter],
         tokens(contractAddress: String  , first:Int , skip:Int, filter: [FilterParam] ,  filterId:[Int]  ):[Token],
         totalTokens(contractAddress: String):Int,
+        getMerkleProof(id: String, phaseNumber: Int, address: String): MerkleProof
       }
 
       type Attributes {
@@ -190,6 +193,11 @@ const grapQLServer = new ApolloServer({
       phaseNumber: Int,
       merkleTree: String,
       whiteListAddress: [String]
+    }
+
+    type MerkleProof {
+      root: String,
+      proof: [String]
     }
 
 
@@ -441,7 +449,42 @@ const grapQLServer = new ApolloServer({
         }
         return countMeta
 
-      }
+      },
+
+      getMerkleProof: async (_, args) => {
+        const { id, phaseNumber, address } = args
+
+        const res = await Collection.findByCollectionId(id);
+        const { phase = [] } = res[0]
+
+        const findPhase = phase.find((item) => item.phaseNumber == phaseNumber)
+        const { whiteListAddress } = findPhase
+
+        try {
+          const leaves = whiteListAddress.map(item => keccak256(item))
+          const tree = new MerkleTree(leaves, keccak256, { sort: true })
+          
+          // convert to string and start with 0x
+          const buf2hex = (value) => {
+            return `0x${value.toString('hex')}`
+          }
+
+          const root = buf2hex(tree.getRoot())
+
+          let proof = []
+          if(!isEmpty(address)) {
+          const leaf = buf2hex(keccak256(address))
+          proof = tree.getProof(leaf).map(x => buf2hex(x.data));
+          }
+
+          return { root, proof }
+
+        } catch (ex) {
+          console.log('err', ex);
+        }
+
+      },
+
 
     },
     Mutation: {

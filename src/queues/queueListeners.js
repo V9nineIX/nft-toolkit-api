@@ -31,11 +31,11 @@ const queueListeners = (io = null, resSSE = null) => {
                 io.emit("generateProgress", data);
             }
 
-            if (resSSE) {
-                const resData = `data: ${JSON.stringify(data)}\n\n`;
-                resSSE.write(resData);
-                //resSSE.end();
-            }
+            // if (resSSE) {
+            //     const resData = `data: ${JSON.stringify(data)}\n\n`;
+            //     resSSE.write(resData);
+            //     //resSSE.end();
+            // }
         } catch (error) {
             console.log(`error:`, error);
         }

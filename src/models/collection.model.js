@@ -146,7 +146,10 @@ const collectionSchema = new mongoose.Schema({
     },
     phase: {
         type: [PhaseSchema],
-        default: []
+        default: [{
+            phaseNumber: 0,
+            whiteListAddress: []
+        }]
     }
 },
     { timestamps: true }

@@ -685,7 +685,19 @@ app.use("/bull", serverAdapter.getRouter())
 
 /* Sever sent events */
 
-app.setMaxListeners(0);
+// app.setMaxListeners(0);
+require('events').EventEmitter.prototype._maxListeners = 0;
+require('events').defaultMaxListeners = 0;
+
+//   process.on('warning', function (err) {
+//     if ( 'MaxListenersExceededWarning' == err.name ) {
+//       console.log('o kurwa');
+//       // write to log function
+//       process.exit(1); // its up to you what then in my case script was hang
+
+//     }
+//   });
+
 app.get('/progressGenerateImageSSE', (req, res) => {
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
@@ -693,9 +705,9 @@ app.get('/progressGenerateImageSSE', (req, res) => {
     'Connection': 'keep-alive'
   });
 
-  const time = (new Date()).toLocaleTimeString('en-GB', { timezone: 'asia/bangkok' });
+//   const time = (new Date()).toLocaleTimeString('en-GB', { timezone: 'asia/bangkok' });
 
-  res.write(`connection sever sent events ========= ${time} =========\n\n`);
+//   res.write(`connection sever sent events ========= ${time} =========\n\n`);
 
   queueListeners(null, res)
 

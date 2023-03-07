@@ -178,14 +178,16 @@ const drawBackground = () => {
   ctx.fillRect(0, 0, format.width, format.height);
 };
 
-const addMetadata = (_dna,
+const addMetadata = (
+  _dna,
   _edition,
   jsonFolder = `${buildDir}/json`,
   metaData = null,
   ipfsHasId = null,
   metadataList = [],
   extension = "txt",
-  isWriteSingleJson = true
+  isWriteSingleJson = true,
+  imagePath = null
 ) => {
   return new Promise(async (resolve, reject) => {
 
@@ -196,12 +198,17 @@ const addMetadata = (_dna,
     if (!isEmpty(metaData.customAttributes)) {
       attributes = [...attributes, ...metaData.customAttributes]
     }
+    
+    let image = `ipfs://${ipfsHasId}/${_edition}.png`
+    if(imagePath){
+        image = imagePath
+    }
 
     let tempMetadata = {
       name: `${metaData?.name}`,
       description: metaData?.description || "",
       symbol: metaData?.symbol || "",
-      image: `ipfs://${ipfsHasId}/${_edition}.png`,
+      image: image,
       edition: _edition,
       date: dateTime,
       // ...extraMetadata,

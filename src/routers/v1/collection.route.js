@@ -379,7 +379,7 @@ router.route("/updateCollectionStatus/:id").patch(handle(controller.updateCollec
  *         schema:
  *           type: object
  */
-router.route("/setPhase/:id").patch(handle(controller.updatePhase));
+router.route("/setPhase/:id").patch(handle(controller.setPhase));
 
 
 

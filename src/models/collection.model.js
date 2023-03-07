@@ -61,10 +61,6 @@ const PhaseSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
-    merkleTree: {
-        type: String,
-        default: "",
-    },
     whiteListAddress: {
         type: Array,
         default: []
@@ -150,7 +146,10 @@ const collectionSchema = new mongoose.Schema({
     },
     phase: {
         type: [PhaseSchema],
-        default: []
+        default: [{
+            phaseNumber: 0,
+            whiteListAddress: []
+        }]
     }
 },
     { timestamps: true }

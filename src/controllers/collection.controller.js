@@ -558,18 +558,36 @@ const controller = {
   },
 
 
-  updatePhase: async ({ params, body }) => {
+  setPhase: async ({ params, body }) => {
     const { id } = params
-    const { phaseNumber = "", merkleTree = "", whiteListAddress = [] } = body
+    const { phaseNumber = "", whiteListAddress = [] } = body
 
     try {
       const res = await Collection.findByCollectionId(id)
       const { phase = [] } = res[0]
+      
+      const index = phase.findIndex((item) => item.phaseNumber == phaseNumber)
+      
+      let result = {}
+      if(index < 0) {
+        // add new phase
+        let newPhase = [...phase]
+        newPhase.push({ phaseNumber: phaseNumber, whiteListAddress: whiteListAddress })
+        result = await Collection.updateById(id, { "phase": newPhase })
+        
+      } else {
+        // update white list address
+        let newPhase = [...phase]
+        newPhase[index].whiteListAddress = whiteListAddress
+        result = await Collection.updateById(id, { "phase": newPhase })
+      }
 
-      let newPhase = [...phase]
-      newPhase.push({ phaseNumber: phaseNumber, merkleTree: merkleTree, whiteListAddress: whiteListAddress })
 
-      const result = await Collection.updateById(id, { "phase": newPhase })
+
+
+
+
+
 
       return new APIResponse(201, result);
     } catch (ex) {

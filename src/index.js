@@ -191,7 +191,6 @@ const grapQLServer = new ApolloServer({
 
     type Phase {
       phaseNumber: Int,
-      merkleTree: String,
       whiteListAddress: [String]
     }
 
@@ -776,6 +775,42 @@ app.get('/image/:path/:tokenId', async (req, res) => {
 
     console.log("error", ex)
     res.status(httpStatus.NOT_FOUND).send({ message: "Image not found" })
+
+  }
+})
+
+
+app.get('/meta/:path/:tokenId', async (req, res) => {
+  const { path, tokenId } = req.params
+
+  try {
+
+    const img = `folder/${path}/build/json/metadata.json`
+    const basePath = process.cwd();
+    const imagePath = basePath + "/" + img
+
+    //check if a file or directory exists 
+    fs.access(imagePath, fs.constants.F_OK, async (err) => {
+      if (err) {
+        res.status(httpStatus.NOT_FOUND).send({ message: "Meta not found" })
+      } else {
+          const id = tokenId.split('.json')[0]
+          const result = JSON.parse(fs.readFileSync(img, 'utf-8'));
+          const meta = result.find((item)=> item.edition == id)
+
+          if(!isEmpty(meta)){
+            res.status(httpStatus.OK).end(JSON.stringify(meta, null, 3))
+          } else {
+            res.status(httpStatus.NOT_FOUND).send({ message: "Meta not found" })
+          }
+      }
+    })
+
+
+  } catch (ex) {
+
+    console.log("error", ex)
+    res.status(httpStatus.NOT_FOUND).send({ message: "Meta not found" })
 
   }
 })

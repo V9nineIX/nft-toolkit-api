@@ -59,7 +59,7 @@ const VersionSchema = new mongoose.Schema({
 const PhaseSchema = new mongoose.Schema({
     phaseNumber: {
         type: Number,
-        default: 0,
+        default: 1,
     },
     whiteListAddress: {
         type: Array,
@@ -136,7 +136,7 @@ const collectionSchema = new mongoose.Schema({
         type: String,
         default: "",
     },
-    isHasUpdate:{
+    isHasUpdate: {
         type: Boolean,
         default: false,
     },
@@ -147,7 +147,7 @@ const collectionSchema = new mongoose.Schema({
     phase: {
         type: [PhaseSchema],
         default: [{
-            phaseNumber: 0,
+            phaseNumber: 1,
             whiteListAddress: []
         }]
     }

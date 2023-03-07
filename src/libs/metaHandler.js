@@ -612,7 +612,10 @@ const convertAttrToTrait = (meta) => {
 }
 
 
-const writeMetaForCustomServer = ({ projectDir = null }) => {
+const writeMetaForCustomServer = ({
+    projectDir = null ,
+    collectionInfo = null 
+   }) => {
     return new Promise(async (resolve, reject) => {
       try {
         const metadata = await loadMetaJson({ projectDir })
@@ -623,6 +626,11 @@ const writeMetaForCustomServer = ({ projectDir = null }) => {
   
         for (const [index, meta] of metadata.entries()) {
           const imageHost = `${API_DOMAIN_NAME}/image/${projectDir}/${index}.png`
+
+          meta.name         =  collectionInfo.name
+          meta.description  =  collectionInfo.description
+          meta.symbol        = collectionInfo.symbol
+
   
           await addMetadata(
             null,
@@ -638,7 +646,12 @@ const writeMetaForCustomServer = ({ projectDir = null }) => {
   
         } // end loop
   
-        resolve(true)
+  
+
+        resolve({  
+                 ipfsImageHash: `meta/${projectDir}` , 
+                 ipfsJsonHash:  `image/${projectDir}`
+                 })
   
       } catch (ex) {
         reject(new Error("Can not wirte metadata"))

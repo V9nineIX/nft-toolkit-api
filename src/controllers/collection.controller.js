@@ -379,7 +379,7 @@ const controller = {
       const collectionResult = await Collection.findByCollectionId(id)
 
 
-      const { projectDir, name } = collectionResult[0]
+      const { projectDir, name ,symbol ,description } = collectionResult[0]
       const imageFolder = `./folder/` + projectDir + '/build/image/'
       const jsonFolder = `./folder/` + projectDir + '/build/json/'
       let uploadResult = null
@@ -394,9 +394,14 @@ const controller = {
           JWTKey: jwtToken
         })
       }
-      else if(provider="custom"){
+      else if(provider=="custom"){
           // TODO :  upload custom server
-          uploadResult = await writeMetaForCustomServer(projectDir)
+          uploadResult = await writeMetaForCustomServer(
+            {
+            projectDir :  projectDir,
+            collectionInfo : collectionResult[0]
+            }
+        )
 
       } else {
         // nft  storage
@@ -408,7 +413,12 @@ const controller = {
         //   projectDir: projectDir,
         //   jsonFolder: jsonFolder,
         // })
-        uploadResult = await writeMetaForCustomServer(projectDir)
+        uploadResult = await writeMetaForCustomServer(
+            {
+            projectDir :  projectDir,
+            collectionInfo : collectionResult[0]
+            }
+        )
 
       }
 

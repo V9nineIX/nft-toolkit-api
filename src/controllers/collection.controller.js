@@ -12,6 +12,7 @@ import { uploadToPinata } from '../ipfs/pinata'
 import { countFilesInDir, renameFile } from '../utils/filesHelper'
 import { createDirectory } from '../utils/directoryHelper'
 import { uploadToNftStorage } from '../ipfs/nftStorage'
+import { writeMetaForCustomServer } from '../libs/metaHandler'
 
 
 const controller = {
@@ -392,18 +393,26 @@ const controller = {
           jsonFolder: jsonFolder,
           JWTKey: jwtToken
         })
+      }
+      else if(provider="custom"){
+          // TODO :  upload custom server
+          uploadResult = await writeMetaForCustomServer(projectDir)
+
       } else {
         // nft  storage
 
-        uploadResult = await uploadToNftStorage({
-          collectionId: id,
-          buildFolder: imageFolder,
-          projectName: name,
-          projectDir: projectDir,
-          jsonFolder: jsonFolder,
-        })
+        // uploadResult = await uploadToNftStorage({
+        //   collectionId: id,
+        //   buildFolder: imageFolder,
+        //   projectName: name,
+        //   projectDir: projectDir,
+        //   jsonFolder: jsonFolder,
+        // })
+        uploadResult = await writeMetaForCustomServer(projectDir)
 
       }
+
+      // todocheick
 
 
       if (uploadResult) {

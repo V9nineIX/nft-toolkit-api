@@ -21,7 +21,7 @@ import {
   deleteFileInDir,
   renameFile
 } from '../utils/filesHelper'
-import { COLECTION_ROOT_FOLDER } from "../constants"
+import { COLECTION_ROOT_FOLDER ,API_DOMAIN_NAME } from "../constants"
 import { uploadToNftStorage } from '../ipfs/nftStorage'
 
 
@@ -612,6 +612,43 @@ const convertAttrToTrait = (meta) => {
 }
 
 
+const writeMetaForCustomServer = ({ projectDir = null }) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const metadata = await loadMetaJson({ projectDir })
+        const jsonFolder = getJsonDirectory(projectDir)
+        const hostImage = API_DOMAIN_NAME
+
+   
+  
+        for (const [index, meta] of metadata.entries()) {
+          const imageHost = `${API_DOMAIN_NAME}/image/${projectDir}/${index}.png`
+  
+          await addMetadata(
+            null,
+            index,
+            jsonFolder,
+            meta,
+            null,
+            [],
+            "json",
+             true,
+             imageHost
+          )
+  
+        } // end loop
+  
+        resolve(true)
+  
+      } catch (ex) {
+        reject(new Error("Can not wirte metadata"))
+      }
+  
+  
+    })
+  
+  }
+
 
 
 export {
@@ -622,6 +659,7 @@ export {
   fetchMeta,
   fetchToken,
   deleteBulkMeta,
-  writeMetaForIPFS
+  writeMetaForIPFS,
+  writeMetaForCustomServer
 
 }

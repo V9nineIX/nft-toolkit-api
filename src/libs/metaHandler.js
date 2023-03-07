@@ -621,6 +621,7 @@ const writeMetaForCustomServer = ({
         const metadata = await loadMetaJson({ projectDir })
         const jsonFolder = getJsonDirectory(projectDir)
         const hostImage = API_DOMAIN_NAME
+        const result = []
 
    
   
@@ -631,7 +632,8 @@ const writeMetaForCustomServer = ({
           meta.description  =  collectionInfo.description
           meta.symbol        = collectionInfo.symbol
 
-  
+
+          //wirte each meta item
           await addMetadata(
             null,
             index,
@@ -644,7 +646,14 @@ const writeMetaForCustomServer = ({
              imageHost
           )
   
+          meta.image =  imageHost
+          result.push(meta)
+
         } // end loop
+
+
+        //wirte to metadata.json
+        writeMetaData(JSON.stringify(result, null, 2), jsonFolder)
   
   
 

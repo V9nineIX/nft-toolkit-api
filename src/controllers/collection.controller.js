@@ -406,20 +406,14 @@ const controller = {
       } else {
         // nft  storage
 
-        // uploadResult = await uploadToNftStorage({
-        //   collectionId: id,
-        //   buildFolder: imageFolder,
-        //   projectName: name,
-        //   projectDir: projectDir,
-        //   jsonFolder: jsonFolder,
-        // })
-        uploadResult = await writeMetaForCustomServer(
-            {
-            projectDir :  projectDir,
-            collectionInfo : collectionResult[0]
-            }
-        )
-
+        uploadResult = await uploadToNftStorage({
+          collectionId: id,
+          buildFolder: imageFolder,
+          projectName: name,
+          projectDir: projectDir,
+          jsonFolder: jsonFolder,
+        })
+  
       }
 
       // todocheick

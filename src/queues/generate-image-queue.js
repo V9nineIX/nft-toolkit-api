@@ -3,7 +3,6 @@ import config from "../../config";
 const { redis } = config
 
 const generateImageQueue = new Queue("generateImage" ,redis.url,{
-    redis:{ tls: true, enableTLSForSentinelMode: false },
     settings:{
         lockDuration:3600000,
         maxStalledCount:0

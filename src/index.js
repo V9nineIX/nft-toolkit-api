@@ -685,8 +685,8 @@ app.use("/bull", serverAdapter.getRouter())
 
 /* Sever sent events */
 
-// app.setMaxListeners(0);
-require('events').EventEmitter.prototype._maxListeners = 0;
+app.setMaxListeners(0);
+// require('events').EventEmitter.prototype._maxListeners = 0;
 require('events').defaultMaxListeners = 0;
 
 //   process.on('warning', function (err) {

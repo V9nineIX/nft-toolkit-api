@@ -626,7 +626,7 @@ const writeMetaForCustomServer = ({
    
   
         for (const [index, meta] of metadata.entries()) {
-          const imageHost = `${API_DOMAIN_NAME}/image/${projectDir}/${index}.png`
+          const imageHost = `${API_DOMAIN_NAME}/image/${projectDir}/${index}`
 
           meta.name         =  collectionInfo.name
           meta.description  =  collectionInfo.description

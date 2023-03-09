@@ -64,6 +64,8 @@ const grapQLServer = new ApolloServer({
         value: String
       }
 
+
+
       input FilterParam {
         key: String,
         value:[String]
@@ -79,6 +81,13 @@ const grapQLServer = new ApolloServer({
       input MetaQtyParam {
         edition: Int,
         qty: Int
+      }
+       
+
+
+      input NftMergeParam {
+        address: String
+        tokenId: Int
       }
 
 
@@ -205,7 +214,9 @@ const grapQLServer = new ApolloServer({
           deleteBulkMeta(id:String , removeNumber:Int ,totalMint:Int , excludedNumber:Int):BulkMeta,
           updateMeta(id: String , meta:MetaParam ):Boolean,
           updateMetaQty(id:String ,metaQtyParam:[MetaQtyParam], nftType: String ):Boolean
-          restoreCollection(id: String, versionNumber: Int): Boolean
+          restoreCollection(id: String, versionNumber: Int): Boolean,
+          mergeNft( mergeParam:[NftMergeParam] , address:String ,signer:String) : Boolean
+
       }
 
       type LayerFilter {
@@ -214,6 +225,7 @@ const grapQLServer = new ApolloServer({
         value: String,
         useCount: Int,
       }
+
 
     `,
   resolvers: {
@@ -640,7 +652,29 @@ const grapQLServer = new ApolloServer({
         } catch (ex) {
           throw new Error(ex)
         }
+      },
+      mergeNft : async(_, args) => {
+           const { mergeParam=[] ,address ,signer  } = args
+             console.log( mergeParam)
+
+           //TODO: check  owner
+
+           const res = await Collection.find
+
+
+           //TODO: check sign method
+
+
+        
+           try{
+              return true
+           }catch(ex){
+              console.log(ex)
+           }
+
+
       }
+
     },
   }
 })

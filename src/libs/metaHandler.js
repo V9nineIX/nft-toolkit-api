@@ -654,8 +654,14 @@ const writeMetaForCustomServer = ({
 
         //wirte to metadata.json
         writeMetaData(JSON.stringify(result, null, 2), jsonFolder)
+
+        const sourceFolder = `./${COLECTION_ROOT_FOLDER}/${projectDir}/build`
+        const destinationFolder = `./${COLECTION_ROOT_FOLDER}/${projectDir}/build-original`
   
-  
+        if (!fs.existsSync(destinationFolder)) {
+            console.log("create original folder")
+            const copyStatus = await copyDirectory( sourceFolder , destinationFolder )
+        }
 
         resolve({  
                  ipfsImageHash: `image/${projectDir}`,  

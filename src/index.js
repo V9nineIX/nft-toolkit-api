@@ -12,7 +12,7 @@ import resize from "./libs/resize"
 // import { graphqlHTTP } from 'express-graphql'
 // import { buildSchema } from 'graphql'
 const http = require('http');
-const socketIo = require("socket.io");
+// const socketIo = require("socket.io");
 const { ExpressAdapter } = require('@bull-board/express');
 const { createBullBoard } = require('@bull-board/api')
 const { BullAdapter } = require('@bull-board/api/bullAdapter')
@@ -30,13 +30,13 @@ import {
   fetchToken,
   deleteBulkMeta
 } from "./libs/metaHandler"
-import { getJsonDir, copyDirectory } from './utils/directoryHelper'
+import {createDirectory , getJsonDir, getImageDir, copyDirectory , getProjecrDir   } from './utils/directoryHelper'
 import httpStatus from "http-status";
 import APIError from './utils/api-error'
 import APIResponse from './utils/api-response'
-import { createDirectory } from './utils/directoryHelper'
 const fse = require('fs-extra');
-import { deleteFolder } from './utils/filesHelper'
+import { deleteFolder ,fileExists } from './utils/filesHelper'
+import {  mergeImage } from  './utils/imageHelper'
 const { MerkleTree } = require('merkletreejs')
 const keccak256 = require('keccak256')
 
@@ -64,6 +64,8 @@ const grapQLServer = new ApolloServer({
         value: String
       }
 
+
+
       input FilterParam {
         key: String,
         value:[String]
@@ -79,6 +81,13 @@ const grapQLServer = new ApolloServer({
       input MetaQtyParam {
         edition: Int,
         qty: Int
+      }
+       
+
+
+      input NftMergeParam {
+        address: String
+        tokenId: Int
       }
 
 
@@ -205,7 +214,9 @@ const grapQLServer = new ApolloServer({
           deleteBulkMeta(id:String , removeNumber:Int ,totalMint:Int , excludedNumber:Int):BulkMeta,
           updateMeta(id: String , meta:MetaParam ):Boolean,
           updateMetaQty(id:String ,metaQtyParam:[MetaQtyParam], nftType: String ):Boolean
-          restoreCollection(id: String, versionNumber: Int): Boolean
+          restoreCollection(id: String, versionNumber: Int): Boolean,
+          mergeNft( mergeParam:[NftMergeParam] , address:String ,signer:String) : Boolean
+
       }
 
       type LayerFilter {
@@ -214,6 +225,7 @@ const grapQLServer = new ApolloServer({
         value: String,
         useCount: Int,
       }
+
 
     `,
   resolvers: {
@@ -640,7 +652,101 @@ const grapQLServer = new ApolloServer({
         } catch (ex) {
           throw new Error(ex)
         }
+      },
+      mergeNft : async(_, args) => {
+           const { mergeParam=[] ,address ,signer  } = args
+        try{
+   
+
+            const frontLayerNft   =  mergeParam[0]
+            const backLayerNft    =  mergeParam[1]
+
+           //TODO: check  owner
+           const frontLayer = await Collection.findBySmartContractAddress(frontLayerNft.address);
+           const backLayer = await Collection.findBySmartContractAddress(backLayerNft.address);
+           const { projectDir:frontLayerDir } = frontLayer[0]
+           const { projectDir:backLayerDir }  = backLayer[0]
+
+           //Todo file image 
+
+           const frontLayerLayerImageDir =  getImageDir(frontLayerDir)
+           const backLayerLayerImageDir =  getImageDir(backLayerDir)
+
+           const frontImage =  `${frontLayerLayerImageDir}/${frontLayerNft.tokenId}.png`
+           const backImage  =  `${backLayerLayerImageDir}/${backLayerNft.tokenId}.png`
+
+           const  resultImage        =  `${backLayerLayerImageDir}/${frontLayerNft.tokenId}-temp.png`
+           const  folderSizeDefualt  =  `${backLayerLayerImageDir}W0/`
+           const  smallSizeFolder    =  `${backLayerLayerImageDir}W200/`
+    
+          try {
+
+            if( await fileExists(frontImage)  &&  await fileExists(backImage)) {
+
+                await mergeImage({
+                        frontImage,
+                        backImage,
+                        resultImage 
+                    })
+
+                // todo clear cahce
+           
+                if (fs.existsSync(folderSizeDefualt )) {
+                    await  fse.copy( backImage,  `${folderSizeDefualt}/${backLayerNft.tokenId}.png`)
+                }
+
+                await createDirectory(smallSizeFolder)
+
+                await resize(
+                backImage, 
+                "png",
+                    200,
+                    200, 
+                `${smallSizeFolder}${backLayerNft.tokenId}.png`)
+
+            }else{
+                throw Error("Image not found")
+            }
+
+
+
+         }catch(ex){
+            //TODO : / restore image to original 
+            const  rootProjectDir =   getProjecrDir(backLayerDir)
+            const  folderOriginalImage =  `${rootProjectDir}/build-original/image/`
+            const  originalImage = `${folderOriginalImage}${backLayerNft.tokenId}.png`
+            
+
+            if (fs.existsSync( folderOriginalImage )) {
+                await  fse.copy(  originalImage , backImage)
+            }
+
+            if (fs.existsSync( folderSizeDefualt )) { // unlink
+                await fse.copy( originalImage,  `${folderSizeDefualt}/${backLayerNft.tokenId}.png`)
+            }
+
+            if (fs.existsSync( smallSizeFolder )) { // unlink
+                 fse.unlink(`${smallSizeFolder}${backLayerNft.tokenId}.png`)
+            }
+
+            throw ex
+        }
+
+
+
+
+           return true
+        
+           }catch(ex){
+              console.log(ex)
+            // TODO restore image to original
+              return false
+              
+           }
+
+
       }
+
     },
   }
 })
@@ -760,12 +866,6 @@ app.get('/image/:path/:tokenId', async (req, res) => {
         return stream.pipe(res)
       }
     })
-
-
-
-
-
-
 
 
     // }) //  end  read file

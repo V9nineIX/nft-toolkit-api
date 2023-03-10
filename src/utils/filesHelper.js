@@ -69,13 +69,26 @@ async function deleteFolder(folderPath) {
   }
 }
 
+async function fileExists(filePath) {
+    return new Promise((resolve, reject) => {
+      fs.access(filePath, fs.constants.F_OK, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(true);
+        }
+      });
+    });
+  }
+
 
 
   module.exports = { 
     countFilesInDir: countFilesInDir,
     renameFile:  renameFile,
     deleteFileInDir:  deleteFileInDir,
-    deleteFolder: deleteFolder
+    deleteFolder: deleteFolder,
+    fileExists: fileExists
     
 
   }

@@ -1,8 +1,13 @@
 import fs from 'fs'
 import fsextra  from 'fs-extra'
+import {  COLECTION_ROOT_FOLDER } from "../constants"
 
 const getJsonDir = (projectDir) => {
-    return `./folder/${projectDir}/build/json`
+    return `./${COLECTION_ROOT_FOLDER}/${projectDir}/build/json`
+}
+
+const getImageDir = (projectDir) => {
+    return `${process.cwd()}/${COLECTION_ROOT_FOLDER}/${projectDir}/build/image`
 }
 
 const createDirectory =  async(directory) => {
@@ -48,5 +53,6 @@ const copyDirectory =  async(sourceFolder ,destinationFolder) => {
 module.exports = {
     getJsonDir, 
     createDirectory,
-    copyDirectory 
+    copyDirectory,
+    getImageDir 
 }

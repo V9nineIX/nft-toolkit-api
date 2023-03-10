@@ -12,7 +12,7 @@ import resize from "./libs/resize"
 // import { graphqlHTTP } from 'express-graphql'
 // import { buildSchema } from 'graphql'
 const http = require('http');
-const socketIo = require("socket.io");
+// const socketIo = require("socket.io");
 const { ExpressAdapter } = require('@bull-board/express');
 const { createBullBoard } = require('@bull-board/api')
 const { BullAdapter } = require('@bull-board/api/bullAdapter')
@@ -30,13 +30,14 @@ import {
   fetchToken,
   deleteBulkMeta
 } from "./libs/metaHandler"
-import { getJsonDir, copyDirectory } from './utils/directoryHelper'
+import { getJsonDir, getImageDir, copyDirectory } from './utils/directoryHelper'
 import httpStatus from "http-status";
 import APIError from './utils/api-error'
 import APIResponse from './utils/api-response'
 import { createDirectory } from './utils/directoryHelper'
 const fse = require('fs-extra');
-import { deleteFolder } from './utils/filesHelper'
+import { deleteFolder ,fileExists } from './utils/filesHelper'
+import {  mergeImage } from  './utils/imageHelper'
 const { MerkleTree } = require('merkletreejs')
 const keccak256 = require('keccak256')
 
@@ -655,21 +656,49 @@ const grapQLServer = new ApolloServer({
       },
       mergeNft : async(_, args) => {
            const { mergeParam=[] ,address ,signer  } = args
-             console.log( mergeParam)
+        try{
+   
+
+            const frontLayerNft   =  mergeParam[0]
+            const backLayerNft    =  mergeParam[1]
 
            //TODO: check  owner
+           const frontLayer = await Collection.findBySmartContractAddress(frontLayerNft.address);
+           const backLayer = await Collection.findBySmartContractAddress(backLayerNft.address);
+           const { projectDir:frontLayerDir } = frontLayer[0]
+           const { projectDir:backLayerDir }  = backLayer[0]
 
-           const res = await Collection.find
+           //Todo file image 
+
+           const frontLayerLayerImageDir =  getImageDir(frontLayerDir)
+           const backLayerLayerImageDir =  getImageDir(backLayerDir)
+
+           const frontImage =  `${frontLayerLayerImageDir}/${frontLayerNft.tokenId}.png`
+           const backImage =  `${backLayerLayerImageDir}/${backLayerNft.tokenId}.png`
+
+           const  resultImage  =  `${backLayerLayerImageDir}/mergeImage.png`
 
 
-           //TODO: check sign method
+           if( await fileExists(frontImage)  &&  await fileExists(backImage)) {
 
+            //TODO:backup original image
+           
+             await mergeImage({
+                    frontImage,
+                    backImage,
+                    resultImage 
+                })
 
+           }else{
+               throw Error("Image not found")
+           }
+
+           return true
         
-           try{
-              return true
            }catch(ex){
               console.log(ex)
+              return false
+              
            }
 
 

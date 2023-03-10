@@ -46,14 +46,23 @@ async function mergeImage({
     const back = sharp(backImage)
 
 
-    await sharp( backImage)
+    await sharp(backImage)
       .composite([
         {
           input: frontImage ,
         },
       ])
       .toFile(resultImage);
+  
+      await fs.unlink(backImage);
+      await fs.rename(resultImage , backImage);
  
+ }
+
+ async function restoreOriginalImageToken(){
+
+    
+
  }
   
 module.exports = { 

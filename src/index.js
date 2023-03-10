@@ -30,11 +30,10 @@ import {
   fetchToken,
   deleteBulkMeta
 } from "./libs/metaHandler"
-import { getJsonDir, getImageDir, copyDirectory } from './utils/directoryHelper'
+import {createDirectory , getJsonDir, getImageDir, copyDirectory , getProjecrDir   } from './utils/directoryHelper'
 import httpStatus from "http-status";
 import APIError from './utils/api-error'
 import APIResponse from './utils/api-response'
-import { createDirectory } from './utils/directoryHelper'
 const fse = require('fs-extra');
 import { deleteFolder ,fileExists } from './utils/filesHelper'
 import {  mergeImage } from  './utils/imageHelper'
@@ -674,29 +673,73 @@ const grapQLServer = new ApolloServer({
            const backLayerLayerImageDir =  getImageDir(backLayerDir)
 
            const frontImage =  `${frontLayerLayerImageDir}/${frontLayerNft.tokenId}.png`
-           const backImage =  `${backLayerLayerImageDir}/${backLayerNft.tokenId}.png`
+           const backImage  =  `${backLayerLayerImageDir}/${backLayerNft.tokenId}.png`
 
-           const  resultImage  =  `${backLayerLayerImageDir}/mergeImage.png`
+           const  resultImage        =  `${backLayerLayerImageDir}/${frontLayerNft.tokenId}-temp.png`
+           const  folderSizeDefualt  =  `${backLayerLayerImageDir}W0/`
+           const  smallSizeFolder    =  `${backLayerLayerImageDir}W200/`
+    
+          try {
 
+            if( await fileExists(frontImage)  &&  await fileExists(backImage)) {
 
-           if( await fileExists(frontImage)  &&  await fileExists(backImage)) {
+                await mergeImage({
+                        frontImage,
+                        backImage,
+                        resultImage 
+                    })
 
-            //TODO:backup original image
+                // todo clear cahce
            
-             await mergeImage({
-                    frontImage,
-                    backImage,
-                    resultImage 
-                })
+                if (fs.existsSync(folderSizeDefualt )) {
+                    await  fse.copy( backImage,  `${folderSizeDefualt}/${backLayerNft.tokenId}.png`)
+                }
 
-           }else{
-               throw Error("Image not found")
-           }
+                await createDirectory(smallSizeFolder)
+
+                await resize(
+                backImage, 
+                "png",
+                    200,
+                    200, 
+                `${smallSizeFolder}${backLayerNft.tokenId}.png`)
+
+            }else{
+                throw Error("Image not found")
+            }
+
+
+
+         }catch(ex){
+            //TODO : / restore image to original 
+            const  rootProjectDir =   getProjecrDir(backLayerDir)
+            const  folderOriginalImage =  `${rootProjectDir}/build-original/image/`
+            const  originalImage = `${folderOriginalImage}${backLayerNft.tokenId}.png`
+            
+
+            if (fs.existsSync( folderOriginalImage )) {
+                await  fse.copy(  originalImage , backImage)
+            }
+
+            if (fs.existsSync( folderSizeDefualt )) { // unlink
+                await fse.copy( originalImage,  `${folderSizeDefualt}/${backLayerNft.tokenId}.png`)
+            }
+
+            if (fs.existsSync( smallSizeFolder )) { // unlink
+                 fse.unlink(`${smallSizeFolder}${backLayerNft.tokenId}.png`)
+            }
+
+            throw ex
+        }
+
+
+
 
            return true
         
            }catch(ex){
               console.log(ex)
+            // TODO restore image to original
               return false
               
            }
@@ -823,12 +866,6 @@ app.get('/image/:path/:tokenId', async (req, res) => {
         return stream.pipe(res)
       }
     })
-
-
-
-
-
-
 
 
     // }) //  end  read file

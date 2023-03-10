@@ -10,6 +10,10 @@ const getImageDir = (projectDir) => {
     return `${process.cwd()}/${COLECTION_ROOT_FOLDER}/${projectDir}/build/image`
 }
 
+const getProjecrDir = (projectDir) => {
+    return `${process.cwd()}/${COLECTION_ROOT_FOLDER}/${projectDir}`
+}
+
 const createDirectory =  async(directory) => {
     return new Promise( async (resolve ,reject) => {  
         try{
@@ -54,5 +58,6 @@ module.exports = {
     getJsonDir, 
     createDirectory,
     copyDirectory,
-    getImageDir 
+    getImageDir,
+    getProjecrDir  
 }

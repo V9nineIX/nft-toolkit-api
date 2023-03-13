@@ -664,10 +664,8 @@ const writeMetaForCustomServer = ({
         }
 
         resolve({  
-                 ipfsImageHash: `image/${projectDir}/`,  
-                 ipfsJsonHash:  `json/${projectDir}/`  ,
-                 imageURL: `image/${projectDir}/`,  
-                 metaURL:  `json/${projectDir}/`   
+                 imageUrl: `image/${projectDir}/`,  
+                 metaUrl:  `json/${projectDir}/`   
                  })
   
       } catch (ex) {

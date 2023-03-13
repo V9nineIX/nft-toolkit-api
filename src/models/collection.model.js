@@ -151,11 +151,11 @@ const collectionSchema = new mongoose.Schema({
             whiteListAddress: []
         }]
     },
-    imageURL: {
+    imageUrl: {
         type: String,
         default: null,
     },
-    metaURL: {
+    metaUrl: {
         type: String,
         default: null,
     },

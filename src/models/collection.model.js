@@ -159,6 +159,10 @@ const collectionSchema = new mongoose.Schema({
         type: String,
         default: null,
     },
+    nftStorageType: {
+        type: String,
+        default: ""
+    }
 },
     { timestamps: true }
 )

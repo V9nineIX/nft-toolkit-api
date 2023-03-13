@@ -420,11 +420,19 @@ const controller = {
 
 
       if (uploadResult) {
-        const { ipfsImageHash = null, ipfsJsonHash = null } = uploadResult
-        await Collection.updateById(id, {
-          ipfsImageHash,
-          ipfsJsonHash
-        })
+        const { ipfsImageHash = null, ipfsJsonHash = null, imageUrl = null, metaUrl = null } = uploadResult
+
+        if(provider=="custom") {
+          await Collection.updateById(id, {
+            imageUrl,
+            metaUrl
+          })
+        } else {
+          await Collection.updateById(id, {
+            ipfsImageHash,
+            ipfsJsonHash
+          })
+        }
       }
 
 

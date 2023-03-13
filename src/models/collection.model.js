@@ -150,7 +150,15 @@ const collectionSchema = new mongoose.Schema({
             phaseNumber: 1,
             whiteListAddress: []
         }]
-    }
+    },
+    imageUrl: {
+        type: String,
+        default: null,
+    },
+    metaUrl: {
+        type: String,
+        default: null,
+    },
 },
     { timestamps: true }
 )

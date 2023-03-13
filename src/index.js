@@ -136,7 +136,9 @@ const grapQLServer = new ApolloServer({
          smartContractAddress: String,
          isHasUpdate: Boolean,
          version: [Version],
-         phase: [Phase]
+         phase: [Phase],
+         imageUrl: String,
+         metaUrl: String
       }
 
       type CustomToken {

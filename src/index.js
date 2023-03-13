@@ -138,7 +138,8 @@ const grapQLServer = new ApolloServer({
          version: [Version],
          phase: [Phase],
          imageUrl: String,
-         metaUrl: String
+         metaUrl: String,
+         nftStorageType: String
       }
 
       type CustomToken {

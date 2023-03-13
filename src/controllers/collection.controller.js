@@ -418,29 +418,36 @@ const controller = {
 
       // todocheick
 
-
+      const { ipfsImageHash = "", ipfsJsonHash = "", imageUrl = "", metaUrl = "" } = uploadResult
       if (uploadResult) {
-        const { ipfsImageHash = null, ipfsJsonHash = null, imageUrl = null, metaUrl = null } = uploadResult
-
         if(provider=="custom") {
           await Collection.updateById(id, {
             imageUrl,
-            metaUrl
+            metaUrl,
+            nftStorageType: provider
           })
         } else {
-          await Collection.updateById(id, {
+           await Collection.updateById(id, {
             ipfsImageHash,
-            ipfsJsonHash
+            ipfsJsonHash,
+            nftStorageType: provider
           })
         }
+
+        
       }
+      
+      
+      const res = {
+       imageUrl: imageUrl || null,
+       metaUrl: metaUrl || null,
+       ipfsImageHash: ipfsImageHash || null ,
+       ipfsJsonHash: ipfsJsonHash || null,
+       nftStorageType: provider
+     }
 
-
-
-
-      // console.log("res" ,res)
-
-      return new APIResponse(201, "upload ok");
+      return new APIResponse(201, res);
+      
     } catch (ex) {
 
       console.log(ex)

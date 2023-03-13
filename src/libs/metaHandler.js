@@ -622,11 +622,12 @@ const writeMetaForCustomServer = ({
         const jsonFolder = getJsonDirectory(projectDir)
         const hostImage = API_DOMAIN_NAME
         const result = []
-
+        const imagePath  = `${API_DOMAIN_NAME}/folder/${projectDir}/build/image/`
    
   
         for (const [index, meta] of metadata.entries()) {
-          const imageHost = `${API_DOMAIN_NAME}/image/${projectDir}/${index}`
+        //   const imageHost = `${API_DOMAIN_NAME}/image/${projectDir}/${index}`
+          const imageHost = `${imagePath}${index}.png`
 
           meta.name         =  collectionInfo.name
           meta.description  =  collectionInfo.description
@@ -664,8 +665,8 @@ const writeMetaForCustomServer = ({
         }
 
         resolve({  
-                 imageUrl: `image/${projectDir}/`,  
-                 metaUrl:  `json/${projectDir}/`   
+                 imageUrl: imagePath,  
+                 metaUrl:  `${API_DOMAIN_NAME}/json/${projectDir}/`   
                  })
   
       } catch (ex) {

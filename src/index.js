@@ -7,7 +7,7 @@ import bodyParser from "body-parser";
 const path = require('path')
 import cors from "cors"
 import { ApolloServer, gql } from "apollo-server-express";
-import { includes, isEmpty, toLower, method, mapValues, find, findIndex, orderBy, uniqBy, result } from "lodash";
+import { includes, isEmpty, toLower, method, mapValues, find, findIndex, orderBy, uniqBy, result, unionBy, reverse } from "lodash";
 import resize from "./libs/resize"
 // import { graphqlHTTP } from 'express-graphql'
 // import { buildSchema } from 'graphql'
@@ -18,7 +18,7 @@ const { createBullBoard } = require('@bull-board/api')
 const { BullAdapter } = require('@bull-board/api/bullAdapter')
 import { generateImageQueue } from "./queues/generate-image-queue";
 import queueListeners from "./queues/queueListeners";
-import { API_POST_SIZE_LIMIT, COLECTION_ROOT_FOLDER } from "./constants"
+import { API_POST_SIZE_LIMIT, COLECTION_ROOT_FOLDER, OPENSEA_NFT } from "./constants"
 const fs = require('fs');
 import Collection from "./models/collection.model";
 import {
@@ -30,16 +30,16 @@ import {
   fetchToken,
   deleteBulkMeta
 } from "./libs/metaHandler"
-import {createDirectory , getJsonDir, getImageDir, copyDirectory , getProjecrDir   } from './utils/directoryHelper'
+import { createDirectory, getJsonDir, getImageDir, copyDirectory, getProjectDir, getJsonFullDir } from './utils/directoryHelper'
 import httpStatus from "http-status";
 import APIError from './utils/api-error'
 import APIResponse from './utils/api-response'
 const fse = require('fs-extra');
-import { deleteFolder ,fileExists } from './utils/filesHelper'
-import {  mergeImage } from  './utils/imageHelper'
+import { deleteFolder, fileExists } from './utils/filesHelper'
+import { mergeImage } from './utils/imageHelper'
 const { MerkleTree } = require('merkletreejs')
 const keccak256 = require('keccak256')
-
+import fetch from 'node-fetch';
 
 
 
@@ -477,7 +477,7 @@ const grapQLServer = new ApolloServer({
         try {
           const leaves = whiteListAddress.map(item => keccak256(item))
           const tree = new MerkleTree(leaves, keccak256, { sort: true })
-          
+
           // convert to string and start with 0x
           const buf2hex = (value) => {
             return `0x${value.toString('hex')}`
@@ -486,9 +486,9 @@ const grapQLServer = new ApolloServer({
           const root = buf2hex(tree.getRoot())
 
           let proof = []
-          if(!isEmpty(address)) {
-          const leaf = buf2hex(keccak256(address))
-          proof = tree.getProof(leaf).map(x => buf2hex(x.data));
+          if (!isEmpty(address)) {
+            const leaf = buf2hex(keccak256(address))
+            proof = tree.getProof(leaf).map(x => buf2hex(x.data));
           }
 
           return { root, proof }
@@ -554,13 +554,13 @@ const grapQLServer = new ApolloServer({
           // const sourceFolder = `./${COLECTION_ROOT_FOLDER}/${projectDir}/build`
           const destinationFolder = `./${COLECTION_ROOT_FOLDER}/${projectDir}/build-v${version.length + 1}`
 
-              versionList.push({
-                version: version.length + 1,
-                ipfsImageHash: ipfsImageHash,
-                ipfsJsonHash: ipfsJsonHash,
-                buildFolder: destinationFolder,
-                totalSupply: totalSupplyByID
-              })
+          versionList.push({
+            version: version.length + 1,
+            ipfsImageHash: ipfsImageHash,
+            ipfsJsonHash: ipfsJsonHash,
+            buildFolder: destinationFolder,
+            totalSupply: totalSupplyByID
+          })
 
 
           const result = await Collection.updateById(id, { "totalSupply": maxSupply, "isHasUpdate": true, "version": versionList });
@@ -632,22 +632,22 @@ const grapQLServer = new ApolloServer({
           const folderVersion = version[versionNumber - 1]
           const { ipfsImageHash, ipfsJsonHash, totalSupply, buildFolder } = folderVersion
 
-          if(fs.existsSync(buildFolder)) {
+          if (fs.existsSync(buildFolder)) {
             const sourceFolder = `./${COLECTION_ROOT_FOLDER}/${projectDir}/build`
             await fse.emptyDir(sourceFolder);
             await copyDirectory(buildFolder, sourceFolder)
 
 
             let cloneVersion = [...version]
-            const newVersion = cloneVersion.slice(0,versionNumber - 1) // delete version after versionNumber
+            const newVersion = cloneVersion.slice(0, versionNumber - 1) // delete version after versionNumber
 
-            for(const item of cloneVersion) {
-              if(item.version >= versionNumber){
-              await deleteFolder(item?.buildFolder)
+            for (const item of cloneVersion) {
+              if (item.version >= versionNumber) {
+                await deleteFolder(item?.buildFolder)
               }
             }
 
-            await Collection.updateById(id, {"ipfsImageHash": ipfsImageHash, "ipfsJsonHash": ipfsJsonHash, "totalSupply": totalSupply, "version": newVersion });
+            await Collection.updateById(id, { "ipfsImageHash": ipfsImageHash, "ipfsJsonHash": ipfsJsonHash, "totalSupply": totalSupply, "version": newVersion });
 
 
             return true
@@ -656,96 +656,140 @@ const grapQLServer = new ApolloServer({
           throw new Error(ex)
         }
       },
-      mergeNft : async(_, args) => {
-           const { mergeParam=[] ,address ,signer  } = args
-        try{
-   
+      mergeNft: async (_, args) => {
+        const { mergeParam = [], address, signer } = args
 
-            const frontLayerNft   =  mergeParam[0]
-            const backLayerNft    =  mergeParam[1]
+        try {
 
-           //TODO: check  owner
-           const frontLayer = await Collection.findBySmartContractAddress(frontLayerNft.address);
-           const backLayer = await Collection.findBySmartContractAddress(backLayerNft.address);
-           const { projectDir:frontLayerDir } = frontLayer[0]
-           const { projectDir:backLayerDir }  = backLayer[0]
 
-           //Todo file image 
+          const frontLayerNft = mergeParam[0] //closet
+          const backLayerNft = mergeParam[1] //bg
 
-           const frontLayerLayerImageDir =  getImageDir(frontLayerDir)
-           const backLayerLayerImageDir =  getImageDir(backLayerDir)
+          //TODO: check  owner
+          const frontLayer = await Collection.findBySmartContractAddress(frontLayerNft.address);
+          const backLayer = await Collection.findBySmartContractAddress(backLayerNft.address);
+          const { projectDir: frontLayerDir } = frontLayer[0]
+          const { projectDir: backLayerDir } = backLayer[0]
 
-           const frontImage =  `${frontLayerLayerImageDir}/${frontLayerNft.tokenId}.png`
-           const backImage  =  `${backLayerLayerImageDir}/${backLayerNft.tokenId}.png`
+          //Todo file image 
 
-           const  resultImage        =  `${backLayerLayerImageDir}/${frontLayerNft.tokenId}-temp.png`
-           const  folderSizeDefualt  =  `${backLayerLayerImageDir}W0/`
-           const  smallSizeFolder    =  `${backLayerLayerImageDir}W200/`
-    
+          const frontLayerLayerImageDir = getImageDir(frontLayerDir) || ''
+          const backLayerLayerImageDir = getImageDir(backLayerDir) || ''
+
+          const frontImage = `${frontLayerLayerImageDir}/${frontLayerNft.tokenId}.png`
+          const backImage = `${backLayerLayerImageDir}/${backLayerNft.tokenId}.png`
+
+          const resultImage = `${backLayerLayerImageDir}/${frontLayerNft.tokenId}-temp.png`
+          const folderSizeDefualt = `${backLayerLayerImageDir}W0/`
+          const smallSizeFolder = `${backLayerLayerImageDir}W200/`
+
           try {
 
-            if( await fileExists(frontImage)  &&  await fileExists(backImage)) {
+            if (await fileExists(frontImage) && await fileExists(backImage)) {
 
-                await mergeImage({
-                        frontImage,
-                        backImage,
-                        resultImage 
-                    })
+              await mergeImage({
+                frontImage,
+                backImage,
+                resultImage
+              })
 
-                // todo clear cahce
-           
-                if (fs.existsSync(folderSizeDefualt )) {
-                    await  fse.copy( backImage,  `${folderSizeDefualt}/${backLayerNft.tokenId}.png`)
-                }
+              // todo clear cahce
 
-                await createDirectory(smallSizeFolder)
+              if (fs.existsSync(folderSizeDefualt)) {
+                await fse.copy(backImage, `${folderSizeDefualt}/${backLayerNft.tokenId}.png`)
+              }
 
-                await resize(
-                backImage, 
+              await createDirectory(smallSizeFolder)
+
+              await resize(
+                backImage,
                 "png",
-                    200,
-                    200, 
+                200,
+                200,
                 `${smallSizeFolder}${backLayerNft.tokenId}.png`)
 
-            }else{
-                throw Error("Image not found")
+
+              /* ------ Merge Attributes and refresh open sea ------ */
+              const frontLayerJsonDir = getJsonFullDir(frontLayerDir)
+              const backLayerJsonDir = getJsonFullDir(backLayerDir)
+
+              // const pathFrontJson =
+              //   'folder/a3df5b9d-f74b-4732-9207-eb4074b2011f-NanNy1/build/json/0.json' //closet => frontLayerNft.tokenId
+              // // `${frontLayerJsonDir}/${frontLayerNft.tokenId}.json`
+              // const pathBackJson =
+              //   'folder/1916acd6-84ed-42e6-8358-62af1ae645e0-Happy-melody-v6/build/json/0.json' //bg => backLayerNft.tokenId
+              // // 'http://128.199.185.87:3033/folder/1916acd6-84ed-42e6-8358-62af1ae645e0-Happy-melody-v6/build/json/413.json'
+              // // `${backLayerJsonDir}/${backLayerNft.tokenId}.json`
+
+              const frontJson = JSON.parse(fs.readFileSync(frontLayerJsonDir, 'utf-8'));
+              const backJson = JSON.parse(fs.readFileSync(backLayerJsonDir, 'utf-8'));
+              // let newFrontJson = { ...frontJson }
+              let newBackJson = { ...backJson }
+
+              const resNewAttributes = reverse(unionBy(reverse(frontJson["attributes"]), reverse(backJson["attributes"]), 'trait_type'))
+              newBackJson["attributes"] = resNewAttributes
+              fs.writeFileSync(backLayerJsonDir, JSON.stringify(newBackJson, null, 2));
+
+
+              const wait = (milliseconds) => {
+                return new Promise((resolve) => {
+                  setTimeout(() => resolve(), milliseconds);
+                });
+              };
+
+              const refresh = async (address = null, tokenId = null) => {
+                try {
+                  // await fetch(`https://api.opensea.io/api/v1/asset/${address}/${tokenId}/?force_update=true`);
+                  await fetch(`${OPENSEA_NFT}/api/v1/asset/${address}/${tokenId}/?force_update=true`);
+                  console.log(`opensea refreshed ${tokenId}`);
+                  await wait(100);
+                } catch (err) {
+                  console.warn(`Unable to refresh cache: ${tokenId}`, err);
+                }
+              };
+
+              refresh(address, backLayerNft?.tokenId)
+              /* ------ Merge Attributes and refresh open sea ------ */
+
+            } else {
+              throw Error("Image not found")
             }
 
 
 
-         }catch(ex){
+          } catch (ex) {
             //TODO : / restore image to original 
-            const  rootProjectDir =   getProjecrDir(backLayerDir)
-            const  folderOriginalImage =  `${rootProjectDir}/build-original/image/`
-            const  originalImage = `${folderOriginalImage}${backLayerNft.tokenId}.png`
-            
+            const rootProjectDir = getProjectDir(backLayerDir)
+            const folderOriginalImage = `${rootProjectDir}/build-original/image/`
+            const originalImage = `${folderOriginalImage}${backLayerNft.tokenId}.png`
 
-            if (fs.existsSync( folderOriginalImage )) {
-                await  fse.copy(  originalImage , backImage)
+
+            if (fs.existsSync(folderOriginalImage)) {
+              await fse.copy(originalImage, backImage)
             }
 
-            if (fs.existsSync( folderSizeDefualt )) { // unlink
-                await fse.copy( originalImage,  `${folderSizeDefualt}/${backLayerNft.tokenId}.png`)
+            if (fs.existsSync(folderSizeDefualt)) { // unlink
+              await fse.copy(originalImage, `${folderSizeDefualt}/${backLayerNft.tokenId}.png`)
             }
 
-            if (fs.existsSync( smallSizeFolder )) { // unlink
-                 fse.unlink(`${smallSizeFolder}${backLayerNft.tokenId}.png`)
+            if (fs.existsSync(smallSizeFolder)) { // unlink
+              fse.unlink(`${smallSizeFolder}${backLayerNft.tokenId}.png`)
             }
 
             throw ex
+          }
+
+
+
+
+          return true
+
+        } catch (ex) {
+          console.log(ex)
+          // TODO restore image to original
+          return false
+
         }
-
-
-
-
-           return true
-        
-           }catch(ex){
-              console.log(ex)
-            // TODO restore image to original
-              return false
-              
-           }
 
 
       }
@@ -814,9 +858,9 @@ app.get('/progressGenerateImageSSE', (req, res) => {
     'Connection': 'keep-alive'
   });
 
-//   const time = (new Date()).toLocaleTimeString('en-GB', { timezone: 'asia/bangkok' });
+  //   const time = (new Date()).toLocaleTimeString('en-GB', { timezone: 'asia/bangkok' });
 
-//   res.write(`connection sever sent events ========= ${time} =========\n\n`);
+  //   res.write(`connection sever sent events ========= ${time} =========\n\n`);
 
   queueListeners(null, res)
 
@@ -897,15 +941,15 @@ app.get('/meta/:path/:tokenId', async (req, res) => {
       if (err) {
         res.status(httpStatus.NOT_FOUND).send({ message: "Meta not found" })
       } else {
-          const id = tokenId.split('.json')[0]
-          const result = JSON.parse(fs.readFileSync(img, 'utf-8'));
-          const meta = result.find((item)=> item.edition == id)
+        const id = tokenId.split('.json')[0]
+        const result = JSON.parse(fs.readFileSync(img, 'utf-8'));
+        const meta = result.find((item) => item.edition == id)
 
-          if(!isEmpty(meta)){
-            res.status(httpStatus.OK).end(JSON.stringify(meta, null, 3))
-          } else {
-            res.status(httpStatus.NOT_FOUND).send({ message: "Meta not found" })
-          }
+        if (!isEmpty(meta)) {
+          res.status(httpStatus.OK).end(JSON.stringify(meta, null, 3))
+        } else {
+          res.status(httpStatus.NOT_FOUND).send({ message: "Meta not found" })
+        }
       }
     })
 

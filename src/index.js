@@ -663,7 +663,7 @@ const grapQLServer = new ApolloServer({
 
 
           const frontLayerNft = mergeParam[0] //closet
-          const backLayerNft = mergeParam[1] //bg
+          const backLayerNft = mergeParam[1] //base
 
           //TODO: check  owner
           const frontLayer = await Collection.findBySmartContractAddress(frontLayerNft.address);
@@ -714,21 +714,33 @@ const grapQLServer = new ApolloServer({
               const backLayerJsonDir = getJsonFullDir(backLayerDir)
 
               const pathFrontJson =
-                // 'folder/a3df5b9d-f74b-4732-9207-eb4074b2011f-NanNy1/build/json/0.json' //closet => frontLayerNft.tokenId
+                // 'folder/000000000000-Happy-closet/build/json /12.json' //closet => frontLayerNft.tokenId
                 `${frontLayerJsonDir}/${frontLayerNft.tokenId}.json`
               const pathBackJson =
-                // 'folder/1916acd6-84ed-42e6-8358-62af1ae645e0-Happy-melody-v6/build/json/0.json' //bg => backLayerNft.tokenId
-                // 'http://128.199.185.87:3033/folder/1916acd6-84ed-42e6-8358-62af1ae645e0-Happy-melody-v6/build/json/413.json'
+                // 'folder/000000000000-Happy-base/build/json /17.json' //base => backLayerNft.tokenId
                 `${backLayerJsonDir}/${backLayerNft.tokenId}.json`
+              const pathBackMetaDataJson =
+                // 'folder/000000000000-Happy-base/build/json /metadata.json'
+                `${backLayerJsonDir}/metadata.json`
 
               const frontJson = JSON.parse(fs.readFileSync(pathFrontJson, 'utf-8'));
               const backJson = JSON.parse(fs.readFileSync(pathBackJson, 'utf-8'));
+              const backMetaDataJson = JSON.parse(fs.readFileSync(pathBackMetaDataJson, 'utf-8'));
               // let newFrontJson = { ...frontJson }
               let newBackJson = { ...backJson }
+              let newBackMetaDataJson = [...backMetaDataJson]
+
+              let indexBackMetaData = findIndex(newBackMetaDataJson, function (item) {
+                return item.edition == backLayerNft.tokenId;
+              })
 
               const resNewAttributes = reverse(unionBy(reverse(frontJson["attributes"]), reverse(backJson["attributes"]), 'trait_type'))
               newBackJson["attributes"] = resNewAttributes
+              if (indexBackMetaData > -1) {
+                newBackMetaDataJson[indexBackMetaData]["attributes"] = resNewAttributes
+              }
               fs.writeFileSync(pathBackJson, JSON.stringify(newBackJson, null, 2));
+              fs.writeFileSync(pathBackMetaDataJson, JSON.stringify(newBackMetaDataJson, null, 2));
 
 
               const wait = (milliseconds) => {
@@ -758,6 +770,7 @@ const grapQLServer = new ApolloServer({
 
 
           } catch (ex) {
+            console.log(`ex:`, ex);
             //TODO : / restore image to original 
             const rootProjectDir = getProjectDir(backLayerDir)
             const folderOriginalImage = `${rootProjectDir}/build-original/image/`

@@ -728,7 +728,7 @@ const grapQLServer = new ApolloServer({
 
               const resNewAttributes = reverse(unionBy(reverse(frontJson["attributes"]), reverse(backJson["attributes"]), 'trait_type'))
               newBackJson["attributes"] = resNewAttributes
-              fs.writeFileSync(backLayerJsonDir, JSON.stringify(newBackJson, null, 2));
+              fs.writeFileSync(pathBackJson, JSON.stringify(newBackJson, null, 2));
 
 
               const wait = (milliseconds) => {

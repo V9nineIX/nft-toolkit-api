@@ -1,11 +1,11 @@
 const fs = require('fs')
 const sharp = require('sharp')
 
-module.exports = function resize(path, format, width, height,  smallSizeFolder) {
+module.exports = function resize(path, format, width, height,  smallSizeFolder, forceUpdateString) {
 
 
    // Check if the file already exists in the smallSizeFolder directory
-  if (fs.existsSync(smallSizeFolder)) {
+  if (fs.existsSync(smallSizeFolder) && !forceUpdateString) {
     // If it does, return a readable stream to the existing file
      return fs.createReadStream(smallSizeFolder);
   }

@@ -681,7 +681,7 @@ const grapQLServer = new ApolloServer({
 
           const resultImage = `${backLayerLayerImageDir}/${frontLayerNft.tokenId}-temp.png`
           const folderSizeDefualt = `${backLayerLayerImageDir}W0/`
-          const smallSizeFolder = `${backLayerLayerImageDir}W200/`
+          const smallSizeFolder = `${backLayerLayerImageDir}W300/`
 
           try {
 
@@ -704,8 +704,8 @@ const grapQLServer = new ApolloServer({
               await resize(
                 backImage,
                 "png",
-                200,
-                200,
+                300,
+                300,
                 `${smallSizeFolder}${backLayerNft.tokenId}.png`)
 
 
@@ -887,6 +887,7 @@ app.get('/image/:path/:tokenId', async (req, res) => {
   // Extract the query-parameter
   const widthString = req.query.w
   const heightString = req.query.h
+  const forceUpdateString = req.query.forceUpdate // true || false
   const format = req.query.format
   const { path, tokenId } = req.params
 
@@ -921,7 +922,7 @@ app.get('/image/:path/:tokenId', async (req, res) => {
       } else {
 
         //todo  smallSize 
-        const stream = await resize(imagePath, format, width, height, `${smallSizeFolder}${tokenId}.png`)
+        const stream = await resize(imagePath, format, width, height, `${smallSizeFolder}${tokenId}.png`, forceUpdateString)
 
         return stream.pipe(res)
       }

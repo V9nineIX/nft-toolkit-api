@@ -5,7 +5,7 @@ module.exports = function resize(path, format, width, height,  smallSizeFolder, 
 
 
    // Check if the file already exists in the smallSizeFolder directory
-  if (fs.existsSync(smallSizeFolder) && !forceUpdateString) {
+  if (fs.existsSync(smallSizeFolder) && forceUpdateString == 'false') {
     // If it does, return a readable stream to the existing file
      return fs.createReadStream(smallSizeFolder);
   }

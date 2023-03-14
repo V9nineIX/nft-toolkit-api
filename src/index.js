@@ -658,6 +658,7 @@ const grapQLServer = new ApolloServer({
       },
       mergeNft: async (_, args) => {
         const { mergeParam = [], address, signer } = args
+        console.log(`----  mergeNft:  args:`, args);
 
         try {
 
@@ -673,6 +674,8 @@ const grapQLServer = new ApolloServer({
 
           //Todo file image 
 
+          console.log(`----  mergeNft:  frontLayerDir:`, frontLayerDir);
+          console.log(`----  mergeNft:  backLayerDir:`, backLayerDir);
           const frontLayerLayerImageDir = getImageDir(frontLayerDir) || ''
           const backLayerLayerImageDir = getImageDir(backLayerDir) || ''
 
@@ -713,16 +716,16 @@ const grapQLServer = new ApolloServer({
               const frontLayerJsonDir = getJsonFullDir(frontLayerDir)
               const backLayerJsonDir = getJsonFullDir(backLayerDir)
 
-              // const pathFrontJson =
-              //   'folder/a3df5b9d-f74b-4732-9207-eb4074b2011f-NanNy1/build/json/0.json' //closet => frontLayerNft.tokenId
-              // // `${frontLayerJsonDir}/${frontLayerNft.tokenId}.json`
-              // const pathBackJson =
-              //   'folder/1916acd6-84ed-42e6-8358-62af1ae645e0-Happy-melody-v6/build/json/0.json' //bg => backLayerNft.tokenId
-              // // 'http://128.199.185.87:3033/folder/1916acd6-84ed-42e6-8358-62af1ae645e0-Happy-melody-v6/build/json/413.json'
-              // // `${backLayerJsonDir}/${backLayerNft.tokenId}.json`
+              const pathFrontJson =
+                // 'folder/a3df5b9d-f74b-4732-9207-eb4074b2011f-NanNy1/build/json/0.json' //closet => frontLayerNft.tokenId
+                `${frontLayerJsonDir}/${frontLayerNft.tokenId}.json`
+              const pathBackJson =
+                // 'folder/1916acd6-84ed-42e6-8358-62af1ae645e0-Happy-melody-v6/build/json/0.json' //bg => backLayerNft.tokenId
+                // 'http://128.199.185.87:3033/folder/1916acd6-84ed-42e6-8358-62af1ae645e0-Happy-melody-v6/build/json/413.json'
+                `${backLayerJsonDir}/${backLayerNft.tokenId}.json`
 
-              const frontJson = JSON.parse(fs.readFileSync(frontLayerJsonDir, 'utf-8'));
-              const backJson = JSON.parse(fs.readFileSync(backLayerJsonDir, 'utf-8'));
+              const frontJson = JSON.parse(fs.readFileSync(pathFrontJson, 'utf-8'));
+              const backJson = JSON.parse(fs.readFileSync(pathBackJson, 'utf-8'));
               // let newFrontJson = { ...frontJson }
               let newBackJson = { ...backJson }
 

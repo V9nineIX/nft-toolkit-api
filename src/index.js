@@ -658,7 +658,6 @@ const grapQLServer = new ApolloServer({
       },
       mergeNft: async (_, args) => {
         const { mergeParam = [], address, signer } = args
-        console.log(`----  mergeNft:  args:`, args);
 
         try {
 
@@ -674,8 +673,6 @@ const grapQLServer = new ApolloServer({
 
           //Todo file image 
 
-          console.log(`----  mergeNft:  frontLayerDir:`, frontLayerDir);
-          console.log(`----  mergeNft:  backLayerDir:`, backLayerDir);
           const frontLayerLayerImageDir = getImageDir(frontLayerDir) || ''
           const backLayerLayerImageDir = getImageDir(backLayerDir) || ''
 

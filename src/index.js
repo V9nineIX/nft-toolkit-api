@@ -894,7 +894,7 @@ app.get('/image/:path/:tokenId', async (req, res) => {
   try {
 
     const img = `folder/${path}/build/image/${tokenId}.png`
-    const smallSizeFolder = `folder/${path}/build/imageW${widthString || "0"}/`
+    const smallSizeFolder = `folder/${path}/build/imageW${parseInt(widthString) || "0"}/`
     const returnImage = `${smallSizeFolder}${tokenId}.png`
 
     const basePath = process.cwd();

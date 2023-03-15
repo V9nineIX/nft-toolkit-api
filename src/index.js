@@ -887,7 +887,7 @@ app.get('/image/:path/:tokenId', async (req, res) => {
   // Extract the query-parameter
   const widthString = req.query.w
   const heightString = req.query.h
-  const forceUpdateString = req.query.forceUpdate // true || false
+  const forceUpdateString = req.query.forceUpdate || 'false' // true || false
   const format = req.query.format
   const { path, tokenId } = req.params
 

@@ -749,18 +749,28 @@ const grapQLServer = new ApolloServer({
                 });
               };
 
-              const refresh = async (address = null, tokenId = null) => {
+              const refresh = async ({ frontLayerNft, backLayerNft }) => {
+                const { address: addressFront = '', tokenId: tokenIdFront = '' } = frontLayerNft || { address: '', tokenId: '' }
+                const { address: addressBack = '', tokenId: tokenIdBack = '' } = backLayerNft || { address: '', tokenId: '' }
                 try {
-                  // await fetch(`https://api.opensea.io/api/v1/asset/${address}/${tokenId}/?force_update=true`);
-                  await fetch(`${OPENSEA_NFT}/api/v1/asset/${address}/${tokenId}/?force_update=true`);
-                  console.log(`opensea refreshed ${tokenId}`);
+                  await fetch(`${OPENSEA_NFT}/api/v1/asset/${addressFront}/${tokenIdFront}/?force_update=true`);
+                  console.log(`opensea front refreshed ${tokenIdFront}`);
                   await wait(100);
                 } catch (err) {
-                  console.warn(`Unable to refresh cache: ${tokenId}`, err);
+                  console.warn(`Unable to opensea front refresh cache: ${tokenIdFront}`, err);
+                }
+
+                try {
+                  await fetch(`${OPENSEA_NFT}/api/v1/asset/${addressBack}/${tokenIdBack}/?force_update=true`);
+                  console.log(`opensea back refreshed ${tokenIdBack}`);
+                  await wait(100);
+                } catch (err) {
+                  console.warn(`Unable to opensea back refresh cache: ${tokenIdBack}`, err);
                 }
               };
 
-              refresh(backLayerNft?.address, backLayerNft?.tokenId)
+
+              refresh({ frontLayerNft: frontLayerNft, backLayerNft: backLayerNft })
               /* ------ Merge Attributes and refresh open sea ------ */
 
             } else {

@@ -760,7 +760,7 @@ const grapQLServer = new ApolloServer({
                 }
               };
 
-              refresh(address, backLayerNft?.tokenId)
+              refresh(backLayerNft?.address, backLayerNft?.tokenId)
               /* ------ Merge Attributes and refresh open sea ------ */
 
             } else {

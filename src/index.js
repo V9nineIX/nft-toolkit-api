@@ -40,7 +40,9 @@ import { mergeImage } from './utils/imageHelper'
 const { MerkleTree } = require('merkletreejs')
 const keccak256 = require('keccak256')
 import fetch from 'node-fetch';
+import { authenticate } from "./utils/authHelper"
 
+const { server, database } = config;
 
 
 const grapQLServer = new ApolloServer({
@@ -818,14 +820,19 @@ const grapQLServer = new ApolloServer({
       }
 
     },
-  }
+  },
+  context: ({ req }) => {
+     const status = authenticate(req , server.secretKey);
+     return { status };
+  },
+
 })
 
 
 
 
 
-const { server, database } = config;
+
 mongoose.connect(database.uri, database.options);
 
 const app = express();

@@ -6,6 +6,7 @@ const config = {
   server: {
     host: process.env.SERVER_IP || "localhost",
     port: process.env.SERVER_PORT || 3333,
+    secretKey: process.env.SECRET_KEY || '',
   },
   database: {
     name: "database",
